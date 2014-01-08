@@ -400,34 +400,6 @@ function isequal(tn::TimeNum, tn2::TimeNum)
     return equ
 end
 
-####################################
-## TimeNum mathematical operators ##
-####################################
-
-## delegate operators to dataframes
-macro timenum_unary(f)
-    esc(:($(f)(tn::TimeNum) = TimeNum($(f)(tn.vals), dates(tn))))
-end
-
-macroexpand(:(@timenum_unary +))
-
-## declares local variables only
-macro timenum_unary(f)
-    :($(f)(tn::TimeNum) = TimeData.TimeNum($(f)(tn.vals), dates(tn)))
-end
-
-## import Base.+
-## function +(tn::TimeNum)
-##     return TimeData.TimeNum(+(tn.vals), dates(tn))
-## end
-
-import Base.abs
-import Base.sign
-for f in (:abs, :sign, :-, :+, :*, :!)
-    @eval $f(tn::TimeNum) = TimeData.TimeNum($f(tn.vals), dates(tn))
-end
-
-
 ##########
 ## TODO ##
 ##########
