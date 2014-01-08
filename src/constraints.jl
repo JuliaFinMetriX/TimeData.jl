@@ -19,7 +19,8 @@ function chkNumDf(df::DataFrame)
     n = ncol(df)
     for ii=1:n
         ## check for numeric values
-        if(!issubtype(coltypes(df)[ii], Number))
+        if(!issubtype(coltypes(df)[ii], Number) &
+    !isequal(coltypes(df)[ii], NAtype))
             error("all columns must be numeric for conversion")
         end
     end
