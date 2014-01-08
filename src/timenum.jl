@@ -25,12 +25,14 @@ end
 ## TimeNum outer contructors ##
 ################################
 
+## multiple dates, multiple columns, core elements
 function TimeNum(vals::Array{Float64, 2},
                  names::Array{Union(UTF8String,ASCIIString),1},
                  dates::DataArray{Date{ISOCalendar},1})
     TimeNum(DataFrame(vals, names), dates)
 end
 
+## multiple dates, single column, core elements
 function TimeNum(vals::Array{Float64, 2},
                  names::Union(UTF8String,ASCIIString),
                  dates::DataArray{Date{ISOCalendar},1})
@@ -39,6 +41,7 @@ function TimeNum(vals::Array{Float64, 2},
     TimeNum(df, dates)
 end
 
+## multiple dates, single column, core elements
 function TimeNum(vals::Array{Float64, 1},
                  names::Union(UTF8String,ASCIIString),
                  dates::DataArray{Date{ISOCalendar},1})
@@ -47,6 +50,7 @@ function TimeNum(vals::Array{Float64, 1},
     TimeNum(df, dates)
 end
 
+## single date, multiple columns, core elements
 function TimeNum(vals::Array{Float64, 2},
                  names::Array{Union(UTF8String,ASCIIString),1},
                  dates::Date{ISOCalendar})
@@ -59,6 +63,7 @@ function TimeNum(vals::Array{Float64, 2},
     TimeNum(df, DataArray(dates))
 end
 
+## single date, multiple columns, core elements: manual names
 function TimeNum(vals::Array{Float64, 2},
                  names::Array{ASCIIString,1},
                  dates::Date{ISOCalendar})
@@ -71,6 +76,7 @@ function TimeNum(vals::Array{Float64, 2},
     TimeNum(df, DataArray(dates))
 end
 
+## single date, single column, core elements
 function TimeNum(vals::Float64,
                  names::Union(UTF8String,ASCIIString),
                  dates::Date{ISOCalendar})
@@ -79,6 +85,7 @@ function TimeNum(vals::Float64,
     TimeNum(df, DataArray(dates))
 end
 
+## multiple dates, multiple columns, core elements
 function TimeNum(vals::Array{Float64, 2},
                  dates::DataArray{Date{ISOCalendar},1},
                  names::Array{Union(UTF8String,ASCIIString),1})
@@ -113,6 +120,11 @@ function TimeNum(vals::Array{Float64, 2})
     dates = DataArray(Date, size(vals, 1))
     TimeNum(DataFrame(vals))
 end
+
+## if I manually construct an instance, I will use:
+## - Array{Float64, 2} or Array{Float64, 1}
+## - Array{ASCIIString, 1}
+## - Date{ISOCalendar}, Array{Date{ISOCalendar}, 1} or DataArray{Date{ISOCalendar},1}
 
 #############################
 ## TimeNum dislay methods ##
@@ -246,7 +258,10 @@ end
 
 import Base.size
 function size(tn::TimeNum)
-    return size(core(tn))
+    return size(tn.vals)
+end
+function size(tn::TimeNum, ind::Int)
+    return size(tn.vals, ind)
 end
 
 #######################
@@ -256,72 +271,162 @@ end
 typealias ColumnIndex Union(Real, String, Symbol)
 
 import Base.getindex
-function getindex(tn::TimeNum, col_ind::ColumnIndex)
-    ## select single column
-    selected_column = tn.vals.colindex[col_ind]
 
-    vals = tn.vals.columns[selected_column]
-    valsDf = DataFrame(vals)
-    name = colnames(tn)[selected_column]
-    colnames!(valsDf, [name])
+## Based on following DataFrame getindex behaviour:
+## isa(df[1:2], DataFrame)
+## isa(df[1:2, 3:4], DataFrame)
+## isa(df[1, 3:4], DataFrame)
+## isa(df[1], DataArray{Float64,1})        # loses column name
+## isa(df[2:4, 1], DataArray{Float64,1})   # loses column name
+## isa(df[2, 2], Float64)                  # loses column name
 
-    tnSelection = TimeNum(valsDf, dates(tn))
-    ## vals = DataFrame(getindex(tn.vals, col_ind))
-    ## tnSelection = TimeNum(vals, dates(tn))
-    return tnSelection
-end
-
+## select multiple columns
 function getindex{T <: ColumnIndex}(tn::TimeNum, col_inds::AbstractVector{T})
-    ## select multiple columns
-    valsDf = getindex(tn.vals, col_inds)
+    valsDf = getindex(tn.vals, col_inds) # dataframe
     return TimeNum(valsDf, dates(tn))
 end
 
-function getindex(tn::TimeNum, row_ind::Real, col_ind::ColumnIndex)
-    ## select single row and column index
-    selected_column = tn.vals.colindex[col_ind]
-
-    ## extract individual components
-    val = getindex(tn.vals, row_ind, col_ind)
-    name = colnames(tn)[selected_column]
-    dat = dates(tn)[row_ind]
-
-    ## manually attach colname and date again
-    return TimeNum(val, name, dat)
-end
-
-function getindex{T <: ColumnIndex}(tn::TimeNum, row_ind::Real,
-                                         col_inds::AbstractVector{T})
-    ## single row, multiple columns
-    df = getindex(tn.vals, row_ind, col_inds)
-    date = DataArray([dates(tn)[row_ind]])
-    return TimeNum(df, date)
-end
-
-function getindex{T <: Real}(tn::TimeNum, row_inds::AbstractVector{T},
-                             col_ind::ColumnIndex)
-    ## multiple rows, single column
-
-    ## get single column
-    tnCol = tn[col_ind]
-
-    ## get rows
-    vals = core(tnCol)[row_inds, 1]
-    dats = dates(tnCol)[row_inds]
-
-    return TimeNum(vals, colnames(tnCol)[1], dats)
-end
-
-# df[MultiRowIndex, MultiColumnIndex] => (Sub)?DataFrame
+## multiple rows, multiple columns
 function getindex{R <: Real, T <: ColumnIndex}(tn::TimeNum,
                                                row_inds::AbstractVector{R},
                                                col_inds::AbstractVector{T})
-    ## multiple rows, multiple columns
+    valsDf = getindex(tn.vals, row_inds, col_inds) # dataframe
+    dats = dates(tn)[row_inds]
+    return TimeNum(valsDf, dats)
+end
+
+## single row, multiple columns
+function getindex{T <: ColumnIndex}(tn::TimeNum, row_ind::Real,
+                                         col_inds::AbstractVector{T})
+    valsDf = getindex(tn.vals, row_ind, col_inds) # dataframe
+
+    dat = DataArray(dates(tn)[row_ind])
+    return TimeNum(valsDf, dat)
+end
+
+## select single column
+function getindex(tn::TimeNum, col_ind::ColumnIndex)
+    valsDa = getindex(tn.vals, col_ind) # dataarray
+
+    ## manually get column name
+    selected_column = tn.vals.colindex[col_ind]
+    name = colnames(tn)[selected_column] # ASCIIString
+
+    ## create respective dataframe
+    valsDf = DataFrame(valsDa)
+    colnames!(valsDf, [name])           # colnames must be given as
+                                        # array 
+
+    return TimeNum(valsDf, dates(tn))
+end
+
+## multiple rows, single column
+function getindex{T <: Real}(tn::TimeNum, row_inds::AbstractVector{T},
+                             col_ind::ColumnIndex)
+    valsDa = getindex(tn.vals, row_inds, col_ind) # dataarray
+
+    ## manually get column name
+    selected_column = tn.vals.colindex[col_ind]
+    name = colnames(tn)[selected_column] # ASCIIString
+
+    ## create respective dataframe
+    valsDf = DataFrame(valsDa)
+    colnames!(valsDf, [name])           # colnames must be given as
+                                        # array 
+
+    ## get dates
     dats = dates(tn)[row_inds]
 
-    df = getindex(tn.vals, row_inds, col_inds)
-    return TimeNum(df, dats)
+    return TimeNum(valsDf, dats)
 end
+
+## select single row and single column index
+function getindex(tn::TimeNum, row_ind::Real, col_ind::ColumnIndex)
+    val = getindex(tn.vals, row_ind, col_ind) # single value / NA
+
+    ## manually get column name
+    selected_column = tn.vals.colindex[col_ind]
+    name = colnames(tn)[selected_column] # ASCIIString
+
+    ## create respective dataframe
+    valDf = DataFrame(val)
+    colnames!(valDf, [name])           # colnames must be given as
+                                       # array 
+
+    ## single date needs to be transformed to DataArray
+    dat = DataArray(dates(tn)[row_ind])
+
+    return TimeNum(valDf, dat)
+end
+
+getindex(tn::TimeNum, ex::Expr) = getindex(tn, with(tn.vals, ex))
+getindex(tn::TimeNum, ex::Expr, c::ColumnIndex) =
+    getindex(tn, with(tn.vals, ex), c)
+
+## typealias ColumnIndex Union(Real, String, Symbol)
+getindex{T <: ColumnIndex}(tn::TimeNum, ex::Expr, c::AbstractVector{T}) =
+                               getindex(tn, with(tn.vals, ex), c)
+
+getindex(tn::TimeNum, c::Real, ex::Expr) =
+    getindex(tn, c, with(tn.vals, ex))
+getindex{T <: Real}(tn::TimeNum, c::AbstractVector{T}, ex::Expr) =
+    getindex(tn, c, with(tn.vals, ex))
+getindex(tn::TimeNum, ex1::Expr, ex2::Expr) =
+    getindex(tn, with(tn.vals, ex1), with(tn.vals, ex2))
+
+
+
+##############################
+## TimeNum logical indexing ##
+##############################
+
+import Base.ndims
+function ndims(tn::TimeNum)
+    return ndims(tn.vals)
+end
+
+## function getindex(tn::TimeNum, )
+
+
+#####################
+## TimeNum isequal ##
+#####################
+
+import Base.isequal
+function isequal(tn::TimeNum, tn2::TimeNum)
+    valsEqu = isequal(tn.vals, tn2.vals)
+    datesEqu = isequal(tn.dates, tn2.dates)
+    equ = (valsEqu & datesEqu)
+    return equ
+end
+
+####################################
+## TimeNum mathematical operators ##
+####################################
+
+## delegate operators to dataframes
+macro timenum_unary(f)
+    esc(:($(f)(tn::TimeNum) = TimeNum($(f)(tn.vals), dates(tn))))
+end
+
+macroexpand(:(@timenum_unary +))
+
+## declares local variables only
+macro timenum_unary(f)
+    :($(f)(tn::TimeNum) = TimeData.TimeNum($(f)(tn.vals), dates(tn)))
+end
+
+## import Base.+
+## function +(tn::TimeNum)
+##     return TimeData.TimeNum(+(tn.vals), dates(tn))
+## end
+
+import Base.abs
+import Base.sign
+for f in (:abs, :sign, :-, :+, :*, :!)
+    @eval $f(tn::TimeNum) = TimeData.TimeNum($f(tn.vals), dates(tn))
+end
+
 
 ##########
 ## TODO ##
