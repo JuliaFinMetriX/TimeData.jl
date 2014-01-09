@@ -8,16 +8,21 @@ module TimeData
 using DataFrames
 using DataArrays
 using Datetime
+using TimeSeries
 
 importall Base
 importall Stats
 
 export #
 str,
+TimeDf,
 TimeNum
+
+abstract AbstractTimeData
 
 include("constraints.jl")
 include("timenum.jl")
+include("timedf.jl")
 include("operators.jl")
 
 end
