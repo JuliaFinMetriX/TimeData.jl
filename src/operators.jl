@@ -1,3 +1,10 @@
+## possible delegation operators
+## f(tn) = f(tn.vals)
+## f(tn, args...) = f(tn.vals, args...)
+## f(tn1, tn2) = f(tn1.vals, tn2.vals)
+## f(args1..., tn, args2...) = f(args1..., tn.vals, args2...)
+## Never define f(x::Any, tn): this will lead to method ambiguities
+
 const unary_operators = [:(+), :(-), :(!), :(*)]
 
 const numeric_unary_operators = [:(+), :(-)]
@@ -142,7 +149,7 @@ macro timenum_binary(f)
             if dates(tn) != dates(tn2)
                 error("dates of TimeNum instances are different")
             end
-            return TimeNum($(f)(tn.vals, tn.vals2), dates(tn))
+            return TimeNum($(f)(tn.vals, tn2.vals), dates(tn))
         end
         @swappable $(f)(tn::TimeNum, b::Union(Number, String)) =
             TimeNum($(f)(tn.vals, b), dates(tn))
@@ -150,6 +157,7 @@ macro timenum_binary(f)
             TimeNum($(f)(tn.vals, b), dates(tn))
     end)
 end
+
 
 # Unary operators, DataFrames
 @timenum_unary !
@@ -196,7 +204,6 @@ end
 
 for f in (:&, :|, :$)
     @eval begin
-        # DataFrame
         @timenum_binary $(f)
     end
 end
@@ -219,6 +226,7 @@ for sf in scalar_comparison_operators
         @timenum_binary $vf
     end
 end
+
 
 #
 # Binary operators
