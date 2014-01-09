@@ -7,7 +7,7 @@
 ## - dates and vals must have same number of observations
 ## - values must be numeric
 
-type TimeNum
+type TimeNum <: AbstractTimeData
     vals::DataFrame
     dates::DataArray
 
@@ -442,6 +442,51 @@ function isna(tn::TimeNum)
     return isna(tn.vals)
 end
 
+
+############################
+## read and write to disk ##
+############################
+
+function readTimeNum(filename::String)
+
+    df = readtable(filename, nastrings=[".", "", "NA"])
+    
+    # find columns that have been parsed as Strings by readtable
+    col_to_test = String[]
+
+    for col_data in df[1,:]
+        typeof(df[1,col_data[1]]) == UTF8String?
+        push!(col_to_test, col_data[1]):
+        nothing
+    end
+
+    # test each column's data to see if Datetime will parse it
+    col_that_pass = String[]
+
+    for colname in col_to_test
+        d = match(r"[-|\s|\/|.]", df[1,colname])
+        d !== nothing? (bar = split(df[1, colname], d.match)): (bar = [])
+        if length(bar) == 3
+            push!(col_that_pass, colname)
+        end
+    end
+
+    # parse first column that passes the Datetime regex test
+    datesArr = Date[date(d) for d in df[col_that_pass[1]]] # without
+                                        # Date it would fail chkDates
+                                        # in constructor
+    dates = DataArray(datesArr)
+    
+    delete!(df, [col_that_pass[1]])
+    return TimeNum(df, dates)
+end
+
+function writeTimeNum(filename::String, tn::TimeNum)
+    ## create large dataframe
+    datesDf = DataFrame(dates = dates(tn));
+    df = [datesDf tn.vals];
+    writetable(filename, df)
+end
 
 ##########
 ## TODO ##
