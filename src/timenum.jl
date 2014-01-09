@@ -25,71 +25,34 @@ end
 ## TimeNum outer contructors ##
 ################################
 
-## multiple dates, multiple columns, core elements
+## no names or dates (just simulated values)
+function TimeNum(vals::Array{Float64, 2})
+    dates = DataArray(Date, size(vals, 1))
+    TimeNum(DataFrame(vals), dates)
+end
+
+## from core elements
 function TimeNum(vals::Array{Float64, 2},
                  names::Array{Union(UTF8String,ASCIIString),1},
-                 dates::DataArray{Date{ISOCalendar},1})
-    TimeNum(DataFrame(vals, names), dates)
-end
-
-## multiple dates, single column, core elements
-function TimeNum(vals::Array{Float64, 2},
-                 names::Union(UTF8String,ASCIIString),
-                 dates::DataArray{Date{ISOCalendar},1})
-    df = DataFrame(vals)
-    colnames!(df, [names])
-    TimeNum(df, dates)
-end
-
-## multiple dates, single column, core elements
-function TimeNum(vals::Array{Float64, 1},
-                 names::Union(UTF8String,ASCIIString),
-                 dates::DataArray{Date{ISOCalendar},1})
-    df = DataFrame(vals)
-    colnames!(df, [names])
-    TimeNum(df, dates)
-end
-
-## single date, multiple columns, core elements
-function TimeNum(vals::Array{Float64, 2},
-                 names::Array{Union(UTF8String,ASCIIString),1},
-                 dates::Date{ISOCalendar})
-    ## only valid if vals are row vector
-    if size(vals, 1) > 1
-        error("Only one date given, but called with multiple
-                 observations")
-    end
+                 dates::DataArray{Date{ISOCalendar}, 1})
     df = DataFrame(vals, names)
-    TimeNum(df, DataArray(dates))
+    return TimeNum(df, dates)
 end
 
-## single date, multiple columns, core elements: manual names
-function TimeNum(vals::Array{Float64, 2},
-                 names::Array{ASCIIString,1},
-                 dates::Date{ISOCalendar})
-    ## only valid if vals are row vector
-    if size(vals, 1) > 1
-        error("Only one date given, but called with multiple
-                 observations")
-    end
-    df = DataFrame(vals, names)
-    TimeNum(df, DataArray(dates))
-end
-
-## single date, single column, core elements
-function TimeNum(vals::Float64,
-                 names::Union(UTF8String,ASCIIString),
-                 dates::Date{ISOCalendar})
+## comprehensive constructor: very general, all elements
+function TimeNum{T<:Array, K<:Array, S<:Array}(vals::T, names::K, dates::S) 
     df = DataFrame(vals)
-    colnames!(df, [names])
-    TimeNum(df, DataArray(dates))
+    colnames!(df, names)
+    return TimeNum(df, DataArray(dates))
 end
-
-## multiple dates, multiple columns, core elements
-function TimeNum(vals::Array{Float64, 2},
-                 dates::DataArray{Date{ISOCalendar},1},
-                 names::Array{Union(UTF8String,ASCIIString),1})
-    TimeNum(DataFrame(vals, names), dates)
+    
+## two inputs only, general form
+function TimeNum{T<:Array, S<:Array}(vals::T, names::S)
+    if isa(names[1], Date)
+        TimeNum(DataFrame(vals), DataArray(names))
+    else
+        TimeNum(DataFrame(vals, names))
+    end
 end
 
 ## no dates
@@ -98,28 +61,102 @@ function TimeNum(vals::DataFrame)
     tn = TimeNum(vals, dates)
 end
 
-## no dates
-function TimeNum(vals::Array{Float64, 2},
-                 names::Array{Union(UTF8String,ASCIIString),1})
-    TimeNum(DataFrame(vals, names))
-end
-
 ## no names
 function TimeNum(vals::Array{Float64, 2}, dates::DataArray)
     TimeNum(DataFrame(vals), dates)
 end
 
-## no names
-function TimeNum(vals::Array{Float64, 2},
-                 dates::Array{Date{ISOCalendar},1})
-    TimeNum(DataFrame(vals), DataArray(dates))
-end
 
-## no names or dates
-function TimeNum(vals::Array{Float64, 2})
-    dates = DataArray(Date, size(vals, 1))
-    TimeNum(DataFrame(vals))
-end
+## ## no dates
+## function TimeNum(vals::Array{Float64, 2},
+##                  names::Array{Union(UTF8String,ASCIIString),1})
+##     TimeNum(DataFrame(vals, names))
+## end
+
+## ## no names
+## function TimeNum(vals::Array{Float64, 2},
+##                  dates::Array{Date{ISOCalendar},1})
+##     TimeNum(DataFrame(vals), DataArray(dates))
+## end
+
+####################################
+
+
+## ## multiple dates, multiple columns, core elements
+## function TimeNum(vals::Array{Float64, 2},
+##                  names::Array{Union(UTF8String,ASCIIString),1},
+##                  dates::DataArray{Date{ISOCalendar},1})
+##     TimeNum(DataFrame(vals, names), dates)
+## end
+
+## ## multiple dates, single column, core elements
+## function TimeNum(vals::Array{Float64, 2},
+##                  names::Union(UTF8String,ASCIIString),
+##                  dates::DataArray{Date{ISOCalendar},1})
+##     df = DataFrame(vals)
+##     colnames!(df, [names])
+##     TimeNum(df, dates)
+## end
+
+## ## multiple dates, single column, core elements
+## function TimeNum(vals::Array{Float64, 1},
+##                  names::Union(UTF8String,ASCIIString),
+##                  dates::DataArray{Date{ISOCalendar},1})
+##     df = DataFrame(vals)
+##     colnames!(df, [names])
+##     TimeNum(df, dates)
+## end
+
+## ## single date, multiple columns, core elements
+## function TimeNum(vals::Array{Float64, 2},
+##                  names::Array{Union(UTF8String,ASCIIString),1},
+##                  dates::Date{ISOCalendar})
+##     ## only valid if vals are row vector
+##     if size(vals, 1) > 1
+##         error("Only one date given, but called with multiple
+##                  observations")
+##     end
+##     df = DataFrame(vals, names)
+##     TimeNum(df, DataArray(dates))
+## end
+
+## ## single date, multiple columns, core elements: manual names
+## function TimeNum(vals::Array{Float64, 2},
+##                  names::Array{ASCIIString,1},
+##                  dates::Date{ISOCalendar})
+##     ## only valid if vals are row vector
+##     if size(vals, 1) > 1
+##         error("Only one date given, but called with multiple
+##                  observations")
+##     end
+##     df = DataFrame(vals, names)
+##     TimeNum(df, DataArray(dates))
+## end
+
+## ## single date, single column, core elements
+## function TimeNum(vals::Float64,
+##                  names::Union(UTF8String,ASCIIString),
+##                  dates::Date{ISOCalendar})
+##     df = DataFrame(vals)
+##     colnames!(df, [names])
+##     TimeNum(df, DataArray(dates))
+## end
+
+## ## multiple dates, multiple columns, core elements
+## function TimeNum(vals::Array{Float64, 2},
+##                  dates::DataArray{Date{ISOCalendar},1},
+##                  names::Array{Union(UTF8String,ASCIIString),1})
+##     TimeNum(DataFrame(vals, names), dates)
+## end
+
+
+
+## getindex never breaks parts deeper than dataframe in order to cope
+## with NAs -> only uses TimeNum(df::DataFrame, da::DataArray)
+
+## sometimes instances will represent simulated data, and hence could
+## be built from Arrays directly, missing dates or names ->
+## constructor for elementary parts, with some parts missing
 
 ## if I manually construct an instance, I will use:
 ## - Array{Float64, 2} or Array{Float64, 1}
@@ -399,6 +436,12 @@ function isequal(tn::TimeNum, tn2::TimeNum)
     equ = (valsEqu & datesEqu)
     return equ
 end
+
+import DataFrames.isna
+function isna(tn::TimeNum)
+    return isna(tn.vals)
+end
+
 
 ##########
 ## TODO ##
