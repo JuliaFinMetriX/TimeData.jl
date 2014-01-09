@@ -25,37 +25,74 @@ valsArr = ones(8, 4)
 ## test outer constructors ##
 #############################
 
+## general idea:
+## - major order: values, names, dates
+## - comprehensive constructor built on arrays
+
+## inner constructor: with true field types
+vals = DataFrame([2., 3, 4])
 dates = [date(2013, 7, 1),
          date(2013, 7, 2),
          date(2013, 7, 3)]
 dates = DataArray(dates)         
-TimeData.TimeNum(vals, dates)
+tn = TimeData.TimeNum(vals, dates)
 
+## from core elements
+vals = TimeData.core(tn)
+names = TimeData.colnames(tn)
+dates = TimeData.dates(tn)
+TimeData.TimeNum(vals, names, dates)
+
+## with numeric data only
+vals = rand(4, 3)
 TimeData.TimeNum(vals)
 
-valsArr = ones(8, 4)
-TimeData.TimeNum(valsArr)
+## values and dates
+vals = [2., 3, 4]
+dates = [date(2013, 7, 1),
+         date(2013, 7, 2),
+         date(2013, 7, 3)]
+TimeData.TimeNum(vals, dates)
 
+## values and names
+vals = rand(4, 3)
+nams = ["X", "Y", "Z"]
+TimeData.TimeNum(vals, nams)
+
+## clean dates, sloppy values without names
 dates = [date(2013, 7, 1),
          date(2013, 7, 2),
          date(2013, 7, 3)]
 dates = DataArray(dates)
-valsArr = ones(3, 4)
-TimeData.TimeNum(valsArr, dates)
+vals = rand(3, 4)
+TimeData.TimeNum(vals, dates)
 
-tmp = TimeData.TimeNum(3.0, "Z4", date(2013, 7, 1))
-
-tmp = TimeData.TimeNum([1.0, 4, 3], "Z4", dates)
-tmp = TimeData.TimeNum([1.0 4 3], ["Z1", "Z2", "W3"], dates[1])
-
+## single variable -> expressed as array
 dates = [date(2013, 7, 1),
          date(2013, 7, 2),
          date(2013, 7, 3)]
-valsArr = ones(3, 4)
-tmp = TimeData.TimeNum(valsArr, dates)
+tmp = TimeData.TimeNum([1.0, 4, 3], ["Z4"], dates)
+
+## single date -> expressed as array
+dates = date(2013, 7, 1)
+tmp = TimeData.TimeNum([1.0 4 3], ["Z1", "Z2", "W3"], [dates])
+
+
+#####################
+## other functions ##
+#####################
 
 ## test str
 TimeData.str(tmp)
+
+tmp = setupTestInstance()
+df = tmp.vals
+for ii=1:size(df, 2)
+    da = df[ii]
+    da[isna(da)] = 0
+    df[ii] = da
+end
+tmp = TimeData.TimeNum(df, TimeData.dates(tmp))
 
 ## test mean
 TimeData.mean(tmp)
@@ -69,10 +106,8 @@ vals = TimeData.core(tmp)
 nams = TimeData.vars(tmp)
 dats = TimeData.dates(tmp)
 tmp2 = TimeData.TimeNum(vals, nams, dats)
-tmp3 = TimeData.TimeNum(vals, dats, nams)
+@test_throws TimeData.TimeNum(vals, dats, nams)
 @test isequal(tmp, tmp2)
-@test isequal(tmp3, tmp2)
-@test isequal(tmp, tmp3)
 
 ##################
 ## test isequal ##
@@ -108,11 +143,7 @@ df[2, 2] = NA
 df[3, 4] = NA
 df[4, 4] = NA
 
-dates = [date(2013, 7, 1),
-         date(2013, 7, 2),
-         date(2013, 7, 3),
-         date(2013, 7, 4),
-         date(2013, 7, 5)]
+dates = [date(2013, 7, ii) for ii=1:5]
          
 tn = TimeData.TimeNum(df, DataArray(dates))
 
