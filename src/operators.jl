@@ -5,47 +5,164 @@
 ## f(args1..., tn, args2...) = f(args1..., tn.vals, args2...)
 ## Never define f(x::Any, tn): this will lead to method ambiguities
 
-const scalar_comparison_operators = [:(==), :(!=), :(>), :(>=),
-                                     :(<), :(<=)]
-const arithmetic_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/), :(./),
-                              :(.^), :(div), :(mod), :(fld), :(rem)]
+
+#########################################
+## Swappable operators preserving type ##
+#########################################
+## Swappable operators come with five possible calls: 
+## .^(a::DataFrame,b::DataFrame)
+## .^(a::DataFrame,b::Union(String,Number))
+## .^(b::Union(String,Number),a::DataFrame)
+## .^(a::DataFrame,b::NAtype)
+## .^(b::NAtype,a::DataFrame)
+
+## elementwise: * and / excluded -> should mean matrix multiplication
+## for Timenum
+const element_wise_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*),
+                                     :(/), :(./), :(.^)]
+const element_wise_operators_ext = [:(div), :(mod), :(fld), :(rem)]
+
+## $(f)(td::Timedata, td2::Timedata) =
+##     Timedata($(f)(td.vals, td2.vals))
+macro swap_type(f, myType)
+    esc(quote
+        $(f)(inst::$(myType), inst2::$(myType)) =
+            $(myType)($(f)(inst.vals, inst2.vals), dates(inst))
+
+        $(f)(inst::$(myType),b::Union(String,Number)) =
+            $(myType)($(f)(inst.val,b), dates(inst))
+        
+        $(f)(b::Union(String,Number),inst::$(myType)) =
+            $(myType)($(f)(b,inst.val), dates(inst))
+
+        $(f)(inst::$(myType),b::NAtype) =
+            $(myType)($(f)(inst.val,b), dates(inst))
+        
+        $(f)(b::NAtype,inst::$(myType)) =
+            $(myType)($(f)(b,inst.val), dates(inst))
+    end)
+end
+
+swap_type_operators = [element_wise_operators,
+                       element_wise_operators_ext]
+
+importall Base
+
+for t = (:Timedata, :Timenum, :Timematr)
+    for f in swap_type_operators
+        ## print(macroexpand(:(@swap_type($f, $t))))
+        eval(macroexpand(:(@swap_type($f, $t))))        
+        ## @eval begin
+        ##     @swap_type $(f) $(t)
+        ## end
+    end
+end
+
+## function +(inst::Timedata,inst2::Timedata) # none, line 3:
+##     Timedata(+(inst.vals,inst2.vals),dates(inst))
+## end # line 6:
 
 
-## const unary_operators = [:(+), :(-), :(!), :(*)]
-## const numeric_unary_operators = [:(+), :(-)]
-## const logical_unary_operators = [:(!)]
-## const elementary_functions = [:abs, :sign, :acos, :acosh, :asin,
-##                               :asinh, :atan, :atanh, :sin, :sinh,
-##                               :cos, :cosh, :tan, :tanh, :ceil, :floor,
-##                               :round, :trunc, :exp, :exp2, :expm1, :log, :log10, :log1p,
-##                               :log2, :exponent, :sqrt, :gamma, :lgamma, :digamma,
-##                               :erf, :erfc]
-## const two_argument_elementary_functions = [:round, :ceil, :floor, :trunc]
-## const special_comparison_operators = [:isless]
-## const comparison_operators = [:(==), :(.==), :(!=), :(.!=),
-##                               :(>), :(.>), :(>=), :(.>=), :(<), :(.<),
-##                               :(<=), :(.<=)]
-## const array_comparison_operators = [:(.==), :(.!=), :(.>), :(.>=), :(.<), :(.<=)]
-## const vectorized_comparison_operators = [(:(.==), :(==)), (:(.!=), :(!=)),
-##                                          (:(.>), :(>)), (:(.>=), :(>=)),
-##                                          (:(.<), :(<)), (:(.<=), :(<=))]
-## const binary_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/), :(./),
-##                           :(.^), :(div), :(mod), :(fld), :(rem)]
-## const induced_binary_operators = [:(^)]
-## const induced_arithmetic_operators = [:(^)]
-## const biscalar_operators = [:(max), :(min)]
-## const scalar_arithmetic_operators = [:(+), :(-), :(*), :(/),
-##                                      :(div), :(mod), :(fld), :(rem)]
-## const induced_scalar_arithmetic_operators = [:(^)]
-## const array_arithmetic_operators = [:(+), :(.+), :(-), :(.-), :(.*), :(.^)]
-## const bit_operators = [:(&), :(|), :($)]
+############################################
+## no function arguments, preserving type ##
+############################################
+
+const unary_operators = [:(+), :(-)]    # [:(*), :(/)]
+
+const mathematical_functions = [:abs, :sign,
+                                :acos, :acosh, :asin, :asinh,
+                                :atan, :atanh, :sin, :sinh, :cos, 
+                                :cosh, :tan, :tanh, :exp, :exp2,
+                                :expm1, :log, :log10, :log1p,
+                                :log2, :exponent, :sqrt, :gamma,
+                                :lgamma, :digamma, :erf, :erfc]
+
+## $(f)(td::Timedata) = Timedata($(f)(td.vals, dates(td))
+macro timedata_unary(f, myType)
+    esc(quote
+        $(f)(inst::$(myType)) =
+            $(myType)($(f)(inst.vals), dates(inst))
+    end)
+end
+
+unary_type_operators = [unary_operators, mathematical_functions]
+
+for t = (:Timedata, :Timenum, :Timematr)
+    for f in unary_type_operators
+        ## @timedata_unary f t
+        eval(macroexpand(:(@timedata_unary($f, $t))))                
+    end
+end
+
+##########################################################
+## Swappable operators, returning logical type Timedata ##
+##########################################################
+
+const element_wise_comparisons = [:(.==), :(.!=), :(.>), :(.>=),
+                                     :(.<), :(.<=)]
+
+const element_wise_logicals = [:(&), :(|), :($)]
+
+macro logical_ops(f)
+    esc(quote
+        $(f)(inst::AbstractTimeData, inst2::AbstractTimeData) =
+            Timedata($(f)(inst.vals, inst2.vals), dates(inst))
+
+        $(f)(inst::AbstractTimeData,b::Union(String,Number)) =
+            Timedata($(f)(inst.val,b), dates(inst))
+        
+        $(f)(b::Union(String,Number),inst::AbstractTimeData) =
+            Timedata($(f)(b,inst.val), dates(inst))
+
+        $(f)(inst::AbstractTimeData,b::NAtype) =
+            Timedata($(f)(inst.val,b), dates(inst))
+        
+        $(f)(b::NAtype,inst::AbstractTimeData) =
+            Timedata($(f)(b,inst.val), dates(inst))
+    end)
+end
+
+swap_operators_timedata = [element_wise_comparisons,
+                           element_wise_logicals]
+
+for f in swap_operators_timedata
+    eval(macroexpand(:(@logical_ops($f))))                    
+    ## @logical_ops f
+end
+
+########################################
+## varargs functions, preserving type ##
+########################################
+
+const rounding_operators = [:round, :ceil, :floor, :trunc] 
+
+## $(f)(td::Timedata, args...) = Timedata($(f)(td.vals, args...), dates(td))
+macro varargs_type(f, myType)
+    esc(quote
+        $(f)(inst::$(myType), args...) =
+            $(myType)($(f)(inst.vals, args...), dates(inst))
+    end)
+end
+
+varargs_type_functions = rounding_operators
+
+for t = (:Timedata, :Timenum, :Timematr)
+    for f in varargs_type_functions
+        ## @varargs_type f t
+        eval(macroexpand(:(@varargs_type($f, $t))))                        
+    end
+end
+
+###########################
+## statistical functions ##
+###########################
+
+## some need additional input for dimension
+## const stat_functions = [:(mean), :(cov)]
 ## const unary_vector_operators = [:minimum, :maximum, :prod, :sum, :mean, :median, :std,
 ##                                 :var, :mad, :norm, :skewness, :kurtosis]
-# TODO: dist, iqr, rle, inverse_rle
 ## const pairwise_vector_operators = [:diff, :reldiff]#, :percent_change]
 ## const cumulative_vector_operators = [:cumprod, :cumsum, :cumsum_kbn, :cummin, :cummax]
-## const ffts = [:fft]
-## const binary_vector_operators = [:dot, :cor, :cov, :cor_spearman]
 ## const rowwise_operators = [:rowmins, :rowmaxs, :rowprods, :rowsums,
 ##                            :rowmeans, :rowmedians, :rowstds, :rowvars,
 ##                            :rowffts, :rownorms]
@@ -54,227 +171,4 @@ const arithmetic_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/), :(./)
 ##                             :colffts, :colnorms]
 ## const boolean_operators = [:any, :all]
 
-# Swap arguments to fname() anywhere in AST. Returns the number of
-# arguments swapped
-function swapargs(ast::Expr, fname::Symbol)
-    if ast.head == :call &&
-       (ast.args[1] == fname ||
-        (isa(ast.args[1], Expr) && ast.args[1].head == :curly &&
-         ast.args[1].args[1] == fname)) &&
-       length(ast.args) == 3
 
-        ast.args[2], ast.args[3] = ast.args[3], ast.args[2]
-        1
-    else
-        n = 0
-        for arg in ast.args
-            n += swapargs(arg, fname)
-        end
-        n
-    end
-end
-function swapargs(ast, fname::Symbol)
-    ast
-    0
-end
-
-# Return a block consisting of both the given function and a copy of
-# the function in which arguments to the function itself and any
-# 2-argument calls to a function of the same name are swapped
-macro swappable(func, syms...)
-    if (func.head != :function && func.head != :(=)) ||
-       func.args[1].head != :call || length(func.args[1].args) != 3
-        error("@swappable may only be applied to functions of two arguments")
-    end
-    
-    func2 = deepcopy(func)
-    fname = func2.args[1].args[1]
-    if isa(fname, Expr)
-        if fname.head == :curly
-            fname = fname.args[1]
-        else
-            error("Unexpected function name $fname")
-        end
-    end
-
-    for s in unique([fname, syms...])
-        if swapargs(func2, s) < 1
-            error("No argument swapped")
-        end
-    end
-    esc(Expr(:block, func, func2))
-end
-
-#
-# Unary operator macros for DataFrames and DataArrays
-#
-
-macro timedata_unary(f)
-    esc(quote
-        $(f)(tn::TimeNum) = TimeNum($(f)(tn.vals), dates(tn))
-        $(f)(tdf::TimeDf) = TimeDf($(f)(tdf.vals), dates(tdf))
-    end)    
-end
-
-#
-# Binary operator macros for DataFrames and DataArrays
-#
-
-macro timedata_binary(f)
-    esc(quote
-        function $(f)(tn::TimeNum, tn2::TimeNum)
-            if dates(tn) != dates(tn2)
-                error("dates of TimeNum instances are different")
-            end
-            return TimeNum($(f)(tn.vals, tn2.vals), dates(tn))
-        end
-        @swappable $(f)(tn::TimeNum, b::Union(Number, String)) =
-            TimeNum($(f)(tn.vals, b), dates(tn))
-        @swappable $(f)(tn::TimeNum, b::NAtype) =
-            TimeNum($(f)(tn.vals, b), dates(tn))
-
-        function $(f)(tdf::TimeDf, tdf2::TimeDf)
-            if dates(tdf) != dates(tdf2)
-                error("dates of TimeDf instances are different")
-            end
-            return TimeNum($(f)(tdf.vals, tdf2.vals), dates(tdf))
-        end
-        @swappable $(f)(tdf::TimeDf, b::Union(Number, String)) =
-            TimeDf($(f)(tdf.vals, b), dates(tdf))
-        @swappable $(f)(tdf::TimeDf, b::NAtype) =
-            TimeDf($(f)(tdf.vals, b), dates(tdf))
-    end)
-end
-
-
-# Unary operators, DataFrames
-@timedata_unary !
-@timedata_unary -
-
-# As in Base, these are identity operators
-for f in (:(+), :(*))
-    @eval $(f)(tn::TimeNum) = tn
-    @eval $(f)(tdf::TimeDf) = tdf
-end
-
-#
-# Elementary functions
-#
-# XXX: The below should be revisited once we have a way to infer what
-# the proper return type of an array should be.
-
-# One-argument elementary functions that return the same type as their
-# inputs
-for f in (:abs, :sign)
-    @eval begin
-        @timedata_unary $(f)
-    end
-end
-
-# One-argument elementary functions that always return floating points
-for f in (:acos, :acosh, :asin, :asinh, :atan, :atanh, :sin, :sinh, :cos,
-          :cosh, :tan, :tanh, :exp, :exp2, :expm1, :log, :log10, :log1p,
-          :log2, :exponent, :sqrt, :gamma, :lgamma, :digamma, :erf, :erfc)
-    @eval begin
-        @timedata_unary $(f)
-    end
-end
-
-# Elementary functions that take varargs
-for f in (:round, :ceil, :floor, :trunc)
-    @eval begin
-        $(f)(tn::TimeNum, args::Integer...) =
-            TimeNum($(f)(tn.vals, args...), dates(tn))
-
-        $(f)(tdf::TimeDf, args::Integer...) =
-            TimeDf($(f)(tdf.vals, args...), dates(tdf))
-    end
-end
-
-#
-# Bit operators
-#
-
-for f in (:&, :|, :$)
-    @eval begin
-        @timedata_binary $(f)
-    end
-end
-
-## function isequal(df1::AbstractDataFrame, df2::AbstractDataFrame)
-##     if size(df1, 2) != size(df2, 2)
-##         return false
-##     end
-##     for idx in 1:size(df1, 2)
-##         if !isequal(df1[idx], df2[idx])
-##             return false
-##         end
-##     end
-##     return true
-## end
-
-for sf in scalar_comparison_operators
-    vf = symbol(".$sf")
-    @eval begin
-        @timedata_binary $vf
-    end
-end
-
-
-#
-# Binary operators
-#
-
-for f in arithmetic_operators
-    @eval begin
-        @timedata_binary $f
-    end
-end
-
-## for f in (:minimum, :maximum, :prod, :sum, :mean, :median, :std, :var, :norm)
-##     colf = symbol("col$(f)s")
-##     rowf = symbol("row$(f)s")
-##     @eval begin
-##         function ($colf)(df::AbstractDataFrame)
-##             p = ncol(df)
-##             res = DataFrame()
-##             for j in 1:p
-##                 res[j] = DataArray(($f)(df[j]))
-##             end
-##             colnames!(res, colnames(df))
-##             return res
-##         end
-##     end
-## end
-
-#
-# Boolean operators
-#
-
-## function all(df::AbstractDataFrame)
-##     for i in 1:size(df, 2)
-##         x = all(df[i])
-##         if isna(x)
-##             return NA
-##         end
-##         if !x
-##             return false
-##         end
-##     end
-##     true
-## end
-
-## function any(df::AbstractDataFrame)
-##     has_na = false
-##     for i in 1:size(df, 2)
-##         x = any(df[i])
-##         if !isna(x)
-##             if x
-##                 return true
-##             end
-##         else
-##             has_na = true
-##         end
-##     end
-##     has_na ? NA : false
-## end
