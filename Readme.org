@@ -1,0 +1,53 @@
+* Why?
+- alternative: Dates as first column of DataFrame
+- Problems:
+  - mean(df) 
+    - has to be adjusted for first column: mean(df[:, 2:end])
+
+  - overload plot methods
+  - models will return simulated data without dates
+    - evaluating portfolio returns should be robust to both real data
+      with dates and simulated data without dates
+    - any(isna(df[:, 2:end]))
+
+* Behaviour 
+As DataFrame most likely will become the most important type in data
+analysis, Timedata types should behave as similar to DataFrames as
+possible. Hence, behaviour should be inherited with only few
+exceptions. 
+
+* Inheritance
+In object oriented programming, this is possible through
+classes: subclasses will automatically inherit the behaviour of
+superclasses. 
+
+This kind of inheritance can easily be emulated in Julia through
+types, although composite types generally are not allowed to be
+supertypes (only abstract types have subtypes). One simply needs to
+define a new composite type which owns a field of the respective
+"supertype", and delegate all functionality that should be inherited
+to this field. 
+
+#+BEGIN_SRC julia
+f(myType) = f(myType.superclass)
+#+END_SRC
+
+However, looking at delegation in more detail, one needs to
+distinguish between two types of methods:
+- type preserving methods
+- non-preserving methods
+
+** Non-preserving methods
+#+BEGIN_SRC julia
+   f(myType) = f(myType.superclass)
+#+END_SRC
+
+** Type preserving methods
+#+BEGIN_SRC julia
+   function f(myType)
+       superclassResult = f(myType.superclass)
+       return myType(superclassResult)
+   end
+#+END_SRC
+
+* Inheritance

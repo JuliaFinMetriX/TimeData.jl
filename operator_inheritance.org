@@ -1,8 +1,8 @@
 * Operator / function inheritance
 
 Two types of function:
-1. returning superclass 
-2. returning third type
+1. type preserving methods
+2. non-preserving methods
 
 ** Field of superclass
 
