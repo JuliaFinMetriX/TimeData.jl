@@ -1,17 +1,17 @@
 ##############################
-## TimeData display methods ##
+## Timedata display methods ##
 ##############################
 
-function str(tn::AbstractTimeData)
+function str(tn::AbstractTimedata)
     ## display information about an array
     
     ## set display parameters
-    maxDispRows = 5;
+    maxDispRows = Inf;
     maxDispCols = 5;
     
     ## get type and field information
-    ## TODO: print subtype
-    println("\ntype: TimeData")    
+    typ = typeof(tn)
+    println("\ntype: $typ")    
     nms = names(tn)
     ## types = DataType[]
     for fieldname in nms
@@ -48,15 +48,16 @@ function str(tn::AbstractTimeData)
 end
 
 import Base.Multimedia.display
-function display(tn::AbstractTimeData)
+function display(tn::AbstractTimedata)
     ## display information about an array
     
     ## set display parameters
-    maxDispRows = 5;
+    maxDispRows = Inf;
     maxDispCols = 5;
     
     ## get type and field information
-    println("\ntype: TimeData")
+    typ = typeof(tn)
+    println("\ntype: $typ")    
     print("dimensions: ")
     print(size(tn.vals))
     print("\n")
@@ -74,37 +75,33 @@ function display(tn::AbstractTimeData)
 end
 
 ####################################
-## TimeData information retrieval ##
+## Timedata information retrieval ##
 ####################################
 
-function dates(tn::AbstractTimeData)
+function dates(tn::AbstractTimedata)
     return tn.dates
 end
 
-function vars(tn::AbstractTimeData)
-    return colnames(tn.vals)
-end
-
 import DataFrames.colnames
-function colnames(tn::AbstractTimeData)
+function colnames(tn::AbstractTimedata)
     return colnames(tn.vals)
 end
 
 ###################
-## TimeData size ##
+## Timedata size ##
 ###################
 
 import Base.size
-function size(tn::AbstractTimeData)
+function size(tn::AbstractTimedata)
     return size(tn.vals)
 end
 
-function size(tn::AbstractTimeData, ind::Int)
+function size(tn::AbstractTimedata, ind::Int)
     return size(tn.vals, ind)
 end
 
 import Base.ndims
-function ndims(tn::AbstractTimeData)
+function ndims(tn::AbstractTimedata)
     return ndims(tn.vals)
 end
 
@@ -113,7 +110,7 @@ end
 ######################
 
 import Base.isequal
-function isequal(tn::AbstractTimeData, tn2::AbstractTimeData)
+function isequal(tn::AbstractTimedata, tn2::AbstractTimedata)
     typeEqu = isequal(typeof(tn), typeof(tn2))
     valsEqu = isequal(tn.vals, tn2.vals)
     datesEqu = isequal(tn.dates, tn2.dates)
@@ -127,7 +124,7 @@ end
 ##########
 
 import DataFrames.isna
-function isna(tn::AbstractTimeData)
+function isna(tn::AbstractTimedata)
     Timedata(isna(tn.vals), dates(tn))
     return isna(tn.vals)
 end
