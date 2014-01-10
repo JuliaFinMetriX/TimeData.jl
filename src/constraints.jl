@@ -25,3 +25,14 @@ function chkNumDf(df::DataFrame)
         end
     end
 end
+
+############################################
+## check for numeric values only - no NAs ##
+############################################
+
+function chkNum(df::DataFrame)
+    if any(isna(df))
+        error("no NAs allowed in TimeMatr")
+    end
+    chkNumDf(df)
+end
