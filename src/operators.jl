@@ -105,19 +105,19 @@ const element_wise_logicals = [:(&), :(|), :($)]
 
 macro logical_ops(f)
     esc(quote
-        $(f)(inst::AbstractTimeData, inst2::AbstractTimeData) =
+        $(f)(inst::AbstractTimedata, inst2::AbstractTimedata) =
             Timedata($(f)(inst.vals, inst2.vals), dates(inst))
 
-        $(f)(inst::AbstractTimeData,b::Union(String,Number)) =
+        $(f)(inst::AbstractTimedata,b::Union(String,Number)) =
             Timedata($(f)(inst.val,b), dates(inst))
         
-        $(f)(b::Union(String,Number),inst::AbstractTimeData) =
+        $(f)(b::Union(String,Number),inst::AbstractTimedata) =
             Timedata($(f)(b,inst.val), dates(inst))
 
-        $(f)(inst::AbstractTimeData,b::NAtype) =
+        $(f)(inst::AbstractTimedata,b::NAtype) =
             Timedata($(f)(inst.val,b), dates(inst))
         
-        $(f)(b::NAtype,inst::AbstractTimeData) =
+        $(f)(b::NAtype,inst::AbstractTimedata) =
             Timedata($(f)(b,inst.val), dates(inst))
     end)
 end
@@ -146,12 +146,12 @@ end
 
 varargs_type_functions = rounding_operators
 
-for t = (:Timedata, :Timenum, :Timematr)
-    for f in varargs_type_functions
-        ## @varargs_type f t
-        eval(macroexpand(:(@varargs_type($f, $t))))                        
-    end
-end
+## for t = (:Timedata, :Timenum, :Timematr)
+##     for f in varargs_type_functions
+##         ## @varargs_type f t
+##         eval(macroexpand(:(@varargs_type($f, $t))))                        
+##     end
+## end
 
 ###########################
 ## statistical functions ##
