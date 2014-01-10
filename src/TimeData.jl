@@ -14,15 +14,18 @@ importall Base
 importall Stats
 
 export #
+AbstractTimeData,
 str,
-TimeDf,
-TimeNum
-
-abstract AbstractTimeData
+Timedata,
+Timematr,
+Timenum
 
 include("constraints.jl")
+include("timedata.jl")
 include("timenum.jl")
-include("timedf.jl")
+include("timematr.jl")
+## include("timedf.jl")
 include("operators.jl")
+include("abstractFuncs.jl")
 
 end
