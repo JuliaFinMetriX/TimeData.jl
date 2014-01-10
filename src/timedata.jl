@@ -1,6 +1,7 @@
-abstract AbstractTimeData
+abstract AbstractTimedata
+abstract AbstractTimenum <: AbstractTimedata
 
-type Timedata <: AbstractTimeData
+type Timedata <: AbstractTimedata
     vals::DataFrame
     dates::DataArray
 
@@ -10,4 +11,18 @@ type Timedata <: AbstractTimeData
         end
         return new(vals, dates)
     end
+end
+
+#################
+## Conversions ##
+#################
+
+## conversion downwards: fails for non-numeric values
+function convert(Timenum, td::Timedata)
+    Timenum(td.vals, td.dates)
+end
+
+## conversion downwards: fails for NAs
+function convert(Timematr, td::Timedata)
+    Timematr(td.vals, td.dates)
 end
