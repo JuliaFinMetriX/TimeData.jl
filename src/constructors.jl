@@ -4,6 +4,11 @@
 
 for t = (:Timedata, :Timenum, :Timematr)
     @eval begin
+        
+        ###########################
+        ## shortcuts without NAs ##
+        ###########################
+        
         ## no names or dates (just simulated values)
         function $(t)(vals::Array{Float64, 2})
             dates = DataArray(Date, size(vals, 1))
@@ -12,8 +17,8 @@ for t = (:Timedata, :Timenum, :Timematr)
         
         ## from core elements
         function $(t)(vals::Array{Float64, 2},
-                         names::Array{Union(UTF8String,ASCIIString),1},
-                         dates::DataArray{Date{ISOCalendar}, 1})
+                      names::Array{Union(UTF8String,ASCIIString),1},
+                      dates::DataArray{Date{ISOCalendar}, 1})
             df = DataFrame(vals, names)
             return $(t)(df, dates)
         end
@@ -34,11 +39,19 @@ for t = (:Timedata, :Timenum, :Timematr)
             end
         end
         
+        ###################
+        ## NAs in values ##
+        ###################
+        
         ## no dates
         function $(t)(vals::DataFrame)
             dates = DataArray(Date, size(vals, 1))
             tn = $(t)(vals, dates)
         end
+        
+        ##################
+        ## NAs in dates ##
+        ##################
         
         ## no names
         function $(t)(vals::Array{Float64, 2}, dates::DataArray)
