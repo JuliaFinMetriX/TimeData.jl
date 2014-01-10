@@ -172,3 +172,5 @@ varargs_type_functions = rounding_operators
 ## const boolean_operators = [:any, :all]
 
 
+## still missing:
+## assign, ref, sub, copy, %, merge, flipud, delete!, deepcopy, similar, empty!
