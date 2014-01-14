@@ -50,4 +50,3 @@ distinguish between two types of methods:
    end
 #+END_SRC
 
-* Inheritance
