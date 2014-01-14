@@ -1,20 +1,13 @@
-## possible delegation operators
-## f(tn) = f(tn.vals)
-## f(tn, args...) = f(tn.vals, args...)
-## f(tn1, tn2) = f(tn1.vals, tn2.vals)
-## f(args1..., tn, args2...) = f(args1..., tn.vals, args2...)
-## Never define f(x::Any, tn): this will lead to method ambiguities
+#######################################################
+## type preserving symmetric operators and functions ##
+#######################################################
 
-
-#########################################
-## Swappable operators preserving type ##
-#########################################
-## Swappable operators come with five possible calls: 
-## .^(a::DataFrame,b::DataFrame)
-## .^(a::DataFrame,b::Union(String,Number))
-## .^(b::Union(String,Number),a::DataFrame)
-## .^(a::DataFrame,b::NAtype)
-## .^(b::NAtype,a::DataFrame)
+## symmetric operators and functions with method signatures: 
+## f(b::NAtype, inst::NewType)
+## f(inst::NewType, b::NAtype)
+## f(inst::NewType, b::NewType)
+## f(inst::NewType, b::Union(String,Number))
+## f(b::Union(String,Number), inst::NewType)
 
 ## elementwise: * and / excluded -> should mean matrix multiplication
 ## for Timenum
@@ -22,10 +15,22 @@ const element_wise_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*),
                                      :(/), :(./), :(.^)]
 const element_wise_operators_ext = [:(div), :(mod), :(fld), :(rem)]
 
-## $(f)(td::Timedata, td2::Timedata) =
-##     Timedata($(f)(td.vals, td2.vals))
-macro swap_type(f, myType)
+
+## type preserving symmetric operations and functions
+##
+## f(b::NAtype, inst::NewType) = NewType(f(b, inst.vals), dates(inst)) 
+## f(inst::NewType, b::NAtype) = NewType(f(inst.vals, b), dates(inst))
+## f(inst::NewType, inst2::NewType) = NewType(f(inst1.vals, inst2.vals), dates(inst))
+## f(inst::NewType, b::Union(String,Number)) = NewType(f(inst.vals, b), dates(inst))
+## f(b::Union(String,Number), inst::NewType) = NewType(f(b, inst.vals), dates(inst))
+macro pres_msSymmetric(f, myType)
     esc(quote
+        $(f)(inst::$(myType),b::NAtype) =
+            $(myType)($(f)(inst.val,b), dates(inst))
+        
+        $(f)(b::NAtype,inst::$(myType)) =
+            $(myType)($(f)(b,inst.val), dates(inst))
+
         $(f)(inst::$(myType), inst2::$(myType)) =
             $(myType)($(f)(inst.vals, inst2.vals), dates(inst))
 
@@ -34,24 +39,18 @@ macro swap_type(f, myType)
         
         $(f)(b::Union(String,Number),inst::$(myType)) =
             $(myType)($(f)(b,inst.val), dates(inst))
-
-        $(f)(inst::$(myType),b::NAtype) =
-            $(myType)($(f)(inst.val,b), dates(inst))
-        
-        $(f)(b::NAtype,inst::$(myType)) =
-            $(myType)($(f)(b,inst.val), dates(inst))
     end)
 end
 
-swap_type_operators = [element_wise_operators,
-                       element_wise_operators_ext]
+pres_msSymmetric_functions = [element_wise_operators,
+                              element_wise_operators_ext]
 
 importall Base
 
 for t = (:Timedata, :Timenum, :Timematr)
-    for f in swap_type_operators
+    for f in pres_msSymmetric_functions
         ## print(macroexpand(:(@swap_type($f, $t))))
-        eval(macroexpand(:(@swap_type($f, $t))))        
+        eval(macroexpand(:(@pres_msSymmetric($f, $t))))        
         ## @eval begin
         ##     @swap_type $(f) $(t)
         ## end
@@ -62,10 +61,9 @@ end
 ##     Timedata(+(inst.vals,inst2.vals),dates(inst))
 ## end # line 6:
 
-
-############################################
-## no function arguments, preserving type ##
-############################################
+#################################################
+## type preserving functions without arguments ##
+#################################################
 
 const unary_operators = [:(+), :(-)]    # [:(*), :(/)]
 
