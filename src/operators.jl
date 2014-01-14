@@ -15,6 +15,8 @@ const element_wise_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*),
                                      :(/), :(./), :(.^)]
 const element_wise_operators_ext = [:(div), :(mod), :(fld), :(rem)]
 
+pres_msSymmetric_functions = [element_wise_operators,
+                              element_wise_operators_ext]
 
 ## type preserving symmetric operations and functions
 ##
@@ -42,9 +44,6 @@ macro pres_msSymmetric(f, myType)
     end)
 end
 
-pres_msSymmetric_functions = [element_wise_operators,
-                              element_wise_operators_ext]
-
 importall Base
 
 for t = (:Timedata, :Timenum, :Timematr)
@@ -57,13 +56,12 @@ for t = (:Timedata, :Timenum, :Timematr)
     end
 end
 
-## function +(inst::Timedata,inst2::Timedata) # none, line 3:
-##     Timedata(+(inst.vals,inst2.vals),dates(inst))
-## end # line 6:
-
 #################################################
 ## type preserving functions without arguments ##
 #################################################
+
+## type preserving functions with method signature:
+## f(inst::NewType)
 
 const unary_operators = [:(+), :(-)]    # [:(*), :(/)]
 
@@ -75,33 +73,46 @@ const mathematical_functions = [:abs, :sign,
                                 :log2, :exponent, :sqrt, :gamma,
                                 :lgamma, :digamma, :erf, :erfc]
 
+pres_msUnitary_functions = [unary_operators, mathematical_functions]
+
 ## $(f)(td::Timedata) = Timedata($(f)(td.vals, dates(td))
-macro timedata_unary(f, myType)
+macro pres_msUnitary(f, myType)
     esc(quote
         $(f)(inst::$(myType)) =
             $(myType)($(f)(inst.vals), dates(inst))
     end)
 end
 
-unary_type_operators = [unary_operators, mathematical_functions]
+
 
 for t = (:Timedata, :Timenum, :Timematr)
     for f in unary_type_operators
         ## @timedata_unary f t
-        eval(macroexpand(:(@timedata_unary($f, $t))))                
+        eval(macroexpand(:(@pres_msUnitary($f, $t))))                
     end
 end
 
-##########################################################
-## Swappable operators, returning logical type Timedata ##
-##########################################################
+######################################################
+## non-preserving symmetric functions and operators ##
+######################################################
+
+## symmetric operators and functions with method signatures: 
+## f(b::NAtype, inst::NewType)
+## f(inst::NewType, b::NAtype)
+## f(inst::NewType, b::NewType)
+## f(inst::NewType, b::Union(String,Number))
+## f(b::Union(String,Number), inst::NewType)
 
 const element_wise_comparisons = [:(.==), :(.!=), :(.>), :(.>=),
                                      :(.<), :(.<=)]
 
 const element_wise_logicals = [:(&), :(|), :($)]
 
-macro logical_ops(f)
+nonpres_msSymmetric_functions = [element_wise_comparisons,
+                           element_wise_logicals]
+
+
+macro nonpres_msSymmetric(f)
     esc(quote
         $(f)(inst::AbstractTimedata, inst2::AbstractTimedata) =
             Timedata($(f)(inst.vals, inst2.vals), dates(inst))
@@ -120,36 +131,38 @@ macro logical_ops(f)
     end)
 end
 
-swap_operators_timedata = [element_wise_comparisons,
-                           element_wise_logicals]
-
-for f in swap_operators_timedata
-    eval(macroexpand(:(@logical_ops($f))))                    
+for f in nonpres_msSymmetric_functions
+    eval(macroexpand(:(@nonpres_msSymmetric($f))))                    
     ## @logical_ops f
 end
 
-########################################
-## varargs functions, preserving type ##
-########################################
+#########################################################
+## type preserving functions, single or extra argument ##
+#########################################################
 
-const rounding_operators = [:round, :ceil, :floor, :trunc] 
+## symmetric operators and functions with method signatures: 
+## f(inst::NewType)
+## f(inst::NewType, i::Integer)
 
-## $(f)(td::Timedata, args...) = Timedata($(f)(td.vals, args...), dates(td))
-macro varargs_type(f, myType)
+const rounding_operators = [:round, :ceil, :floor, :trunc]
+
+pres_msSingle_or_extra_functions = rounding_operators
+
+## f(td::NewType) = NewType(f(td.vals), dates(td))
+## f(td::NewType, i::Integer) = NewType(f(td.vals, i), dates(td))
+macro pres_msSingle_or_extra(f, myType)
     esc(quote
         $(f)(inst::$(myType), args...) =
             $(myType)($(f)(inst.vals, args...), dates(inst))
     end)
 end
 
-varargs_type_functions = rounding_operators
-
-## for t = (:Timedata, :Timenum, :Timematr)
-##     for f in varargs_type_functions
-##         ## @varargs_type f t
-##         eval(macroexpand(:(@varargs_type($f, $t))))                        
-##     end
-## end
+for t = (:Timedata, :Timenum, :Timematr)
+    for f in pres_msSingle_or_extra_functions
+        ## @varargs_type f t
+        eval(macroexpand(:(@pres_msSingle_or_extra($f, $t))))
+    end
+end
 
 ###########################
 ## statistical functions ##
