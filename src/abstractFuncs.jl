@@ -125,6 +125,5 @@ end
 
 import DataFrames.isna
 function isna(tn::AbstractTimedata)
-    Timedata(isna(tn.vals), dates(tn))
-    return isna(tn.vals)
+    return Timedata(isna(tn.vals), dates(tn))
 end
