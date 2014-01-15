@@ -1,9 +1,16 @@
 * What? Why?
 
 The goal of the package TimeData is to provide fast, robust and
-convenient handling of time series data. This shall be achieved
-through introduction of new composite types that match the
-characteristics of several types of time series data more closely.
+convenient representation of time series data. This shall be achieved
+through introduction of several new composite types that match the
+characteristics of various types of time series data more closely.
+
+#+BEGIN_SRC julia 
+a = [1 2 3]
+#+END_SRC
+
+#+RESULTS:
+| 1 | 2 | 3 |
 
 Main points:
 (- alternative: Dates as first column of DataFrame)
