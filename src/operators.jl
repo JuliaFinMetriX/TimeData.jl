@@ -74,11 +74,8 @@ const mathematical_functions = [:abs, :sign,
 
 pres_msUnitary_functions = [unary_operators, mathematical_functions]
 
-
-
-
 for t = (:Timedata, :Timenum, :Timematr)
-    for f in unary_type_operators
+    for f in pres_msUnitary_functions
         ## @timedata_unary f t
         eval(macroexpand(:(@pres_msUnitary($f, $t))))                
     end
@@ -137,8 +134,10 @@ end
 ## f(td::NewType, i::Integer) = NewType(f(td.vals, i), dates(td))
 macro pres_msSingle_or_extra(f, myType)
     esc(quote
-        $(f)(inst::$(myType), args...) =
-            $(myType)($(f)(inst.vals, args...), dates(inst))
+        $(f)(inst::$(myType)) =
+            $(myType)($(f)(inst.vals), dates(inst))
+        $(f)(inst::$(myType), i::Integer) =
+            $(myType)($(f)(inst.vals, i), dates(inst))
     end)
 end
 
