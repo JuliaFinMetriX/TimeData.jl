@@ -8,18 +8,6 @@
 ## test exception throwing in constructor ##
 ############################################
 
-## dates initialized with wrong type
-vals = DataFrame([2, 3, 4])
-dates = DataArray([1, 2, 3])
-@test_throws TimeDataTypes.TimeNum(vals, dates)
-
-## dates and vals sizes not matching
-dates = [date(2013, 7, 1),
-         date(2013, 7, 2),
-         date(2013, 7, 3)]
-dates = DataArray(dates)
-valsArr = ones(8, 4)
-@test_throws TimeDataTypes.TimeNum(valsArr, dates)
 
 #############################
 ## test outer constructors ##
@@ -35,30 +23,30 @@ dates = [date(2013, 7, 1),
          date(2013, 7, 2),
          date(2013, 7, 3)]
 dates = DataArray(dates)         
-tn = TimeDataTypes.TimeNum(vals, dates)
+tn = TimeData.TimeNum(vals, dates)
 
 ## from core elements
-vals = TimeDataTypes.core(tn)
-names = TimeDataTypes.colnames(tn)
-dates = TimeDataTypes.dates(tn)
-tn2 = TimeDataTypes.TimeNum(vals, names, dates)
+vals = TimeData.core(tn)
+names = TimeData.colnames(tn)
+dates = TimeData.dates(tn)
+tn2 = TimeData.TimeNum(vals, names, dates)
 @test isequal(tn, tn2)
 
 ## with numeric data only
 vals = rand(4, 3)
-TimeDataTypes.TimeNum(vals)
+TimeData.TimeNum(vals)
 
 ## values and dates
 vals = [2., 3, 4]
 dates = [date(2013, 7, 1),
          date(2013, 7, 2),
          date(2013, 7, 3)]
-TimeDataTypes.TimeNum(vals, dates)
+TimeData.TimeNum(vals, dates)
 
 ## values and names
 vals = rand(4, 3)
 nams = ["X", "Y", "Z"]
-TimeDataTypes.TimeNum(vals, nams)
+TimeData.TimeNum(vals, nams)
 
 ## clean dates, sloppy values without names
 dates = [date(2013, 7, 1),
@@ -66,17 +54,17 @@ dates = [date(2013, 7, 1),
          date(2013, 7, 3)]
 dates = DataArray(dates)
 vals = rand(3, 4)
-TimeDataTypes.TimeNum(vals, dates)
+TimeData.TimeNum(vals, dates)
 
 ## single variable -> expressed as array
 dates = [date(2013, 7, 1),
          date(2013, 7, 2),
          date(2013, 7, 3)]
-tmp = TimeDataTypes.TimeNum([1.0, 4, 3], ["Z4"], dates)
+tmp = TimeData.TimeNum([1.0, 4, 3], ["Z4"], dates)
 
 ## single date -> expressed as array
 dates = date(2013, 7, 1)
-tmp = TimeDataTypes.TimeNum([1.0 4 3], ["Z1", "Z2", "W3"], [dates])
+tmp = TimeData.TimeNum([1.0 4 3], ["Z1", "Z2", "W3"], [dates])
 
 
 #####################
@@ -84,7 +72,7 @@ tmp = TimeDataTypes.TimeNum([1.0 4 3], ["Z1", "Z2", "W3"], [dates])
 #####################
 
 ## test str
-TimeDataTypes.str(tmp)
+TimeData.str(tmp)
 
 tmp = setupTestInstance()
 df = tmp.vals
@@ -93,21 +81,21 @@ for ii=1:size(df, 2)
     da[isna(da)] = 0
     df[ii] = da
 end
-tmp = TimeDataTypes.TimeNum(df, TimeDataTypes.dates(tmp))
+tmp = TimeData.TimeNum(df, TimeData.dates(tmp))
 
 ## test mean
-TimeDataTypes.mean(tmp)
-TimeDataTypes.mean(tmp, 1)
+TimeData.mean(tmp)
+TimeData.mean(tmp, 1)
 
-@test_throws TimeDataTypes.mean(tmp, 2)
+@test_throws TimeData.mean(tmp, 2)
 
-TimeDataTypes.rowmeans(tmp)
+TimeData.rowmeans(tmp)
 
-vals = TimeDataTypes.core(tmp)
-nams = TimeDataTypes.vars(tmp)
-dats = TimeDataTypes.dates(tmp)
-tmp2 = TimeDataTypes.TimeNum(vals, nams, dats)
-@test_throws TimeDataTypes.TimeNum(vals, dats, nams)
+vals = TimeData.core(tmp)
+nams = TimeData.vars(tmp)
+dats = TimeData.dates(tmp)
+tmp2 = TimeData.TimeNum(vals, nams, dats)
+@test_throws TimeData.TimeNum(vals, dats, nams)
 @test isequal(tmp, tmp2)
 
 ##################
@@ -119,10 +107,10 @@ dates = [date(2013, 7, 1),
          date(2013, 7, 3)]
 valsArr = repmat([1. 2 3], 3, 1)
 
-tmp = TimeDataTypes.TimeNum(valsArr, dates)
-tmp2 = TimeDataTypes.TimeNum(valsArr, dates)
+tmp = TimeData.TimeNum(valsArr, dates)
+tmp2 = TimeData.TimeNum(valsArr, dates)
 
-@test TimeDataTypes.isequal(tmp, tmp2)
+@test TimeData.isequal(tmp, tmp2)
 
 ##################################
 ## getindex DataFrame behaviour ##
@@ -146,7 +134,7 @@ df[4, 4] = NA
 
 dates = [date(2013, 7, ii) for ii=1:5]
          
-tn = TimeDataTypes.TimeNum(df, DataArray(dates))
+tn = TimeData.TimeNum(df, DataArray(dates))
 
 ## multiple columns
 tn[1:2]
@@ -179,10 +167,10 @@ tn[1, 1]
 ## create TimeNum test instance 
 tn = setupTestInstance()
 
-@test isequal(TimeDataTypes.ndims(tn), 2)
-@test isequal(TimeDataTypes.size(tn), (5, 4))
-@test isequal(TimeDataTypes.size(tn, 1), 5)
-@test isequal(TimeDataTypes.size(tn, 2), 4)
+@test isequal(TimeData.ndims(tn), 2)
+@test isequal(TimeData.size(tn), (5, 4))
+@test isequal(TimeData.size(tn, 1), 5)
+@test isequal(TimeData.size(tn, 2), 4)
 
 ## create bolean vector
 bol = tn.vals[1] .> 3
@@ -220,7 +208,7 @@ function setupTestInstance()
              date(2013, 7, 3),
              date(2013, 7, 4),
              date(2013, 7, 5)]
-    tn = TimeDataTypes.TimeNum(df, DataArray(dates))
+    tn = TimeData.TimeNum(df, DataArray(dates))
     return tn
 end    
 
@@ -229,7 +217,7 @@ tn = setupTestInstance()
 -tn
 +tn
 ## !tn
-TimeDataTypes.abs(tn)
+TimeData.abs(tn)
 sign(tn)
 sign(-tn)
 
