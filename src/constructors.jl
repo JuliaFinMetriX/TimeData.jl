@@ -2,6 +2,10 @@
 ## outer contructors ##
 #######################
 
+## concept:
+## If no NA values are present, initialization could be done more
+## easily with arrays.
+
 for t = (:Timedata, :Timenum, :Timematr)
     @eval begin
         
@@ -46,6 +50,12 @@ for t = (:Timedata, :Timenum, :Timematr)
         ## no dates
         function $(t)(vals::DataFrame)
             dates = DataArray(Date, size(vals, 1))
+            tn = $(t)(vals, dates)
+        end
+
+        ## dates as array
+        function $(t)(vals::DataFrame, dates::Array)
+            dates = DataArray(dates)
             tn = $(t)(vals, dates)
         end
         
