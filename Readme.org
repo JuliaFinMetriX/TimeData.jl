@@ -1,3 +1,8 @@
+#+OPTIONS: eval:never-export
+#+PROPERTY: exports both
+#+PROPERTY: results output
+#+PROPERTY: session *julia*
+
 * What? Why?
 
 The goal of the package TimeData is to provide fast, robust and
@@ -6,11 +11,52 @@ through introduction of several new composite types that match the
 characteristics of various types of time series data more closely.
 
 #+BEGIN_SRC julia 
-a = [1 2 3]
+   using TimeData
+   
+   dates = [date(2013, 1, ii) for ii=1:4];
+   tn = Timenum(rand(4, 3), ["A", "B", "C"], dates);
+   str(tn)
 #+END_SRC
 
 #+RESULTS:
-| 1 | 2 | 3 |
+#+begin_example
+
+type: Timenum
+:vals  		  DataFrame
+:dates  		  DataArray{T,N}
+
+dimensions: (4,3)
+
+-------------------------------------------
+From: 2013-01-01, To: 2013-01-04
+-------------------------------------------
+
+4x4 DataFrame:
+             dates        A        B        C
+[1,]    2013-01-01 0.253634 0.902882 0.504933
+[2,]    2013-01-02  0.77589 0.281316  0.75411
+[3,]    2013-01-03 0.701701 0.842502 0.022901
+[4,]    2013-01-04 0.302652 0.194639 0.377064
+#+end_example
+
+#+BEGIN_SRC julia
+tn[1:2]
+#+END_SRC
+
+#+RESULTS:
+: 
+: type: Timenum
+: dimensions: (4,2)
+: 4x3 DataFrame:
+:              dates        A        B
+: [1,]    2013-01-01 0.253634 0.902882
+: [2,]    2013-01-02  0.77589 0.281316
+: [3,]    2013-01-03 0.701701 0.842502
+: [4,]    2013-01-04 0.302652 0.194639
+
+#+BEGIN_SRC julia
+   tn["B"]
+#+END_SRC
 
 Main points:
 (- alternative: Dates as first column of DataFrame)
