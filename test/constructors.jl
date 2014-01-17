@@ -6,12 +6,22 @@ using DataFrames
 using Datetime
 using TimeData
 
+println("\n Running constructor tests\n")
+
 ## init test values
 vals = rand(30, 4)
 dats = [date(2013, 7, ii) for ii=1:30]
 nams = ["A", "B", "C", "D"]
 valsDf = DataFrame(vals, nams)
 datsDa = DataArray(dats)
+
+########################
+## inner constructors ##
+########################
+
+td = TimeData.Timedata(valsDf, datsDa)
+td = TimeData.Timenum(valsDf, datsDa)
+td = TimeData.Timematr(valsDf, datsDa)
 
 #######################################
 ## shortcuts from arrays without NAs ##
