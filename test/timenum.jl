@@ -4,26 +4,15 @@
 
 ## using Base.Test
 
-############################################
-## test exception throwing in constructor ##
-############################################
+## reconstructing Timenum instance from core elements
+td = TimeData.Timenum(vals, nams, dats)
+vals2 = TimeData.core(td)
+nams2 = TimeData.colnames(td)
+dats2 = TimeData.dates(td)
+td2 = TimeData.Timenum(vals2, nams2, dats2)
+@test TimeData.isequal(td, td2)
 
-
-#############################
-## test outer constructors ##
-#############################
-
-## general idea:
-## - major order: values, names, dates
-## - comprehensive constructor built on arrays
-
-## inner constructor: with true field types
-vals = DataFrame([2., 3, 4])
-dates = [date(2013, 7, 1),
-         date(2013, 7, 2),
-         date(2013, 7, 3)]
-dates = DataArray(dates)         
-tn = TimeData.TimeNum(vals, dates)
+core is only defined for 
 
 ## from core elements
 vals = TimeData.core(tn)
