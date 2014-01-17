@@ -115,7 +115,6 @@ function isequal(tn::AbstractTimedata, tn2::AbstractTimedata)
     valsEqu = isequal(tn.vals, tn2.vals)
     datesEqu = isequal(tn.dates, tn2.dates)
     equ = (valsEqu & datesEqu & typeEqu)
-    ## check for equal type
     return equ
 end
 

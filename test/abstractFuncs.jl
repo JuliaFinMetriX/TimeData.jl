@@ -4,21 +4,23 @@ using Base.Test
 using DataArrays
 using DataFrames
 using Datetime
-## using TimeData
+using TimeData
 
-## define macro for expressions that return nothing 
-macro returnsNothing(ex)
-    :(isa($ex, Nothing))
-end
+println("\n Running abstract function tests\n")
 
 ## create instance
-dats = [date(2013, 7, ii) for ii=1:30]
 vals = rand(30, 4)
-tn = TimeData.Timematr(vals, dats)
+dats = [date(2013, 7, ii) for ii=1:30]
+nams = ["A", "B", "C", "D"]
 
-## test dates
-@test isequal(TimeData.dates(tn), DataArray(dats))
-TimeData.colnames(tn)
+## test information retrieval functions
+for t = (:Timedata, :Timenum, :Timematr)
+    eval(quote
+        td = $(t)(vals, nams, dats)
+        @test isequal(colnames(td), nams)
+        @test isequal(TimeData.dates(td), DataArray(dats))
+    end)
+end
 
 
 end
