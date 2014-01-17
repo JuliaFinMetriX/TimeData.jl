@@ -35,3 +35,10 @@ function convert(Timematr, tn::Timenum)
     Timematr(tn.vals, tn.dates)
 end
 
+###################
+## get core data ##
+###################
+
+function core(tn::Timenum)
+    return matrix(tn.vals)
+end
