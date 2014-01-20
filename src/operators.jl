@@ -12,19 +12,19 @@
 macro pres_msSymmetric(f, myType)
     esc(quote
         $(f)(inst::$(myType),b::NAtype) =
-            $(myType)($(f)(inst.val,b), dates(inst))
+            $(myType)($(f)(inst.vals,b), dates(inst))
         
         $(f)(b::NAtype,inst::$(myType)) =
-            $(myType)($(f)(b,inst.val), dates(inst))
+            $(myType)($(f)(b,inst.vals), dates(inst))
 
         $(f)(inst::$(myType), inst2::$(myType)) =
             $(myType)($(f)(inst.vals, inst2.vals), dates(inst))
 
         $(f)(inst::$(myType),b::Union(String,Number)) =
-            $(myType)($(f)(inst.val,b), dates(inst))
+            $(myType)($(f)(inst.vals,b), dates(inst))
         
         $(f)(b::Union(String,Number),inst::$(myType)) =
-            $(myType)($(f)(b,inst.val), dates(inst))
+            $(myType)($(f)(b,inst.vals), dates(inst))
     end)
 end
 
@@ -94,19 +94,19 @@ end
 macro nonpres_msSymmetric(f)
     esc(quote
         $(f)(b::NAtype,inst::AbstractTimedata) =
-            Timedata($(f)(b,inst.val), dates(inst))
+            Timedata($(f)(b,inst.vals), dates(inst))
 
         $(f)(inst::AbstractTimedata,b::NAtype) =
-            Timedata($(f)(inst.val,b), dates(inst))
+            Timedata($(f)(inst.vals,b), dates(inst))
         
         $(f)(inst::AbstractTimedata, inst2::AbstractTimedata) =
             Timedata($(f)(inst.vals, inst2.vals), dates(inst))
 
         $(f)(inst::AbstractTimedata,b::Union(String,Number)) =
-            Timedata($(f)(inst.val,b), dates(inst))
+            Timedata($(f)(inst.vals,b), dates(inst))
         
         $(f)(b::Union(String,Number),inst::AbstractTimedata) =
-            Timedata($(f)(b,inst.val), dates(inst))
+            Timedata($(f)(b,inst.vals), dates(inst))
     end)
 end
 
