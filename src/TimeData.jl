@@ -30,5 +30,6 @@ include("getindex.jl")
 include("operators.jl")
 include("abstractFuncs.jl")
 include("io.jl")
+include("financial.jl")
 
 end
