@@ -27,7 +27,8 @@ function readTimedata(filename::String)
     end
 
     # parse first column that passes the Datetime regex test
-    datesArr = Date[date(d) for d in df[col_that_pass[1]]] # without
+    datesArr = Date{ISOCalendar}[date(d) for d in
+                                 df[col_that_pass[1]]] # without
                                         # Date it would fail chkDates
                                         # in constructor
     dates = DataArray(datesArr)
@@ -37,14 +38,16 @@ function readTimedata(filename::String)
     ## try whether DataFrame fits subtypes
     try
         td = Timematr(df, dates)
+        return td        
     catch
         try
             td = Timenum(df, dates)
+            return td
         catch
             td = Timedata(df, dates)
+            return td
         end
     end
-    return td
 end
 
 function writeTimedata(filename::String, td::AbstractTimedata)
