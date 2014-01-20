@@ -63,8 +63,8 @@ function display(tn::AbstractTimedata)
     print("\n")
     
     ## get first entries
-    nrow = length(tn.vals[:, 1]);
-    ncol = length(tn.vals[1, :]);
+    nrow = size(tn.vals, 1)
+    ncol = size(tn.vals, 2)
 
     showRows = minimum([maxDispRows nrow]);
     showCols = minimum([maxDispCols ncol]);
