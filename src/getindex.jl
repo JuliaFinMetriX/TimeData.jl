@@ -102,11 +102,11 @@ for t = (:Timedata, :Timenum, :Timematr)
             
             return $(t)(valDf, dat)
         end
-
+        
         #############################################################
         ## assumed as type preserving without further tests so far ##
         #############################################################
-
+        
         getindex(td::$(t), ex::Expr) = getindex(td, with(td.vals, ex))
         getindex(td::$(t), ex::Expr, c::ColumnIndex) =
             getindex(td, with(td.vals, ex), c)
@@ -121,13 +121,36 @@ for t = (:Timedata, :Timenum, :Timematr)
             getindex(td, c, with(td.vals, ex))
         getindex(td::$(t), ex1::Expr, ex2::Expr) =
             getindex(td, with(td.vals, ex1), with(td.vals, ex2))
+
+        #########################
+        ## indexing with dates ##
+        #########################
+
+        function getindex(td::$(t), date::Date)
+            row_ind = dates(td) .== date
+            return td[row_ind, :]
+        end
+        
+        function getindex(td::$(t), dates::Array{Date{ISOCalendar},1})
+            datesDa = DataArray(dates)
+            row_inds = findin(TimeData.dates(td), datesDa)
+            return td[row_inds, :]
+        end
+        
+        function getindex(td::$(t), dates::Array{Date{ISOCalendar},1}, x::Any)
+            datesDa = DataArray(dates)
+            row_inds = findin(TimeData.dates(td), datesDa)
+            return td[row_inds, x]
+        end
+        
+        function getindex(td::$(t), dates::DateRange{ISOCalendar})
+            return getindex(td, [dates])
+        end
+        
+        function getindex(td::$(t), dates::DateRange{ISOCalendar},
+                                   x::Any)
+            return getindex(td, [dates], x)
+        end
         
     end
 end
-
-##########
-## TODO ##
-##########
-
-## - logical indexing
-## - indexing with dates
