@@ -15,11 +15,15 @@ type Timenum <: AbstractTimenum
         chkDates(dates)
         chkNumDf(vals)
         if(size(vals, 1) != length(dates))
+            if (length(dates) == 0) | (size(vals, 1) == 0)
+                return new(DataFrame([]), DataArray([]))
+            end
             error("number of dates must equal number of columns of data")
         end
         return new(vals, dates)
     end
 end
+
 
 #################
 ## Conversions ##
@@ -33,12 +37,4 @@ end
 ## conversion downwards: fails for NAs
 function convert(Timematr, tn::Timenum)
     Timematr(tn.vals, tn.dates)
-end
-
-###################
-## get core data ##
-###################
-
-function core(tn::Timenum)
-    return matrix(tn.vals)
 end
