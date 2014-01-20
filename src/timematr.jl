@@ -58,6 +58,27 @@ function rowmeans(tm::Timematr)
     means = Timematr(meanVals, dates(tm))
 end
 
+######################################
+## Timematr get row and column sums ##
+######################################
+
+import Base.sum
+function sum(tm::Timematr, dim::Int = 1)
+    ## output: DataFrame, since date dimension is lost
+    if dim == 2
+        error("For rowwise sum use rowsums function")
+    end
+    sumVals = sum(core(tm), dim)
+    sums = DataFrame(sumVals, colnames(tm))
+end
+
+function rowsums(tm::Timematr)
+    ## output: Timematr
+    sumVals = sum(core(tm), 2)
+    sums = Timematr(sumVals, dates(tm))
+end
+
+
 #########################
 ## Timematr covariance ##
 #########################
@@ -67,6 +88,17 @@ function cov(tm::Timematr)
     ## output: DataFrame
     covDf = DataFrame(cov(core(tm)), colnames(tm.vals))
     return covDf
+end
+
+##########################
+## Timematr correlation ##
+##########################
+
+import Base.cov
+function cor(tm::Timematr)
+    ## output: DataFrame
+    corDf = DataFrame(cor(core(tm)), colnames(tm.vals))
+    return corDf
 end
 
 #########################
