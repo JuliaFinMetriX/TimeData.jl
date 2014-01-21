@@ -164,4 +164,4 @@ by delegating functions to field ~vals~.
 
 * Documentation
 
-For more details, visit the online documentation.
+For more details, visit the [[http://cgroll.github.io/TimeData.jl][online documentation]].
