@@ -52,8 +52,8 @@ end
 
 function writeTimedata(filename::String, td::AbstractTimedata)
     ## create large dataframe
-    datesDf = DataFrame(dates = dates(tn));
-    df = [datesDf tn.vals];
+    datesDf = DataFrame(dates = dates(td));
+    df = [datesDf td.vals];
     writetable(filename, df)
 end
 
