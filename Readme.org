@@ -131,28 +131,37 @@ dimensions: (5,1)
 
 ** Additional benefits
 
-Main points:
-(- alternative: Dates as first column of DataFrame)
+Performance: delegate to best method for case of Timematr with numeric
+data only
+
+Robustness: Modularity: models 
+
   - more robust (user can not mess up first column)
-  - more convenient (mean(tn) instead of mean(df[:, 2:end])) 
-  - function overloading
-    - allow suitable plotting methods
   - greater modularity
     - models will return simulated data without dates
       - evaluating portfolio returns should be robust to both real
         data with dates and simulated data without dates
-  - performance: only numeric data, fastest and most specialized
-    methods (no NA checking)
 
-* Under the hood: inheritance
-In object oriented programming, this is possible through
-classes: subclasses will automatically inherit the behaviour of
-superclasses. 
+* Under the hood: implementation
 
-This kind of inheritance can easily be emulated in Julia through
-types, although composite types generally are not allowed to be
-supertypes (only abstract types have subtypes). One simply needs to
-define a new composite type which owns a field of the respective
-"supertype", and delegate all functionality that should be inherited
-to this field. 
+The balancing act between emulating and extending ~DataFrames~ maybe
+is implemented in Julia a bit less naturally than in traditional
+object oriented programming languages. There, can easily inherit
+behavior from other classes as subclasses, while overwriting methods
+whenever desired. In Julia, however, composite types are not allowed
+to be subtypes of other composite types, but only abstract types may
+act as parent. Under the hood, ~TimeData~ types hence inherit their
+behavior by owning a field of type ~DataFrame~. This way, functions
+can easily be delegated to this field whenever necessary.
 
+* Current state
+
+So far, only type ~Timematr~ has functionality that goes beyond the
+basic methods inherited from ~DataFrames~. Still, all ~TimeData~ types
+should already provide a convenient way to represent time series data,
+and any ~DataFrame~ functionality in principle can easily be regained
+by delegating functions to field ~vals~.
+
+* Documentation
+
+For more details, visit online documentation.
