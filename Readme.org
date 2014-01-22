@@ -3,7 +3,7 @@
 #+PROPERTY: results output
 #+PROPERTY: session *julia-readme*
 
-[![Build Status](https://travis-ci.org/cgroll/TimeData.jl.png)](https://travis-ci.org/cgroll/TimeData.jl)
+[[https://travis-ci.org/cgroll/TimeData.jl][https://travis-ci.org/cgroll/TimeData.jl.png]]
 
 * What? Why?
 
