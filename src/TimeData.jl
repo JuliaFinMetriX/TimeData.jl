@@ -11,7 +11,7 @@ using Datetime
 ## using TimeSeries
 
 importall Base
-importall Stats
+## importall Stats
 
 export #
 AbstractTimedata,
