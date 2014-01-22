@@ -149,10 +149,10 @@ end
 ## plotting numeric time series ##
 ##################################
 
-import Winston.plot
-function plot(tm::Timematr)
-    plot(core(tm))
-end
+## import Winston.plot
+## function plot(tm::Timematr)
+##     plot(core(tm))
+## end
 
 #####################
 ## moving averages ##
