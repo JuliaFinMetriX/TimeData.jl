@@ -8,7 +8,7 @@ module TimeData
 using DataFrames
 using DataArrays
 using Datetime
-## using TimeSeries
+using Winston
 
 importall Base
 ## importall Stats
