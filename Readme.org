@@ -3,6 +3,8 @@
 #+PROPERTY: results output
 #+PROPERTY: session *julia-readme*
 
+[![Build Status](https://travis-ci.org/cgroll/TimeData.jl.png)](https://travis-ci.org/cgroll/TimeData.jl)
+
 * What? Why?
 
 The goal of the package TimeData is to provide *fast*, *robust* and
