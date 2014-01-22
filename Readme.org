@@ -17,15 +17,16 @@ Behavior of ~TimeData~ types in most cases borrows heavily from
 representing quite general data. In particular, ~DataFrames~ already
 allow for named columns, as well as missing observations. In many
 situations, however, the time information of the data adds a separate
-and unique dimension to the data. Then, the different characteristics
-of time data and observations would not be accounted for sufficiently,
-if time was only one further column amongst the other observations.
+and unique dimension to the data. The different characteristics of
+time data and observations then would not be accounted for
+sufficiently, if time was only one further column amongst the other
+observations.
 
 The ~TimeData~ package provides users with the well-known experience
 of ~DataFrames~ whenever possible. It only deviates where additional
 convenience can be achieved through a more explicit separation between
 time information and observations. In particular, the following two
-features allow intuitive data handling. 
+features allow convenient data handling. 
 
 ** Intuitive indexing
 
@@ -131,28 +132,58 @@ dimensions: (5,1)
 
 ** Additional benefits
 
-Performance: delegate to best method for case of Timematr with numeric
-data only
+*** Specialized types
+The package introduces several new types for time series data. All
+types treat time information consistently, internally stored in a
+separate field. In addition, each new type tries to match one
+particular type of time series data as closely as possible. So far,
+the following types exist:
+- ~Timedata~ :: observations are stored as ~DataFrame~ without further
+                restrictions
+- ~Timenum~ :: observations may only consist of numeric values or
+               missing values
+- ~Timematr~ :: observations must be numeric values only
 
-Robustness: Modularity: models 
+*** Speed
+The package tries to achieve high performance by delegating
+functionality to the most specialized case. For example, methods for
+instances of ~Timematr~ are delegated to ~Array{Float64, 2}~, as they
+are not allowed to entail ~NAs~ anyways. 
 
-  - more robust (user can not mess up first column)
-  - greater modularity
-    - models will return simulated data without dates
-      - evaluating portfolio returns should be robust to both real
-        data with dates and simulated data without dates
+*** Robustness
+Through the hard-coded distinction between time data and observations,
+code will become cleaner and less error-prone, as users can not mess
+with time information as easily anymore. Functions that apply to
+observations only, do not need to explicitly take into account the
+time information anymore. For example, storing dates in the first
+column of a ~DataFrame~, simply rescaling observations by a factor of
+2 becomes:
+
+#+BEGIN_SRC julia :results silent
+newDf = [DataFrame(df[:, 1]) df[:, 2:end]]
+#+END_SRC
+
+In contrast, for ~TimeData~ types, the code is 
+#+BEGIN_SRC julia :results silent
+newTm = tm*2
+#+END_SRC
 
 * Under the hood: implementation
 
-The balancing act between emulating and extending ~DataFrames~ maybe
-is implemented in Julia a bit less naturally than in traditional
-object oriented programming languages. There, can easily inherit
-behavior from other classes as subclasses, while overwriting methods
-whenever desired. In Julia, however, composite types are not allowed
-to be subtypes of other composite types, but only abstract types may
-act as parent. Under the hood, ~TimeData~ types hence inherit their
-behavior by owning a field of type ~DataFrame~. This way, functions
-can easily be delegated to this field whenever necessary.
+The balancing act between emulating and extending ~DataFrames~ is
+implemented in Julia maybe a bit less naturally than in traditional
+object oriented programming languages. There, one can easily inherit
+behavior from other classes through subclasses, thereby overwriting
+inherited methods whenever desired. In Julia, however, composite types
+are not allowed to be subtypes of other composite types, but only
+abstract types may act as parent. Under the hood, ~TimeData~ types
+hence inherit their behavior by owning a field of type ~DataFrame~.
+This way, functions can easily be delegated to this field whenever
+necessary. 
+
+Time information in ~TimeData~ is handled through types of the package
+~Datetime~. 
+
 
 * Current state
 
@@ -160,7 +191,9 @@ So far, only type ~Timematr~ has functionality that goes beyond the
 basic methods inherited from ~DataFrames~. Still, all ~TimeData~ types
 should already provide a convenient way to represent time series data,
 and any ~DataFrame~ functionality in principle can easily be regained
-by delegating functions to field ~vals~.
+by delegating functions to field ~vals~. Also, I only tested
+~TimeData~ types with ~date~ type from the ~Datetime~ package, and not
+yet with type ~datetime~.
 
 * Documentation
 
