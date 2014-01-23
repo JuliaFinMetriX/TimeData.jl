@@ -17,11 +17,17 @@ export #
 AbstractTimedata,
 AbstractTimenum,
 AbstractTimematr,
+core,
+dates,
+movAvg,
+readTimedata,
+rowsums,
 str,
 Timecop,
 Timedata,
 Timematr,
-Timenum
+Timenum,
+writeTimedata
 
 include("constraints.jl")
 include("abstractTypes.jl")
