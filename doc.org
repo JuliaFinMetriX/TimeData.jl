@@ -106,7 +106,7 @@ Although this seems to be quite logically, this behavior does deviate
 from ~DataFrame~ behavior in such that, for example, ~DataFrames~
 return ~DataArray~ for single columns.
 
-#+BEGIN_SRC julia :tangle yes :exports results :results output
+#+BEGIN_SRC julia :tangle yes :exports both :results output
       typeof(valsDf[:, 1])
       typeof(tm[:, 1])
       
@@ -117,6 +117,8 @@ return ~DataArray~ for single columns.
       typeof(tm[4:3, 5:4])
    
 #+END_SRC
+
+This will print:
 
 #+RESULTS:
 : DataArray{Float64,1} (constructor with 1 method)

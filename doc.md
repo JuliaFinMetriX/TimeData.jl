@@ -112,6 +112,17 @@ Although this seems to be quite logically, this behavior does deviate
 from `DataFrame` behavior in such that, for example, `DataFrames`
 return `DataArray` for single columns.
 
+    typeof(valsDf[:, 1])
+    typeof(tm[:, 1])
+    
+    typeof(valsDf[1, 1])
+    typeof(tm[1, 1])
+    
+    ## empty instance
+    typeof(tm[4:3, 5:4])
+
+This will print:
+
     DataArray{Float64,1} (constructor with 1 method)
     Timematr (constructor with 9 methods)
     
