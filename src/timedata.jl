@@ -1,6 +1,3 @@
-abstract AbstractTimedata
-abstract AbstractTimenum <: AbstractTimedata
-
 type Timedata <: AbstractTimedata
     vals::DataFrame
     dates::DataArray

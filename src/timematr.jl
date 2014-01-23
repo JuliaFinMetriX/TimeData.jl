@@ -1,4 +1,4 @@
-type Timematr <: AbstractTimenum
+type Timematr <: AbstractTimematr
     vals::DataFrame
     dates::DataArray
 
