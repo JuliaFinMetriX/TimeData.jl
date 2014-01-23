@@ -5,17 +5,101 @@
 #+PROPERTY: session *julia-timedata*
 #+TANGLE: yes
 
-* Setting up
-Required packages: 
-- DataFrames / DataArrays
-- Datetime
-- Winston
+* TimeData types
+
+All types introduced are subtypes of abstract type ~AbstractTimedata~
+and have two fields, separating time information from observations:
+- vals :: a ~DataFrame~ 
+- dates :: a ~DataArray~ composed of ~dates~ from package ~Datetime~
+
+However, accessing these fields directly is considered poor style, as
+one could circumvent any constraints on the individual fields this
+way! Hence, only reference the fields directly if you really know what
+you are doing.
+
+Given these commonalities of all ~TimeData~ types, there exist several
+distinct types that implement different constraints on the
+observations. Sorted from most general to most specific case, the
+following types are introduced:
+- ~Timedata~ :: no further restrictions on observations
+- ~Timenum~ :: observations may consist of numeric values or missing
+               values only
+- ~Timematr~ :: observations must be numeric values only
+- ~Timecop~ :: observations must be numeric values between 0 and 1
+               only
+
+Given that these constraints are fulfilled, one is able to define and
+use more specific functions matching the data characteristics more
+closely. For example, ~Timematr~ instances can directly make use of
+fast and numerically optimized ~Array{Float64, 2}~ methods under the
+hood. Hence, it is important that these constraints are reliably
+fulfilled. They are guaranteed as they are hard-coded into variables
+at creation through the individual constructors. And, by now, no
+further ~setindex~ methods exist that would allow data manipulation.
+
+* Constructors
+
+For each type, variables can be created by directly handing over
+observations as ~DataFrame~ and time information as ~DataArray~ to the
+inner constructor.
+
+#+BEGIN_SRC julia
+vals = rand(30, 4)
+dats = [date(2013, 7, ii) for ii=1:30]
+nams = ["A", "B", "C", "D"]
+valsDf = DataFrame(vals, nams)
+datsDa = DataArray(dats)
+
+tm = Timematr(valsDf, datsDa)
+#+END_SRC
+
+Besides, there also exist several outer constructors for each type,
+allowing more convenient creation. In particular, if observations or
+dates do not entail any ~NAs~, there is no need to wrap them up into
+~DataFrames~ or ~DataArrays~ previously, but ~TimeData~ objects can
+simply be created from ~Arrays~. Also, there might be situations where
+variable names and / or dates are missing. For these cases, there
+exist more convenient outer constructors, too, which generally follow
+the convention that dates do never precede variable names as
+arguments.
+
+#+BEGIN_SRC julia
+tm = Timematr(vals, nams, dats)
+tm = Timematr(vals, nams)
+tm = Timematr(vals, dats)
+tm = Timematr(vals)
+#+END_SRC
+
+Alternatively, you could also initialize either observations or dates
+directly with the correct type, while using more convenient inputs for
+the other components. For example, a ~DataFrame~ of observations could
+either be used alone or in combination with an array of dates.
+#+BEGIN_SRC 
+tm = Timematr(valsDf)
+tm = Timematr(valsDf, dats)
+#+END_SRC
+
+With dates already given as ~DataArray~, observations could be given
+as ~Array~ with or without names given as ~Array~ as well.
+#+BEGIN_SRC julia
+tm = Timematr(vals, datsDa)
+tm = Timematr(vals, nams, datsDa)
+#+END_SRC
+
+
+* getindex
+
+* Read / write / show
+
+* A word on general functions from DataFrames
+
+* Additional functions
+
+* Loading data
 
 #+BEGIN_SRC julia :results silent
 using TimeData
 #+END_SRC
-
-* Loading data
 
 Data can easily be imported from csv-files using function
 ~readTimedata~. Under the hood, the function makes use of ~readtable~
