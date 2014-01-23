@@ -34,7 +34,7 @@ end
 #############################
 
 ## possible without NAs
-function core(tm::Timematr)
+function core(tm::AbstractTimematr)
     return matrix(tm.vals)
 end
 
