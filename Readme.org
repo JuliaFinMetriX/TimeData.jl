@@ -181,7 +181,8 @@ are not allowed to be subtypes of other composite types, but only
 abstract types may act as parent. Under the hood, ~TimeData~ types
 hence inherit their behavior by owning a field of type ~DataFrame~.
 This way, functions can easily be delegated to this field whenever
-necessary. 
+necessary. For a more elaborate discussion on this topic and the
+interior design of ~TimeData~, take a look at [[http://grollchristian.wordpress.com/2014/01/22/julia-inheriting-behavior/][this post]] on my blog. 
 
 Time information in ~TimeData~ is handled through types of the package
 ~Datetime~. 
