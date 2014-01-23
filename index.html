@@ -151,7 +151,16 @@ Although this seems to be quite logically, this behavior does deviate
 from <code>DataFrame</code> behavior in such that, for example, <code>DataFrames</code>
 return <code>DataArray</code> for single columns.</p>
 
-<pre><code>DataArray{Float64,1} (constructor with 1 method)
+<pre><code>typeof(valsDf[:, 1])
+typeof(tm[:, 1])
+
+typeof(valsDf[1, 1])
+typeof(tm[1, 1])
+
+## empty instance
+typeof(tm[4:3, 5:4])
+
+DataArray{Float64,1} (constructor with 1 method)
 Timematr (constructor with 9 methods)
 
 Float64
