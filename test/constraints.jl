@@ -4,6 +4,7 @@ using Base.Test
 using DataArrays
 using DataFrames
 using Datetime
+using TimeData
 ## using TimeData
 
 ## define macro for expressions that return nothing 
@@ -56,4 +57,14 @@ invalidDf = DataFrame(quote
 @test_throws TimeData.chkNumDf(invalidDf)
 @test_throws TimeData.chkNum(invalidDf)
 
+#############
+## chkUnit ##
+#############
+
+validDf = DataFrame(rand(8, 3))
+TimeData.chkUnit(validDf)
+
+invalidDf = DataFrame(rand(8, 3))
+invalidDf[2, 2] = -0.2
+@test_throws TimeData.chkUnit(invalidDf)
 end

@@ -13,8 +13,10 @@ vals = rand(30, 4)
 dats = [date(2013, 7, ii) for ii=1:30]
 nams = ["A", "B", "C", "D"]
 
+allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
+
 ## test information retrieval functions
-for t = (:Timedata, :Timenum, :Timematr)
+for t in allTypes
     eval(quote
         td = $(t)(vals, nams, dats)
         @test isequal(colnames(td), nams)

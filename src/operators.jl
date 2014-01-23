@@ -38,7 +38,7 @@ pres_msSymmetric_functions = [element_wise_operators,
                               element_wise_operators_ext]
 
 importall Base
-for t = (:Timedata, :Timenum, :Timematr)
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     for f in pres_msSymmetric_functions
         ## print(macroexpand(:(@swap_type($f, $t))))
         eval(macroexpand(:(@pres_msSymmetric($f, $t))))        
@@ -74,7 +74,7 @@ const mathematical_functions = [:abs, :sign,
 
 pres_msUnitary_functions = [unary_operators, mathematical_functions]
 
-for t = (:Timedata, :Timenum, :Timematr)
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     for f in pres_msUnitary_functions
         ## @timedata_unary f t
         eval(macroexpand(:(@pres_msUnitary($f, $t))))                
@@ -145,7 +145,7 @@ const rounding_operators = [:round, :ceil, :floor, :trunc]
 
 pres_msSingle_or_extra_functions = rounding_operators
 
-for t = (:Timedata, :Timenum, :Timematr)
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     for f in pres_msSingle_or_extra_functions
         ## @varargs_type f t
         eval(macroexpand(:(@pres_msSingle_or_extra($f, $t))))

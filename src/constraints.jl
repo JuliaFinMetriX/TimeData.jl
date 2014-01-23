@@ -36,3 +36,14 @@ function chkNum(df::DataFrame)
     end
     chkNumDf(df)
 end
+
+###########################################
+## check for values within unit interval ##
+###########################################
+
+function chkUnit(df::DataFrame)
+    vals = matrix(df)
+    if (any(vals .< 0) | any(vals .> 1))
+        error("values must be inside of unit interval")
+    end
+end

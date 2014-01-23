@@ -6,7 +6,7 @@
 ## If no NA values are present, initialization could be done more
 ## easily with arrays.
 
-for t = (:Timedata, :Timenum, :Timematr)
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     @eval begin
         
         ###########################
@@ -22,7 +22,13 @@ for t = (:Timedata, :Timenum, :Timematr)
         ## from core elements
         function $(t)(vals::Array{Float64, 2},
                       names::Array{Union(UTF8String,ASCIIString),1},
-                      dates::DataArray{Date{ISOCalendar}, 1})
+                      dates::DataArray)
+            df = DataFrame(vals, names)
+            return $(t)(df, dates)
+        end
+        function $(t)(vals::Array{Float64, 2},
+                      names::Array{ASCIIString,1},
+                      dates::DataArray)
             df = DataFrame(vals, names)
             return $(t)(df, dates)
         end

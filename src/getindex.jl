@@ -13,7 +13,7 @@
 typealias ColumnIndex Union(Real, String, Symbol)
 import Base.getindex
 
-for t = (:Timedata, :Timenum, :Timematr)
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     @eval begin
         
         ############################################

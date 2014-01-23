@@ -15,61 +15,67 @@ nams = ["A", "B", "C", "D"]
 valsDf = DataFrame(vals, nams)
 datsDa = DataArray(dats)
 
+allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
+
 ########################
 ## inner constructors ##
 ########################
 
-td = TimeData.Timedata(valsDf, datsDa)
-td = TimeData.Timenum(valsDf, datsDa)
-td = TimeData.Timematr(valsDf, datsDa)
+for t in allTypes
+    eval(quote
+        td = $t(valsDf, datsDa)
+    end)
+end
 
 #######################################
 ## shortcuts from arrays without NAs ##
 #######################################
 
-## from numeric array only
-td = TimeData.Timedata(vals)
-td = TimeData.Timenum(vals)
-td = TimeData.Timematr(vals)
 
-## from arrays without names
-td = TimeData.Timedata(vals, dats)
-td = TimeData.Timenum(vals, dats)
-td = TimeData.Timematr(vals, dats)
+for t in allTypes
+    eval(quote
+        ## from numeric array only
+        td = $(t)(vals)
 
-## from arrays without dates
-td = TimeData.Timedata(vals, nams)
-td = TimeData.Timenum(vals, nams)
-td = TimeData.Timematr(vals, nams)
+        ## from arrays without names
+        td = $(t)(vals, dats)
 
-## from three arrays with names and dates
-td = TimeData.Timedata(vals, nams, dats)
-td = TimeData.Timenum(vals, nams, dats)
-td = TimeData.Timematr(vals, nams, dats)
+        ## from arrays without dates
+        td = $(t)(vals, nams)
+
+        ## from three arrays with names and dates
+        td = $(t)(vals, nams, dats)
+    end)
+end
 
 ###################
 ## NAs in values ##
 ###################
 
-## from DataFrame without dates
-td = TimeData.Timedata(valsDf)
-td = TimeData.Timenum(valsDf)
-td = TimeData.Timematr(valsDf)
+for t in allTypes
+    eval(quote
+        ## from DataFrame without dates
+        td = $(t)(valsDf)
 
-## from DataFrame with dates as array
-td = TimeData.Timedata(valsDf, dats)
-td = TimeData.Timenum(valsDf, dats)
-td = TimeData.Timematr(valsDf, dats)
-
+        ## from DataFrame with dates as array
+        td = $(t)(valsDf, dats)
+    end)
+end
 
 ##################
 ## NAs in dates ##
 ##################
 
-## from DataArray dates without names
-td = TimeData.Timedata(vals, datsDa)
-td = TimeData.Timenum(vals, datsDa)
-td = TimeData.Timematr(vals, datsDa)
+for t in allTypes
+    eval(quote
+        ## from DataArray dates without names
+        td = $(t)(vals, datsDa)
+
+        ## from DataArray dates with names
+        td = $(t)(vals, nams, datsDa)
+    end)
+end
+
 
 ######################################
 ## throwing errors for wrong inputs ##
@@ -78,16 +84,20 @@ td = TimeData.Timematr(vals, datsDa)
 ## dates initialized with wrong type
 vals = DataFrame([2, 3, 4])
 invalidDates = DataArray([1, 2, 3])
-@test_throws TimeData.Timedata(vals, dates)
-@test_throws TimeData.Timenum(vals, dates)
-@test_throws TimeData.Timematr(vals, dates)
+for t in allTypes
+    eval(quote
+        @test_throws $(t)(vals, dates)        
+    end)
+end
 
 ## dates and vals sizes not matching
 dates = [date(2013, 7, ii) for ii=1:30]
 dates = DataArray(dates)
 valsArr = rand(20, 4)
-@test_throws TimeData.Timedata(valsArr, dates)
-@test_throws TimeData.Timenum(valsArr, dates)
-@test_throws TimeData.Timematr(valsArr, dates)
+for t in allTypes
+    eval(quote
+        @test_throws $(t)(valsArr, dates)
+    end)
+end
 
 end
