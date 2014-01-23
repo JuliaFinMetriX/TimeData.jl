@@ -94,7 +94,7 @@ end
 ## Timematr correlation ##
 ##########################
 
-import Base.cov
+import Base.cor
 function cor(tm::Timematr)
     ## output: DataFrame
     corDf = DataFrame(cor(core(tm)), colnames(tm.vals))
