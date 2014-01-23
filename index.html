@@ -36,9 +36,13 @@
 <a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
 <div>
 <ul>
-<li><a href="#sec-1">1. Setting up</a></li>
-<li><a href="#sec-2">2. Loading data</a></li>
-<li><a href="#sec-3">3. </a></li>
+<li><a href="#sec-1">1. TimeData types</a></li>
+<li><a href="#sec-2">2. Constructors</a></li>
+<li><a href="#sec-3">3. Indexing</a></li>
+<li><a href="#sec-4">4. Read, write, io</a></li>
+<li><a href="#sec-5">5. Functions and operators inherited from DataFrames</a></li>
+<li><a href="#sec-6">6. Additional functions</a></li>
+<li><a href="#sec-7">7. Acknowledgement</a></li>
 </ul>
 </div>
 
@@ -46,20 +50,159 @@
 </div>
 
 <h1>
-<a name="setting-up" class="anchor" href="#setting-up"><span class="octicon octicon-link"></span></a>Setting up</h1>
+<a name="timedata-types" class="anchor" href="#timedata-types"><span class="octicon octicon-link"></span></a>TimeData types</h1>
 
-<p>Required packages: </p>
+<p>All types introduced are subtypes of abstract type <code>AbstractTimedata</code>
+and have two fields, separating time information from observations:</p>
 
 <ul>
-<li><p>DataFrames / DataArrays</p></li>
-<li><p>Datetime</p></li>
-<li>
-<p>Winston</p>
+<li><p><strong>vals:</strong> a <code>DataFrame</code></p></li>
+<li><p><strong>dates:</strong> a <code>DataArray</code> composed of <code>dates</code> from package <code>Datetime</code></p></li>
+</ul><p>However, accessing these fields directly is considered poor style, as
+one could circumvent any constraints on the individual fields this
+way! Hence, only reference the fields directly if you really know what
+you are doing.</p>
 
-<p>using TimeData</p>
-</li>
-</ul><h1>
-<a name="loading-data" class="anchor" href="#loading-data"><span class="octicon octicon-link"></span></a>Loading data</h1>
+<p>Given these commonalities of all <code>TimeData</code> types, there exist several
+distinct types that implement different constraints on the
+observations. Sorted from most general to most specific case, the
+following types are introduced:</p>
+
+<ul>
+<li><p><strong><code>Timedata</code>:</strong> no further restrictions on observations</p></li>
+<li><p><strong><code>Timenum</code>:</strong> observations may consist of numeric values or missing
+values only</p></li>
+<li><p><strong><code>Timematr</code>:</strong> observations must be numeric values only</p></li>
+<li><p><strong><code>Timecop</code>:</strong> observations must be numeric values between 0 and 1
+only</p></li>
+</ul><p>Given that these constraints are fulfilled, one is able to define and
+use more specific functions matching the data characteristics more
+closely. For example, <code>Timematr</code> instances can directly make use of
+fast and numerically optimized <code>Array{Float64, 2}</code> methods under the
+hood. Hence, it is important that these constraints are reliably
+fulfilled. They are guaranteed as they are hard-coded into variables
+at creation through the individual constructors. And, by now, no
+further <code>setindex</code> methods exist that would allow data manipulation.</p>
+
+<h1>
+<a name="constructors" class="anchor" href="#constructors"><span class="octicon octicon-link"></span></a>Constructors</h1>
+
+<p>For each type, variables can be created by directly handing over
+observations as <code>DataFrame</code> and time information as <code>DataArray</code> to the
+inner constructor.</p>
+
+<pre><code>using TimeData
+using Datetime
+
+vals = rand(30, 4)
+dats = [date(2013, 7, ii) for ii=1:30]
+nams = ["A", "B", "C", "D"]
+valsDf = DataFrame(vals, nams)
+datsDa = DataArray(dats)
+
+tm = Timematr(valsDf, datsDa)
+</code></pre>
+
+<p>Besides, there also exist several outer constructors for each type,
+allowing more convenient creation. In particular, if observations or
+dates do not entail any <code>NAs</code>, there is no need to wrap them up into
+<code>DataFrames</code> or <code>DataArrays</code> previously, but <code>TimeData</code> objects can
+simply be created from <code>Arrays</code>. Also, there might be situations where
+variable names and / or dates are missing. For these cases, there
+exist more convenient outer constructors, too, which generally follow
+the convention that dates do never precede variable names as
+arguments.</p>
+
+<pre><code>tm = Timematr(vals, nams, dats)
+tm = Timematr(vals, nams)
+tm = Timematr(vals, dats)
+tm = Timematr(vals)
+</code></pre>
+
+<p>Alternatively, you could also initialize either observations or dates
+directly with the correct type, while using more convenient inputs for
+the other components. For example, a <code>DataFrame</code> of observations could
+either be used alone or in combination with an array of dates.</p>
+
+<pre><code>tm = Timematr(valsDf)
+tm = Timematr(valsDf, dats)
+</code></pre>
+
+<p>With dates already given as <code>DataArray</code>, observations could be given
+as <code>Array</code> with or without names given as <code>Array</code> as well.</p>
+
+<pre><code>tm = Timematr(vals, datsDa)
+tm = Timematr(vals, nams, datsDa)
+</code></pre>
+
+<h1>
+<a name="indexing" class="anchor" href="#indexing"><span class="octicon octicon-link"></span></a>Indexing</h1>
+
+<p>The idea of <code>getindex</code> is to stick with the behavior of <code>DataFrames</code>
+as far as possible for the basics, while extending it to allow
+indexing of rows by dates. Hence, indexing <code>TimeData</code> types should
+hopefully fit seamlessly into behavior familiar from other important
+types, with only intuitive extensions. However, it is important to
+note that indexing deviates from <code>DataFrame</code> behavior in one aspect:
+<code>getindex</code> will NEVER change the type of the variable! If you call it
+on a <code>Timematr</code> variable, it will also return a <code>Timematr</code> variable,
+and if you call it on type <code>Timenum</code> it will return <code>Timenum</code> as well.
+Although this seems to be quite logically, this behavior does deviate
+from <code>DataFrame</code> behavior in such that, for example, <code>DataFrames</code>
+return <code>DataArray</code> for single columns.</p>
+
+<pre><code>DataArray{Float64,1} (constructor with 1 method)
+Timematr (constructor with 9 methods)
+
+Float64
+Timematr (constructor with 9 methods)
+
+
+Timematr (constructor with 9 methods)
+</code></pre>
+
+<p>Possible ways of indexing are:</p>
+
+<pre><code>## indexing by numeric indices
+tmp = tm[2:4]
+tmp = tm[3:5, 1:2]
+tmp = tm[5, :]
+tmp = tm[2]
+tmp = tm[5:8, 2]
+tmp = tm[5, 3]
+
+## indexing with column names
+tmp = tm["A"]
+tmp = tm[5, ["A", "B"]]
+
+## indexing with column names as symbols
+tmp = tm[4:10, :A]
+
+## logical indexing
+logicCol = [true, false, true, false]
+logicRow = repmat([true, false, true], 10, 1)[:]
+tmp = tm[logicCol]
+tmp = tm[logicRow, logicCol]
+tmp = tm[logicRow, :]
+
+## logically indexing rows directly from expression
+ex = :(A .&gt; 0.5)
+tmp = tm[ex, :]
+
+## indexing by date
+tmp = tm[date(2013, 07, 04)]
+
+datesToFind = [date(2013, 07, ii) for ii=12:18]
+tmp = tm[datesToFind]
+tm[date(2013,01,03):date(2013,07,12)]
+tm[date(2013,01,03):date(2013,07,12), ["B", "C"]]
+tm[date(2013,01,03):date(2013,07,12), :D]
+tm[date(2013,01,03):date(2013,07,12),
+             [true, false, false, true]]
+</code></pre>
+
+<h1>
+<a name="read-write-io" class="anchor" href="#read-write-io"><span class="octicon octicon-link"></span></a>Read, write, io</h1>
 
 <p>Data can easily be imported from csv-files using function
 <code>readTimedata</code>. Under the hood, the function makes use of <code>readtable</code>
@@ -68,7 +211,7 @@ dates similar to function <code>readtime</code> from package <code>TimeSeries</c
 first column matching the regexp for dates will be chosen as time
 identifier. </p>
 
-<pre><code>tm = TimeData.readTimedata("data/logRet.csv")
+<pre><code>tm = readTimedata("data/logRet.csv")
 </code></pre>
 
 <p>After loading the data, Julia will call the standard <code>display</code> method
@@ -196,14 +339,137 @@ From: 2012-01-03, To: 2013-05-01
 <p>This will additionally show the names of the fields of any object, and
 also explicitly displays the time period of the data. </p>
 
-<p>Most of the convenience of <code>TimeData</code> types arises from three points: </p>
+<p>To save an object to disk, simply call function <code>writeTimedata</code>, which
+internally uses <code>writetable</code> from the <code>DataFrame</code> package. In
+accordance with <code>writetable</code>, the first argument is the filename as
+string, while the second argument is the variable to be saved.</p>
+
+<pre><code>writeTimedata("data/logRet2.csv", tm)
+</code></pre>
+
+<h1>
+<a name="functions-and-operators-inherited-from-dataframes" class="anchor" href="#functions-and-operators-inherited-from-dataframes"><span class="octicon octicon-link"></span></a>Functions and operators inherited from DataFrames</h1>
+
+<p>Most of the standard functions and mathematical operators that are
+defined for <code>DataFrames</code> are also implemented for <code>TimeData</code> types and
+should behave as expected. Whenever possible, functions apply
+elementwise to observations only, and you should get back the same
+type that you did use to call the function. In case that this is not
+possible, the type that you get back should be the natural first
+choice. For example, elementwise comparisons should return a logical
+value for each entry, which by definition could not be of type
+<code>Timenum</code> where only numeric values are allowed. </p>
+
+<pre><code>typeof(tm + tm)
+typeof(tm .&gt; 0.5)
+
+Timematr (constructor with 9 methods)
+Timedata (constructor with 9 methods)
+</code></pre>
+
+<p>The standard library for <code>TimeData</code> comprises all standard operators
+and mathematical functions. As expected, these functions all apply
+elementwise, and leave the time information untouched. Where
+additional arguments are allowed for <code>DataFrames</code>, they are allowed
+for <code>TimeData</code> types as well.</p>
+
+<pre><code>tm[1:3, 1:3] .&gt; 0.5
+exp(tm[1:3, 1:3])
+round(tm[1:3, 1:3], 2)
+
+
+type: Timedata
+dimensions: (3,3)
+3x4 DataFrame:
+             dates     A     B     C
+[1,]    2013-07-01 false false false
+[2,]    2013-07-02  true  true  true
+[3,]    2013-07-03  true false  true
+
+type: Timematr
+dimensions: (3,3)
+3x4 DataFrame:
+             dates       A       B       C
+[1,]    2013-07-01 1.59726   1.547 1.45007
+[2,]    2013-07-02 2.09634 2.42551 2.20417
+[3,]    2013-07-03 1.84294 1.50174 2.25843
+
+type: Timematr
+dimensions: (3,3)
+3x4 DataFrame:
+             dates    A    B    C
+[1,]    2013-07-01 0.47 0.44 0.37
+[2,]    2013-07-02 0.74 0.89 0.79
+[3,]    2013-07-03 0.61 0.41 0.81
+</code></pre>
+
+<p>A most likely not exhaustive list of basic functions is</p>
+
+<pre><code>TimeDataFunctions = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/),
+                     :(./), :(.^),
+                     :(div), :(mod), :(fld), :(rem),
+                     :abs, :sign, :acos, :acosh, :asin, :asinh, :atan,
+                     :atanh, :sin, :sinh, :cos, :cosh, :tan, :tanh,
+                     :exp, :exp2, :expm1, :log, :log10, :log1p, :log2,
+                     :exponent, :sqrt, :gamma, :lgamma, :digamma,
+                     :erf, :erfc,
+                     :(.==), :(.!=), :(.&gt;), :(.&gt;=), :(.&lt;), :(.&lt;=),
+                     :(&amp;), :(|), :($),
+                     :round, :ceil, :floor, :trunc]
+</code></pre>
+
+<h1>
+<a name="additional-functions" class="anchor" href="#additional-functions"><span class="octicon octicon-link"></span></a>Additional functions</h1>
+
+<p>Beside basic mathematical functions and operators, there are some
+additional basic functions that are defined for each <code>TimeData</code> type.
+For example, you can retrieve individual components of your variable
+with the following functions:</p>
 
 <ul>
-<li><p>intuitive indexing building on <code>DataFrames</code>, which allows naming of
-columns, as well as indexing through dates</p></li>
-<li><p>built-in separation of time information and observations</p></li>
-<li><p>function overloading to allow basic functions to smoothly
-accommodate to specific needs of time series data</p></li>
+<li><p><strong>dates:</strong> returns time information as <code>DataArray</code></p></li>
+<li><p><strong>colnames:</strong> returns variable names as
+              <code>Array{Union(UTF8String,ASCIIString),1}</code></p></li>
+<li><p><strong>core:</strong> implemented for subtypes of <code>AbstractTimematr</code>, it returns a
+matrix of numeric values</p></li>
+</ul><p>These functions shall help to inhibit direct access of <code>TimeData</code>
+fields, which should be avoided.</p>
+
+<p>Some further implemented functions are: </p>
+
+<ul>
+<li><p><code>isequal</code></p></li>
+<li><p><code>size</code></p></li>
+<li><p><code>isna</code></p></li>
+</ul><p>Furthermore, subtypes of type <code>AbstractTimematr</code> should already
+provide functionality for basic statistical functions like <code>mean</code>,
+<code>var</code> and <code>cov</code>.</p>
+
+<h1>
+<a name="acknowledgement" class="anchor" href="#acknowledgement"><span class="octicon octicon-link"></span></a>Acknowledgement</h1>
+
+<p>Of course, any package can only be as good as the individual parts
+that it builds on. Accordingly, I'd like to thank all people that
+were involved in the development of all the functions that were made
+ready to use for me to build this package upon. In particular, I want
+to thank the developers of</p>
+
+<ul>
+<li><p>the <strong>Julia language</strong>, for their continuous and tremendous efforts
+during the creation of this free, fast and highly flexible
+programming language!</p></li>
+<li><p>the <strong>DataFrames</strong> package, which definitely provides the best
+representation for general types of data in data analysis. It's a
+role model that every last bit of code of <code>TimeData</code> depends on, and
+the interface that every statistics package show use.</p></li>
+<li><p>the <strong>Datetime</strong> package, which is a thoughtful implementation of
+dates, time and durations, and the backbone of all time components
+in <code>TimeData</code>.</p></li>
+<li><p>the <strong>TimeSeries</strong> package, which follows a different approach to
+handling time series data by storing time information as a column of
+a DataFrame. Having a quite similar goal in mind, the package was a
+great inspiration for me, and occasionally I even could borrow parts
+of code from it (for example, function <code>readTimedata</code>).</p></li>
 </ul>
       </section>
     </div>
