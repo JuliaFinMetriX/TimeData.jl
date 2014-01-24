@@ -32,7 +32,7 @@ writeTimedata
 include("constraints.jl")
 include("abstractTypes.jl")
 include("timecop.jl")
-include("timedata.jl")
+include("timedata_type.jl")
 include("timenum.jl")
 include("timematr.jl")
 include("constructors.jl")
