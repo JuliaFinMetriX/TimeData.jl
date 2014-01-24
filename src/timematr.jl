@@ -35,7 +35,7 @@ end
 
 ## possible without NAs
 function core(tm::AbstractTimematr)
-    return matrix(tm.vals)
+    return convert(Array{Float64}, matrix(tm.vals))
 end
 
 #######################
