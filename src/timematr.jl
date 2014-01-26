@@ -127,7 +127,8 @@ function cumsum(tm::Timematr)
 end
 
 function getVars(tm::Timematr, mapF::Function, crit::Function)
-    ## get variables that fulfill some condition, and show values 
+    ## map each column to a value, and apply some condition on value
+    ## e.g.: find variables with minimum return less than -30
     ncol = size(tm, 2)
     nrow = size(tm, 1)
     vals = TimeData.core(tm)
