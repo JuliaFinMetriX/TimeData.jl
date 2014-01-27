@@ -10,6 +10,7 @@ before_install:
   - sudo apt-get install libpcre3-dev julia -y
 script:
   - julia -e 'Pkg.add("DataFrames")'
+  - julia -e 'Pkg.pin("DataFrames",v"0.5.0")'
   - julia -e 'Pkg.add("Datetime")'
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("TimeData"))`); Pkg.pin("TimeData"); Pkg.resolve()'
   - julia -e 'using TimeData; @assert isdefined(:TimeData); @assert typeof(TimeData) === Module'
