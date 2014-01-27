@@ -30,11 +30,11 @@ function setupTestInstance()
              date(2013, 7, 3),
              date(2013, 7, 4),
              date(2013, 7, 5)]
-    tn = TimeData.TimeNum(df, DataArray(dates))
+    tn = TimeData.Timenum(df, DataArray(dates))
     return tn
 end    
 
-## operations on TimeNum only
+## operations on Timenum only
 tn = setupTestInstance()
 -tn
 +tn
@@ -70,7 +70,7 @@ tn / 2
 
 
 
-## create TimeNum test instance
+## create Timenum test instance
 
 tn2 = tn + 3
 tn3 = tn
