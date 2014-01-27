@@ -82,9 +82,9 @@ function dates(tn::AbstractTimedata)
     return tn.dates
 end
 
-import DataFrames.colnames
-function colnames(tn::AbstractTimedata)
-    return colnames(tn.vals)
+import DataFrames.names
+function names(tn::AbstractTimedata)
+    return names(tn.vals)
 end
 
 ###################

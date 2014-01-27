@@ -36,7 +36,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         ## comprehensive constructor: very general, all elements
         function $(t){T<:Array, K<:Array, S<:Array}(vals::T, names::K, dates::S) 
             df = DataFrame(vals)
-            colnames!(df, names)
+            names!(df, names)
             return $(t)(df, DataArray(dates))
         end
         

@@ -19,7 +19,7 @@ allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
 for t in allTypes
     eval(quote
         td = $(t)(vals, nams, dats)
-        @test isequal(colnames(td), nams)
+        @test isequal(names(td), nams)
         @test isequal(TimeData.dates(td), DataArray(dats))
     end)
 end

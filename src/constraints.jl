@@ -19,8 +19,8 @@ function chkNumDf(df::DataFrame)
     n = ncol(df)
     for ii=1:n
         ## check for numeric values
-        if(!issubtype(coltypes(df)[ii], Number) &
-    !isequal(coltypes(df)[ii], NAtype))
+        if(!issubtype(types(df)[ii], Number) &
+    !isequal(types(df)[ii], NAtype))
             error("all columns must be numeric for conversion")
         end
     end
@@ -42,7 +42,7 @@ end
 ###########################################
 
 function chkUnit(df::DataFrame)
-    vals = matrix(df)
+    vals = array(df)
     if (any(vals .< 0) | any(vals .> 1))
         error("values must be inside of unit interval")
     end

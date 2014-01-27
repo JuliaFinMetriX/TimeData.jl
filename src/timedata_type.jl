@@ -33,5 +33,5 @@ end
 
 import Base.find
 function find(td::Timedata)
-    return find(matrix(td.vals))
+    return find(array(td.vals))
 end

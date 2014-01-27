@@ -35,7 +35,7 @@ end
 
 ## possible without NAs
 function core(tm::AbstractTimematr)
-    return convert(Array{Float64}, matrix(tm.vals))
+    return convert(Array{Float64}, array(tm.vals))
 end
 
 #######################
@@ -49,7 +49,7 @@ function mean(tm::Timematr, dim::Int = 1)
         error("For rowwise mean use rowmeans function")
     end
     meanVals = mean(core(tm), dim)
-    means = DataFrame(meanVals, colnames(tm))
+    means = DataFrame(meanVals, names(tm))
 end
 
 function rowmeans(tm::Timematr)
@@ -69,7 +69,7 @@ function sum(tm::Timematr, dim::Int = 1)
         error("For rowwise sum use rowsums function")
     end
     sumVals = sum(core(tm), dim)
-    sums = DataFrame(sumVals, colnames(tm))
+    sums = DataFrame(sumVals, names(tm))
 end
 
 function rowsums(tm::Timematr)
@@ -86,7 +86,7 @@ end
 import Base.cov
 function cov(tm::Timematr)
     ## output: DataFrame
-    covDf = DataFrame(cov(core(tm)), colnames(tm.vals))
+    covDf = DataFrame(cov(core(tm)), names(tm.vals))
     return covDf
 end
 
@@ -97,7 +97,7 @@ end
 import Base.cor
 function cor(tm::Timematr)
     ## output: DataFrame
-    corDf = DataFrame(cor(core(tm)), colnames(tm.vals))
+    corDf = DataFrame(cor(core(tm)), names(tm.vals))
     return corDf
 end
 
@@ -113,7 +113,7 @@ function minimum(tm::Timematr, dim::Integer)
     if dim == 2
         error("For rowwise minimum use rowmin function")
     end
-    return DataFrame(minimum(core(tm), 1), colnames(tm))
+    return DataFrame(minimum(core(tm), 1), names(tm))
 end
 
 ############
@@ -123,7 +123,7 @@ end
 import Base.cumsum
 function cumsum(tm::Timematr)
     cumulated = cumsum(core(tm))
-    return Timematr(DataFrame(cumulated, colnames(tm)), dates(tm))
+    return Timematr(DataFrame(cumulated, names(tm)), dates(tm))
 end
 
 function getVars(tm::Timematr, mapF::Function, crit::Function)
@@ -140,8 +140,8 @@ function getVars(tm::Timematr, mapF::Function, crit::Function)
 
     logics = crit(values)
 
-    df = DataFrame(names=colnames(tm)[logics], values=values[logics], )
-    ## colnames!(df, colnames(tm)[logics])
+    df = DataFrame(names=names(tm)[logics], values=values[logics], )
+    ## names!(df, names(tm)[logics])
     return df
 end
 
@@ -182,6 +182,6 @@ function movAvg(tm::Timematr, nPeriods::Integer)
     scaledVals = movAvgs / nPeriods
     dats = dates(tm)[startInd:finInd]
 
-    movAvgTm = Timematr(scaledVals, colnames(tm), dats)
+    movAvgTm = Timematr(scaledVals, names(tm), dats)
     return movAvgTm
 end

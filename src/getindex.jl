@@ -54,11 +54,11 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             
             ## manually get column name
             selected_column = td.vals.colindex[col_ind]
-            name = colnames(td)[selected_column] # ASCIIString
+            name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
             valsDf = DataFrame(valsDa)
-            colnames!(valsDf, [name])           # colnames must be given as
+            names!(valsDf, [name])           # names must be given as
             # array 
             
             return $(t)(valsDf, dates(td))
@@ -71,11 +71,11 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             
             ## manually get column name
             selected_column = td.vals.colindex[col_ind]
-            name = colnames(td)[selected_column] # ASCIIString
+            name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
             valsDf = DataFrame(valsDa)
-            colnames!(valsDf, [name])           # colnames must be given as
+            names!(valsDf, [name])           # names must be given as
             # array 
             
             ## get dates
@@ -90,11 +90,11 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             
             ## manually get column name
             selected_column = td.vals.colindex[col_ind]
-            name = colnames(td)[selected_column] # ASCIIString
+            name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
             valDf = DataFrame(val)
-            colnames!(valDf, [name])           # colnames must be given as
+            names!(valDf, [name])           # names must be given as
             # array 
             
             ## single date needs to be transformed to DataArray
