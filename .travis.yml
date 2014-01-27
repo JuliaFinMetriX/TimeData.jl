@@ -14,3 +14,7 @@ script:
   - julia -e 'Pkg.add("Datetime")'
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("TimeData"))`); Pkg.pin("TimeData"); Pkg.resolve()'
   - julia -e 'using TimeData; @assert isdefined(:TimeData); @assert typeof(TimeData) === Module'
+  - mkdir -p ~/.julia/TimeData
+  - cp -R ./* ~/.julia/TimeData/
+  - julia ./test/runtests.jl
+
