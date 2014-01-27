@@ -40,7 +40,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
                                             col_inds::AbstractVector{T})
             valsDf = getindex(td.vals, row_ind, col_inds) # dataframe
             
-            dat = DataArray(dates(td)[row_ind])
+            dat = DataArray([dates(td)[row_ind]])
             return $(t)(valsDf, dat)
         end
         
@@ -98,7 +98,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             # array 
             
             ## single date needs to be transformed to DataArray
-            dat = DataArray(dates(td)[row_ind])
+            dat = DataArray([dates(td)[row_ind]])
             
             return $(t)(valDf, dat)
         end
@@ -132,13 +132,13 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         end
         
         function getindex(td::$(t), dates::Array{Date{ISOCalendar},1})
-            datesDa = DataArray(dates)
+            datesDa = DataArray([dates])
             row_inds = findin(TimeData.dates(td), datesDa)
             return td[row_inds, :]
         end
         
         function getindex(td::$(t), dates::Array{Date{ISOCalendar},1}, x::Any)
-            datesDa = DataArray(dates)
+            datesDa = DataArray([dates])
             row_inds = findin(TimeData.dates(td), datesDa)
             return td[row_inds, x]
         end
