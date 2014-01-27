@@ -121,10 +121,11 @@ end
 ############
 
 import Base.cumsum
-function cumsum(tm::Timematr)
-    cumulated = cumsum(core(tm))
+function cumsum(tm::Timematr, dim::Integer)
+    cumulated = cumsum(core(tm), dim)
     return Timematr(DataFrame(cumulated, names(tm)), dates(tm))
 end
+
 
 function getVars(tm::Timematr, mapF::Function, crit::Function)
     ## map each column to a value, and apply some condition on value
