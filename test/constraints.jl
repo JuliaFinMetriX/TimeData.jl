@@ -17,7 +17,7 @@ end
 ##############
 
 ## test valid dates
-validDates = DataArray(today())
+validDates = DataArray([today()])
 @test @returnsNothing TimeData.chkDates(validDates)
 
 ## test invalid dates
