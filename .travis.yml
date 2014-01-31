@@ -10,6 +10,8 @@ before_install:
   - sudo apt-get install libpcre3-dev julia -y
 script:
   - julia -e 'versioninfo()'
+  - julia -e 'Pkg.add("DataArrays")'
+  - julia -e 'Pkg.pin("DataFrames",v"0.1.1")'
   - julia -e 'Pkg.add("DataFrames")'
   - julia -e 'Pkg.pin("DataFrames",v"0.5.0")'
   - julia -e 'Pkg.add("Datetime")'
