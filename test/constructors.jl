@@ -100,4 +100,14 @@ for t in allTypes
     end)
 end
 
+######################################
+## check single column constructors ##
+######################################
+
+for t in allTypes
+    eval(quote
+        td = $t(rand(4))
+    end)
+end
+
 end

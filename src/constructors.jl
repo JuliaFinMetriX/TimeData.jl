@@ -6,6 +6,8 @@
 ## If no NA values are present, initialization could be done more
 ## easily with arrays.
 
+FloatArray = Union(Array{Float64, 2}, Array{Float64, 1})
+
 for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     @eval begin
         
@@ -14,19 +16,19 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         ###########################
         
         ## no names or dates (just simulated values)
-        function $(t)(vals::Array{Float64, 2})
+        function $(t)(vals::FloatArray)
             dates = DataArray(Date, size(vals, 1))
             $(t)(DataFrame(vals), dates)
         end
         
         ## from core elements
-        function $(t)(vals::Array{Float64, 2},
+        function $(t)(vals::FloatArray,
                       names::Array{Union(UTF8String,ASCIIString),1},
                       dates::DataArray)
             df = DataFrame(vals, names)
             return $(t)(df, dates)
         end
-        function $(t)(vals::Array{Float64, 2},
+        function $(t)(vals::FloatArray,
                       names::Array{ASCIIString,1},
                       dates::DataArray)
             df = DataFrame(vals, names)
@@ -70,7 +72,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         ##################
         
         ## no names
-        function $(t)(vals::Array{Float64, 2}, dates::DataArray)
+        function $(t)(vals::FloatArray, dates::DataArray)
             $(t)(DataFrame(vals), dates)
         end
     end
