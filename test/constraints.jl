@@ -57,6 +57,11 @@ invalidDf = DataFrame(quote
 @test_throws TimeData.chkNumDf(invalidDf)
 @test_throws TimeData.chkNum(invalidDf)
 
+invalidDf = DataFrame(quote
+    a = [true, false, true]
+    end)
+@test_throws TimeData.chkNumDf(invalidDf)    
+
 #############
 ## chkUnit ##
 #############

@@ -23,6 +23,9 @@ function chkNumDf(df::DataFrame)
     !isequal(types(df)[ii], NAtype))
             error("all columns must be numeric for conversion")
         end
+        if(issubtype(types(df)[ii], Bool))
+            error("all columns must be numeric for conversion")
+        end
     end
 end
 
