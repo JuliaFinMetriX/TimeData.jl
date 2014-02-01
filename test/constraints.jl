@@ -7,21 +7,25 @@ using Datetime
 using TimeData
 ## using TimeData
 
-## define macro for expressions that return nothing 
-macro returnsNothing(ex)
-    :(isa($ex, Nothing))
-end
-
 ##############
 ## chkDates ##
 ##############
 
-## test valid dates
-validDates = DataArray([today()])
-@test @returnsNothing TimeData.chkDates(validDates)
+## test dates
+validDates = [date(2010,02,ii) for ii=1:10]
+TimeData.chkDates(validDates)
+
+## test times
+validDates = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
+                                 for ii=1:10]
+TimeData.chkDates(validDates)
+
+## test integers
+validDates = [1:10]                                 
+TimeData.chkDates(validDates)
 
 ## test invalid dates
-invalidDates = [1 2 3]
+invalidDates = [1. 2 3]
 @test_throws TimeData.chkDates(invalidDates)
 
 ## dates must be array!

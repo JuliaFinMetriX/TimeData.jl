@@ -3,11 +3,11 @@
 ####################################
 
 function chkDates(dates)
-    if(!isa(dates, DataArray))
-        error("dates must be of type DataArray")
+    if !isa(dates, Array)
+        error("time index must be given as array")
     end
-    if(!(issubtype(eltype(dates), Date)))
-        error("entries in dates must be of type Date")
+    if !issubtype(typeof(dates[1]), Union(Integer, Date, DateTime))
+        error("time index must be either Integer or TimeType")
     end
 end
 
