@@ -13,6 +13,7 @@ script:
   - julia -e 'Pkg.add("DataArrays")'
   - julia -e 'Pkg.add("DataFrames")'
   - julia -e 'Pkg.add("Datetime")'
+  - julia -e 'Pkg.update()'
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("TimeData"))`); Pkg.pin("TimeData"); Pkg.resolve()'
   - julia -e 'using TimeData; @assert isdefined(:TimeData); @assert typeof(TimeData) === Module'
   - mkdir -p ~/.julia/TimeData
