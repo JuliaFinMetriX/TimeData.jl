@@ -34,15 +34,14 @@ function str(tn::AbstractTimedata)
     println("\n\n-------------------------------------------")
     println("From: $fromDate, To: $toDate")
     println("-------------------------------------------\n")
-    
-    ## get first entries
-    (nrow, ncol) = size(tn)
 
-    showRows = minimum([maxDispRows nrow]);
+    ## get first entries
+    (nrow, ncol) = size(tn)    
+
     showCols = minimum([maxDispCols ncol]);
 
-    Peekidx = DataFrame(idx = tn.idx[1:showRows]);
-    Peek = [Peekidx tn.vals[1:showRows, 1:showCols]];
+    Peekidx = DataFrame(idx = tn.idx);
+    Peek = [Peekidx tn.vals[:, 1:showCols]];
     display(Peek)
 end
 
@@ -51,7 +50,6 @@ function display(tn::AbstractTimedata)
     ## display information about an array
     
     ## set display parameters
-    maxDispRows = Inf;
     maxDispCols = 5;
     
     ## get type and field information
@@ -64,11 +62,10 @@ function display(tn::AbstractTimedata)
     ## get first entries
     (nrow, ncol) = size(tn)    
 
-    showRows = minimum([maxDispRows nrow]);
     showCols = minimum([maxDispCols ncol]);
 
-    Peekidx = DataFrame(idx = tn.idx[1:showRows]);
-    Peek = [Peekidx tn.vals[1:showRows, 1:showCols]];
+    Peekidx = DataFrame(idx = tn.idx);
+    Peek = [Peekidx tn.vals[:, 1:showCols]];
     display(Peek)
 end
 
