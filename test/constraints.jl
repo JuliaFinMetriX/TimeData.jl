@@ -12,7 +12,7 @@ using TimeData
 ############
 
 ## test dates
-validIdx = [date(2010,02,ii) for ii=1:10]
+validIdx = Date{ISOCalendar}[date(2010,02,ii) for ii=1:10]
 TimeData.chkIdx(validIdx)
 
 ## test times
@@ -47,15 +47,15 @@ naDf = DataFrame(quote
     end)
 naDf[1, 2] = NA
 naDf[3, 1] = NA
-@test @returnsNothing TimeData.chkNumDf(naDf)
+TimeData.chkNumDf(naDf)
 @test_throws TimeData.chkNum(naDf)
 
 numDf = DataFrame(quote
     a = [1, 2, 3]
     b = [4, 5, 6]
     end)
-@test @returnsNothing TimeData.chkNumDf(numDf)
-@test @returnsNothing TimeData.chkNum(numDf)
+TimeData.chkNumDf(numDf)
+TimeData.chkNum(numDf)
 
 ## invalid DataFrame with strings
 invalidDf = DataFrame(quote

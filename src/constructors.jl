@@ -22,22 +22,22 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         end
         
         ## from core elements
-        function $(t){T}(vals::FloatArray,
+        function $(t)(vals::FloatArray,
                       names::Array{Union(UTF8String,ASCIIString),1},
-                      idx::Array{T, 1})
+                      idx::Array)
             df = DataFrame(vals, names)
             return $(t)(df, idx)
         end
-        function $(t){T}(vals::FloatArray,
+        function $(t)(vals::FloatArray,
                       names::Array{ASCIIString,1},
-                      idx::Array{T, 1})
+                      idx::Array)
             df = DataFrame(vals, names)
             return $(t)(df, idx)
         end
         
         ## comprehensive constructor: very general, all elements
         ## required for Timedata type
-        function $(t){T, K<:Array}(vals::K, names::K, idx::Array{T, 1}) 
+        function $(t)(vals::Array, names::Array, idx::Array) 
             df = DataFrame(vals)
             names!(df, names)
             return $(t)(df, idx)

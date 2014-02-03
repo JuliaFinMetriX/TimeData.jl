@@ -19,7 +19,7 @@ df = DataFrame(rand(8, 4))
 
 ## init test values
 vals = rand(30, 4)
-dats = [date(2013, 7, ii) for ii=1:30]
+dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
 nams = ["A", "B", "C", "D"]
 
 for t = (:Timedata, :Timenum, :Timematr)
@@ -53,14 +53,6 @@ for t = (:Timedata, :Timenum, :Timematr)
         tmp = tn[5, 3]
         @test isa(tmp, $(t))
         
-        ## single column
-        tmp = tn["A"]
-        @test isa(tmp, $(t))
-        
-        ## multiple columns
-        tmp = tn[5, ["A", "B"]]
-        @test isa(tmp, $(t))
-        
         ## multiple rows, single column
         tmp = tn[4:10, :A]
         @test isa(tmp, $(t))
@@ -89,16 +81,14 @@ for t = (:Timedata, :Timenum, :Timematr)
         @test isa(tmp, $(t))
         
         ## indexing rows by idx
-        idxToFind = [date(2013, 07, ii) for ii=12:18]
+        idxToFind = Date{ISOCalendar}[date(2013, 07, ii) for ii=12:18]
         tmp = tn[idxToFind]
         @test isa(tmp, $(t))
         
         ## indexing rows by idx, columns
         @test isa(tn[idxToFind, 2:3], $(t))
-        @test isa(tn[idxToFind, ["A", "B"]], $(t))
         @test isa(tn[idxToFind, :A], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12)], $(t))
-        @test isa(tn[date(2013,01,03):date(2013,07,12), ["B", "C"]], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12), :D], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12), 2:3], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12),

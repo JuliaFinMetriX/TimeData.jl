@@ -1,17 +1,23 @@
-type Timedata <: AbstractTimedata
+type Timedata{T} <: AbstractTimedata
     vals::DataFrame
-    idx::DataArray
+    idx::Array{T, 1}
 
-    function Timedata(vals::DataFrame, idx::DataArray)
+    function Timedata(vals::DataFrame, idx::Array{T, 1})
+        chkIdx(idx)
         if(size(vals, 1) != length(idx))
             if (length(idx) == 0) | (size(vals, 1) == 0)
-                return new(DataFrame([]), DataArray([]))
+                return new(DataFrame([]), Array{T, 1}[])
             end
-            error("number of idx must equal number of columns of data")
+            error(length(idx), " idx entries, but ", size(vals, 1), " rows of data")
         end
         return new(vals, idx)
     end
 end
+
+function Timedata{T}(vals::DataFrame, idx::Array{T, 1})
+    return Timedata{T}(vals, idx)
+end
+
 
 #################
 ## Conversions ##

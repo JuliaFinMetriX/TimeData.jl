@@ -12,16 +12,16 @@ function str(tn::AbstractTimedata)
     ## get type and field information
     typ = typeof(tn)
     println("\ntype: $typ")    
-    nms = names(tn)
+    nms = ["vals", "idx"]
     ## types = DataType[]
     for fieldname in nms
-        tp = fieldtype(tn, fieldname)
+        tp = fieldtype(tn, symbol(fieldname))
         ## push!(types, fieldtype(tn, fieldname))
         println(":$fieldname  \t\t  $tp")
     end
 
     print("\ndimensions: ")
-    print(size(tn.vals))
+    print(size(tn))
 
     
     ## get min and max
@@ -36,8 +36,7 @@ function str(tn::AbstractTimedata)
     println("-------------------------------------------\n")
     
     ## get first entries
-    nrow = length(tn.vals[:, 1]);
-    ncol = length(tn.vals[1, :]);
+    (nrow, ncol) = size(tn)
 
     showRows = minimum([maxDispRows nrow]);
     showCols = minimum([maxDispCols ncol]);
@@ -59,12 +58,11 @@ function display(tn::AbstractTimedata)
     typ = typeof(tn)
     println("\ntype: $typ")    
     print("dimensions: ")
-    print(size(tn.vals))
+    print(size(tn))
     print("\n")
     
     ## get first entries
-    nrow = size(tn.vals, 1)
-    ncol = size(tn.vals, 2)
+    (nrow, ncol) = size(tn)    
 
     showRows = minimum([maxDispRows nrow]);
     showCols = minimum([maxDispCols ncol]);

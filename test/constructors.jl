@@ -10,16 +10,14 @@ println("\n Running constructor tests\n")
 
 ## init test values
 vals = rand(30, 4)
-dats = [date(2013, 7, ii) for ii=1:30]
+dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
 tims = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
                                  for ii=1:30]
 idxs = [1:30]
 nams = ["A", "B", "C", "D"]
 valsDf = DataFrame(vals, nams)
-## datsDa = DataArray(dats)
 
 allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
-allTypes = (:Timematr, :Timematr)
 
 ########################
 ## inner constructors ##

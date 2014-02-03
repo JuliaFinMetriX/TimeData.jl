@@ -10,7 +10,7 @@
 ## isa(df[2:4, 1], DataArray{Float64,1})   # loses column name
 ## isa(df[2, 2], Float64)                  # loses column name
 
-typealias ColumnIndex Union(Real, String, Symbol)
+typealias ColumnIndex Union(Real, Symbol)
 import Base.getindex
 
 for t = (:Timedata, :Timenum, :Timematr, :Timecop)
@@ -40,7 +40,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
                                             col_inds::AbstractVector{T})
             valsDf = getindex(td.vals, row_ind, col_inds) # dataframe
             
-            dat = DataArray([idx(td)[row_ind]])
+            dat = [idx(td)[row_ind]]
             return $(t)(valsDf, dat)
         end
         
@@ -79,7 +79,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             # array 
             
             ## get idx
-            dats = idx(td)[row_inds]
+            dats = [idx(td)[row_inds]]
             
             return $(t)(valsDf, dats)
         end
@@ -98,7 +98,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             # array 
             
             ## single date needs to be transformed to DataArray
-            dat = DataArray([idx(td)[row_ind]])
+            dat = [idx(td)[row_ind]]
             
             return $(t)(valDf, dat)
         end
@@ -123,7 +123,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             getindex(td, with(td.vals, ex1), with(td.vals, ex2))
 
         #########################
-        ## indexing with idx ##
+        ## indexing with dates ##
         #########################
 
         function getindex(td::$(t), date::Date)
@@ -131,15 +131,13 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             return td[row_ind, :]
         end
         
-        function getindex(td::$(t), idx::Array{Date{ISOCalendar},1})
-            idxDa = DataArray([idx])
-            row_inds = findin(TimeData.idx(td), idxDa)
+        function getindex(td::$(t), idxs::Array{Date{ISOCalendar},1})
+            row_inds = findin(TimeData.idx(td), idxs)
             return td[row_inds, :]
         end
         
-        function getindex(td::$(t), idx::Array{Date{ISOCalendar},1}, x::Any)
-            idxDa = DataArray([idx])
-            row_inds = findin(TimeData.idx(td), idxDa)
+        function getindex(td::$(t), idxs::Array{Date{ISOCalendar},1}, x::Any)
+            row_inds = findin(TimeData.idx(td), idxs)
             return td[row_inds, x]
         end
         

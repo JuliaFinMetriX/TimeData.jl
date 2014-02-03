@@ -7,21 +7,25 @@
 ## - idx and vals must have same number of observations
 ## - values must be numeric
 
-type Timenum <: AbstractTimenum
+type Timenum{T} <: AbstractTimenum
     vals::DataFrame
-    idx::DataArray
+    idx::Array{T, 1}
 
-    function Timenum(vals::DataFrame, idx::DataArray)
+    function Timenum(vals::DataFrame, idx::Array{T, 1})
         chkIdx(idx)
         chkNumDf(vals)
         if(size(vals, 1) != length(idx))
             if (length(idx) == 0) | (size(vals, 1) == 0)
-                return new(DataFrame([]), DataArray([]))
+                return new(DataFrame([]), Array{T, 1}[])
             end
-            error("number of idx must equal number of columns of data")
+            error(length(idx), " idx entries, but ", size(vals, 1), " rows of data")
         end
         return new(vals, idx)
     end
+end
+
+function Timenum{T}(vals::DataFrame, idx::Array{T, 1})
+    return Timenum{T}(vals, idx)
 end
 
 

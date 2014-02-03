@@ -134,7 +134,7 @@ end
 
 function getVars(tm::Timematr, mapF::Function, crit::Function)
     ## map each column to a value, and apply some condition on value
-    ## e.g.: find variables with minimum return less than -30
+    ## e.g.: find variables with minimum value less than -30
     ncol = size(tm, 2)
     nrow = size(tm, 1)
     vals = TimeData.core(tm)
@@ -146,7 +146,7 @@ function getVars(tm::Timematr, mapF::Function, crit::Function)
 
     logics = crit(values)
 
-    df = DataFrame(names=names(tm)[logics], values=values[logics], )
+    df = DataFrame(names=names(tm)[logics], values=values[logics])
     ## names!(df, names(tm)[logics])
     return df
 end

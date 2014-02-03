@@ -27,11 +27,10 @@ function readTimedata(filename::String)
     end
 
     # parse first column that passes the Datetime regex test
-    idxArr = Date{ISOCalendar}[date(d) for d in
+    idx = Date{ISOCalendar}[date(d) for d in
                                  df[col_that_pass[1]]] # without
                                         # Date it would fail chkIdx
                                         # in constructor
-    idx = DataArray(idxArr)
     
     delete!(df, [col_that_pass[1]])
 
