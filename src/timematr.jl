@@ -42,6 +42,10 @@ end
 function core(tm::AbstractTimematr)
     return convert(Array{Float64}, array(tm.vals))
 end
+## alternative implementation not determining Float64
+## function core(tm::AbstractTimematr)
+##     return reshape([promote(array(tm.vals)...)...], size(tm))
+## end
 
 #######################
 ## Timematr get mean ##
