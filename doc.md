@@ -20,7 +20,9 @@ and have two fields, separating time information from observations:
 
 -   **vals:** a `DataFrame`
 
--   **dates:** a `DataArray` composed of `dates` from package `Datetime`
+-   **idx:** an `Array{T, 1}`, consisting of type `Integer`, or type
+             `Date` or `DateTime` from package `Datetime`
+
 
 However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
@@ -45,8 +47,8 @@ following types are introduced:
 Given that these constraints are fulfilled, one is able to define and
 use more specific functions matching the data characteristics more
 closely. For example, `Timematr` instances can directly make use of
-fast and numerically optimized `Array{Float64, 2}` methods under the
-hood. Hence, it is important that these constraints are reliably
+fast and numerically optimized methods using `Array{Float64, 2}` under
+the hood. Hence, it is important that these constraints are reliably
 fulfilled. They are guaranteed as they are hard-coded into variables
 at creation through the individual constructors. And, by now, no
 further `setindex` methods exist that would allow data manipulation.
@@ -54,48 +56,32 @@ further `setindex` methods exist that would allow data manipulation.
 # Constructors
 
 For each type, variables can be created by directly handing over
-observations as `DataFrame` and time information as `DataArray` to the
+observations as `DataFrame` and time information as `Array` to the
 inner constructor.
 
     using TimeData
     using Datetime
 
     vals = rand(30, 4)
-    dats = [date(2013, 7, ii) for ii=1:30]
+    dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
     nams = ["A", "B", "C", "D"]
     valsDf = DataFrame(vals, nams)
-    datsDa = DataArray(dats)
     
-    tm = Timematr(valsDf, datsDa)
+    tm = Timematr(valsDf, dats)
 
 Besides, there also exist several outer constructors for each type,
-allowing more convenient creation. In particular, if observations or
-dates do not entail any `NAs`, there is no need to wrap them up into
-`DataFrames` or `DataArrays` previously, but `TimeData` objects can
-simply be created from `Arrays`. Also, there might be situations where
-variable names and / or dates are missing. For these cases, there
-exist more convenient outer constructors, too, which generally follow
-the convention that dates do never precede variable names as
-arguments.
+allowing more convenient creation. In particular, if observations do
+not entail any `NAs`, there is no need to wrap them up into
+`DataFrames` previously, but `TimeData` objects can simply be created
+from `Arrays`. Also, there might be situations where variable names
+and / or dates are missing. For these cases, there exist more
+convenient outer constructors, too, which generally follow the
+convention that dates do never precede variable names as arguments.
 
     tm = Timematr(vals, nams, dats)
     tm = Timematr(vals, nams)
     tm = Timematr(vals, dats)
     tm = Timematr(vals)
-
-Alternatively, you could also initialize either observations or dates
-directly with the correct type, while using more convenient inputs for
-the other components. For example, a `DataFrame` of observations could
-either be used alone or in combination with an array of dates.
-
-    tm = Timematr(valsDf)
-    tm = Timematr(valsDf, dats)
-
-With dates already given as `DataArray`, observations could be given
-as `Array` with or without names given as `Array` as well.
-
-    tm = Timematr(vals, datsDa)
-    tm = Timematr(vals, nams, datsDa)
 
 # Indexing
 
@@ -124,13 +110,13 @@ return `DataArray` for single columns.
 This will print:
 
     DataArray{Float64,1} (constructor with 1 method)
-    Timematr (constructor with 9 methods)
+    Timematr{Date{ISOCalendar}} (constructor with 1 method)
     
     Float64
-    Timematr (constructor with 9 methods)
+    Timematr{Date{ISOCalendar}} (constructor with 1 method)
     
     
-    Timematr (constructor with 9 methods)
+    Timematr{Date{ISOCalendar}} (constructor with 1 method)
 
 
 Possible ways of indexing are:
@@ -143,12 +129,9 @@ Possible ways of indexing are:
     tmp = tm[5:8, 2]
     tmp = tm[5, 3]
     
-    ## indexing with column names
-    tmp = tm["A"]
-    tmp = tm[5, ["A", "B"]]
-    
     ## indexing with column names as symbols
-    tmp = tm[4:10, :A]
+    tmp = tm[:A]
+    tmp = tm[5, [:A, :B]]
     
     ## logical indexing
     logicCol = [true, false, true, false]
@@ -164,12 +147,11 @@ Possible ways of indexing are:
     ## indexing by date
     tmp = tm[date(2013, 07, 04)]
     
-    datesToFind = [date(2013, 07, ii) for ii=12:18]
+    datesToFind = Date{ISOCalendar}[date(2013, 07, ii) for ii=12:18]
     tmp = tm[datesToFind]
-    tm[date(2013,01,03):date(2013,07,12)]
-    tm[date(2013,01,03):date(2013,07,12), ["B", "C"]]
-    tm[date(2013,01,03):date(2013,07,12), :D]
-    tm[date(2013,01,03):date(2013,07,12),
+    tm[date(2013,07,03):date(2013,07,12)]
+    tm[date(2013,07,03):date(2013,07,12), :D]
+    tm[date(2013,07,03):date(2013,07,12),
                  [true, false, false, true]]
 
 # Read, write, io
@@ -187,7 +169,7 @@ After loading the data, Julia will call the standard `display` method
 to show information about the data:
 
     
-    type: Timematr
+    type: Timematr{Date{ISOCalendar}}
     dimensions: (333,348)
     333x6 DataFrame:
                    dates      MMM      ABT      ACE      ACT     ADBE
@@ -250,9 +232,9 @@ which will print:
     str(tm)
 
     
-    type: Timematr
+    type: Timematr{Date{ISOCalendar}}
     :vals         DataFrame
-    :dates        DataArray{T,N}
+    :idx          Array{Date{ISOCalendar},1}
     
     dimensions: (333,348)
     
@@ -305,7 +287,7 @@ which will print:
     [333,]    2013-05-01 -0.14498 -0.08162 -0.94057 -1.27548 -0.82415
 
 This will additionally show the names of the fields of any object, and
-also explicitly displays the time period of the data. 
+also explicitly display the time period of the data.
 
 To save an object to disk, simply call function `writeTimedata`, which
 internally uses `writetable` from the `DataFrame` package. In
@@ -388,9 +370,9 @@ additional basic functions that are defined for each `TimeData` type.
 For example, you can retrieve individual components of your variable
 with the following functions:
 
--   **dates:** returns time information as `DataArray`
+-   **idx:** returns time information as `Array`
 
--   **colnames:** returns variable names as
+-   **names:** returns variable names as
                   `Array{Union(UTF8String,ASCIIString),1}`
 
 -   **core:** implemented for subtypes of `AbstractTimematr`, it returns a
@@ -426,7 +408,7 @@ to thank the developers of
 -   the **DataFrames** package, which definitely provides the best
     representation for general types of data in data analysis. It's a
     role model that every last bit of code of `TimeData` depends on, and
-    the interface that every statistics package show use.
+    the interface that every statistics package should use.
 
 -   the **Datetime** package, which is a thoughtful implementation of
     dates, time and durations, and the backbone of all time components
