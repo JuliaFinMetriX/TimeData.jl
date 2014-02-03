@@ -7,30 +7,34 @@ using Datetime
 using TimeData
 ## using TimeData
 
-##############
-## chkDates ##
-##############
+############
+## chkIdx ##
+############
 
 ## test dates
-validDates = [date(2010,02,ii) for ii=1:10]
-TimeData.chkDates(validDates)
+validIdx = [date(2010,02,ii) for ii=1:10]
+TimeData.chkIdx(validIdx)
 
 ## test times
-validDates = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
+validIdx = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
                                  for ii=1:10]
-TimeData.chkDates(validDates)
+TimeData.chkIdx(validIdx)
 
 ## test integers
-validDates = [1:10]                                 
-TimeData.chkDates(validDates)
+validIdx = [1:10]                                 
+TimeData.chkIdx(validIdx)
 
-## test invalid dates
-invalidDates = [1. 2 3]
-@test_throws TimeData.chkDates(invalidDates)
+## test invalid idx
+invalidIdx = [1. 2 3]
+@test_throws TimeData.chkIdx(invalidIdx)
 
-## dates must be array!
-invalidDates = today()
-@test_throws TimeData.chkDates(invalidDates)
+## array of element type Any
+invalidIdx = [datetime(2010,02,ii,00,00,00) for ii=1:10]
+@test_throws TimeData.chkIdx(invalidIdx)
+
+## idx must be array!
+invalidIdx = today()
+@test_throws TimeData.chkIdx(invalidIdx)
 
 #########################
 ## chkNum and chkNumDf ##

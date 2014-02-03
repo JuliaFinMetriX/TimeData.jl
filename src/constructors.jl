@@ -17,63 +17,57 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         
         ## no names or dates (just simulated values)
         function $(t)(vals::FloatArray)
-            dates = DataArray(Date, size(vals, 1))
-            $(t)(DataFrame(vals), dates)
+            idx = [1:size(vals, 1)]
+            $(t)(DataFrame(vals), idx)
         end
         
         ## from core elements
-        function $(t)(vals::FloatArray,
+        function $(t){T}(vals::FloatArray,
                       names::Array{Union(UTF8String,ASCIIString),1},
-                      dates::DataArray)
+                      idx::Array{T, 1})
             df = DataFrame(vals, names)
-            return $(t)(df, dates)
+            return $(t)(df, idx)
         end
-        function $(t)(vals::FloatArray,
+        function $(t){T}(vals::FloatArray,
                       names::Array{ASCIIString,1},
-                      dates::DataArray)
+                      idx::Array{T, 1})
             df = DataFrame(vals, names)
-            return $(t)(df, dates)
+            return $(t)(df, idx)
         end
         
         ## comprehensive constructor: very general, all elements
-        function $(t){T<:Array, K<:Array, S<:Array}(vals::T, names::K, dates::S) 
+        ## required for Timedata type
+        function $(t){T, K<:Array}(vals::K, names::K, idx::Array{T, 1}) 
             df = DataFrame(vals)
             names!(df, names)
-            return $(t)(df, DataArray(dates))
+            return $(t)(df, idx)
         end
         
         ## two inputs only, general form
-        function $(t){T<:Array, S<:Array}(vals::T, names::S)
-            if isa(names[1], Date)
-                $(t)(DataFrame(vals), DataArray(names))
-            else
+        function $(t)(vals::Array, names::Array)
+            if isa(names[1], Union(UTF8String,ASCIIString))
                 $(t)(DataFrame(vals, names))
+            else
+                $(t)(DataFrame(vals), names)
             end
         end
-        
+
+        function $(t)(vals::DataFrame, names::Array)
+            if isa(names[1], Union(UTF8String,ASCIIString))
+                $(t)(DataFrame(vals, names))
+            else
+                $(t)(DataFrame(vals), names)
+            end
+        end
+
         ###################
         ## NAs in values ##
         ###################
         
-        ## no dates
+        ## no idx
         function $(t)(vals::DataFrame)
-            dates = DataArray(Date, size(vals, 1))
-            tn = $(t)(vals, dates)
-        end
-
-        ## dates as array
-        function $(t)(vals::DataFrame, dates::Array)
-            dates = DataArray(dates)
-            tn = $(t)(vals, dates)
-        end
-        
-        ##################
-        ## NAs in dates ##
-        ##################
-        
-        ## no names
-        function $(t)(vals::FloatArray, dates::DataArray)
-            $(t)(DataFrame(vals), dates)
+            idx = [1:size(vals, 1)]
+            tn = $(t)(vals, idx)
         end
     end
 end

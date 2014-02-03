@@ -11,11 +11,15 @@ println("\n Running constructor tests\n")
 ## init test values
 vals = rand(30, 4)
 dats = [date(2013, 7, ii) for ii=1:30]
+tims = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
+                                 for ii=1:30]
+idxs = [1:30]
 nams = ["A", "B", "C", "D"]
 valsDf = DataFrame(vals, nams)
-datsDa = DataArray(dats)
+## datsDa = DataArray(dats)
 
 allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
+allTypes = (:Timematr, :Timematr)
 
 ########################
 ## inner constructors ##
@@ -23,7 +27,9 @@ allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
 
 for t in allTypes
     eval(quote
-        td = $t(valsDf, datsDa)
+        td = $t(valsDf, dats)
+        td = $t(valsDf, tims)
+        td = $t(valsDf, idxs)
     end)
 end
 
@@ -39,12 +45,16 @@ for t in allTypes
 
         ## from arrays without names
         td = $(t)(vals, dats)
+        td = $(t)(vals, tims)
+        td = $(t)(vals, idxs)
 
-        ## from arrays without dates
+        ## from arrays without idx
         td = $(t)(vals, nams)
 
-        ## from three arrays with names and dates
+        ## from three arrays with names and idx
         td = $(t)(vals, nams, dats)
+        td = $(t)(vals, nams, tims)
+        td = $(t)(vals, nams, idxs)
     end)
 end
 
@@ -54,49 +64,35 @@ end
 
 for t in allTypes
     eval(quote
-        ## from DataFrame without dates
+        ## from DataFrame without idx
         td = $(t)(valsDf)
 
-        ## from DataFrame with dates as array
+        ## from DataFrame with idx as array
         td = $(t)(valsDf, dats)
+        td = $(t)(valsDf, tims)
+        td = $(t)(valsDf, idxs)
     end)
 end
-
-##################
-## NAs in dates ##
-##################
-
-for t in allTypes
-    eval(quote
-        ## from DataArray dates without names
-        td = $(t)(vals, datsDa)
-
-        ## from DataArray dates with names
-        td = $(t)(vals, nams, datsDa)
-    end)
-end
-
 
 ######################################
 ## throwing errors for wrong inputs ##
 ######################################
 
-## dates initialized with wrong type
+## idx initialized with wrong type
 vals = DataFrame([2, 3, 4])
-invalidDates = DataArray([1, 2, 3])
+invalidIdx = DataArray([1, 2, 3])
 for t in allTypes
     eval(quote
-        @test_throws $(t)(vals, dates)        
+        @test_throws $(t)(vals, idx)        
     end)
 end
 
-## dates and vals sizes not matching
-dates = [date(2013, 7, ii) for ii=1:30]
-dates = DataArray(dates)
+## idx and vals sizes not matching
+idx = [date(2013, 7, ii) for ii=1:30]
 valsArr = rand(20, 4)
 for t in allTypes
     eval(quote
-        @test_throws $(t)(valsArr, dates)
+        @test_throws $(t)(valsArr, idx)
     end)
 end
 

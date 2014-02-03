@@ -1,39 +1,44 @@
-type Timematr <: AbstractTimematr
+type Timematr{T} <: AbstractTimematr
     vals::DataFrame
-    dates::DataArray
+    idx::Array{T, 1}
 
-    function Timematr(vals::DataFrame, dates::DataArray)
-        chkDates(dates)
+    function Timematr(vals::DataFrame, idx::Array{T, 1})
+        chkIdx(idx)
         chkNum(vals)
-        if(size(vals, 1) != length(dates))
-            if (length(dates) == 0) | (size(vals, 1) == 0)
-                return new(DataFrame([]), DataArray([]))
+        if(size(vals, 1) != length(idx))
+            if (length(idx) == 0) | (size(vals, 1) == 0)
+                return new(DataFrame([]), Array{T, 1}[])
             end
-            error(length(dates), " dates, but ", size(vals, 1), " rows of data")
+            error(length(idx), " idx entries, but ", size(vals, 1), " rows of data")
         end
-        return new(vals, dates)
+        return new(vals, idx)
     end
 end
 
+function Timematr{T}(vals::DataFrame, idx::Array{T, 1})
+    return Timematr{T}(vals, idx)
+end
+
+    
 #################
 ## Conversions ##
 #################
 
 ## conversion upwards: always works
 function convert(Timedata, tm::Timematr)
-    Timedata(tm.vals, tm.dates)
+    Timedata(tm.vals, tm.idx)
 end
 
 ## conversion upwards: always works
 function convert(Timenum, tm::Timematr)
-    Timenum(tm.vals, tm.dates)
+    Timenum(tm.vals, tm.idx)
 end
 
 #############################
 ## get numeric values only ##
 #############################
 
-## possible without NAs
+## possible without NAs: extract values as Float64
 function core(tm::AbstractTimematr)
     return convert(Array{Float64}, array(tm.vals))
 end
@@ -55,7 +60,7 @@ end
 function rowmeans(tm::Timematr)
     ## output: Timematr
     meanVals = mean(core(tm), 2)
-    means = Timematr(meanVals, dates(tm))
+    means = Timematr(meanVals, idx(tm))
 end
 
 ######################################
@@ -75,7 +80,7 @@ end
 function rowsums(tm::Timematr)
     ## output: Timematr
     sumVals = sum(core(tm), 2)
-    sums = Timematr(sumVals, dates(tm))
+    sums = Timematr(sumVals, idx(tm))
 end
 
 
@@ -123,7 +128,7 @@ end
 import Base.cumsum
 function cumsum(tm::Timematr, dim::Integer)
     cumulated = cumsum(core(tm), dim)
-    return Timematr(DataFrame(cumulated, names(tm)), dates(tm))
+    return Timematr(DataFrame(cumulated, names(tm)), idx(tm))
 end
 
 
@@ -181,7 +186,7 @@ function movAvg(tm::Timematr, nPeriods::Integer)
 
     ## divide
     scaledVals = movAvgs / nPeriods
-    dats = dates(tm)[startInd:finInd]
+    dats = idx(tm)[startInd:finInd]
 
     movAvgTm = Timematr(scaledVals, names(tm), dats)
     return movAvgTm

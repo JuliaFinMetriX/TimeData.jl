@@ -1,12 +1,12 @@
 ####################################
-## check for dataarray with dates ##
+## check for dataarray with idx ##
 ####################################
 
-function chkDates(dates)
-    if !isa(dates, Array)
+function chkIdx(idx)
+    if !isa(idx, Array)
         error("time index must be given as array")
     end
-    if !issubtype(typeof(dates[1]), Union(Integer, Date, DateTime))
+    if !issubtype(eltype(idx), Union(Integer, Date, DateTime))
         error("time index must be either Integer or TimeType")
     end
 end

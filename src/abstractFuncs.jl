@@ -28,8 +28,8 @@ function str(tn::AbstractTimedata)
     ## minVal = minimum(tn.vals);
     ## maxVal = maximum(tn.vals);
 
-    fromDate = tn.dates[1];
-    toDate = tn.dates[end];
+    fromDate = tn.idx[1];
+    toDate = tn.idx[end];
     
     println("\n\n-------------------------------------------")
     println("From: $fromDate, To: $toDate")
@@ -42,8 +42,8 @@ function str(tn::AbstractTimedata)
     showRows = minimum([maxDispRows nrow]);
     showCols = minimum([maxDispCols ncol]);
 
-    Peekdates = DataFrame(dates = tn.dates[1:showRows]);
-    Peek = [Peekdates tn.vals[1:showRows, 1:showCols]];
+    Peekidx = DataFrame(idx = tn.idx[1:showRows]);
+    Peek = [Peekidx tn.vals[1:showRows, 1:showCols]];
     display(Peek)
 end
 
@@ -69,8 +69,8 @@ function display(tn::AbstractTimedata)
     showRows = minimum([maxDispRows nrow]);
     showCols = minimum([maxDispCols ncol]);
 
-    Peekdates = DataFrame(dates = tn.dates[1:showRows]);
-    Peek = [Peekdates tn.vals[1:showRows, 1:showCols]];
+    Peekidx = DataFrame(idx = tn.idx[1:showRows]);
+    Peek = [Peekidx tn.vals[1:showRows, 1:showCols]];
     display(Peek)
 end
 
@@ -78,8 +78,8 @@ end
 ## Timedata information retrieval ##
 ####################################
 
-function dates(tn::AbstractTimedata)
-    return tn.dates
+function idx(tn::AbstractTimedata)
+    return tn.idx
 end
 
 import DataFrames.names
@@ -113,8 +113,8 @@ import Base.isequal
 function isequal(tn::AbstractTimedata, tn2::AbstractTimedata)
     typeEqu = isequal(typeof(tn), typeof(tn2))
     valsEqu = isequal(tn.vals, tn2.vals)
-    datesEqu = isequal(tn.dates, tn2.dates)
-    equ = (valsEqu & datesEqu & typeEqu)
+    idxEqu = isequal(tn.idx, tn2.idx)
+    equ = (valsEqu & idxEqu & typeEqu)
     return equ
 end
 
@@ -124,5 +124,5 @@ end
 
 import DataFrames.isna
 function isna(tn::AbstractTimedata)
-    return Timedata(isna(tn.vals), dates(tn))
+    return Timedata(isna(tn.vals), idx(tn))
 end

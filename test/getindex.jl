@@ -88,15 +88,15 @@ for t = (:Timedata, :Timenum, :Timematr)
         tmp = tn[date(2013, 07, 04)]
         @test isa(tmp, $(t))
         
-        ## indexing rows by dates
-        datesToFind = [date(2013, 07, ii) for ii=12:18]
-        tmp = tn[datesToFind]
+        ## indexing rows by idx
+        idxToFind = [date(2013, 07, ii) for ii=12:18]
+        tmp = tn[idxToFind]
         @test isa(tmp, $(t))
         
-        ## indexing rows by dates, columns
-        @test isa(tn[datesToFind, 2:3], $(t))
-        @test isa(tn[datesToFind, ["A", "B"]], $(t))
-        @test isa(tn[datesToFind, :A], $(t))
+        ## indexing rows by idx, columns
+        @test isa(tn[idxToFind, 2:3], $(t))
+        @test isa(tn[idxToFind, ["A", "B"]], $(t))
+        @test isa(tn[idxToFind, :A], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12)], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12), ["B", "C"]], $(t))
         @test isa(tn[date(2013,01,03):date(2013,07,12), :D], $(t))

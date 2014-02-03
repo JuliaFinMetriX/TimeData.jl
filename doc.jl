@@ -59,8 +59,8 @@ tmp = tm[ex, :]
 ## indexing by date
 tmp = tm[date(2013, 07, 04)]
 
-datesToFind = [date(2013, 07, ii) for ii=12:18]
-tmp = tm[datesToFind]
+idxToFind = [date(2013, 07, ii) for ii=12:18]
+tmp = tm[idxToFind]
 tm[date(2013,01,03):date(2013,07,12)]
 tm[date(2013,01,03):date(2013,07,12), ["B", "C"]]
 tm[date(2013,01,03):date(2013,07,12), :D]

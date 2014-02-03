@@ -23,7 +23,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         ## select multiple columns
         function getindex{T <: ColumnIndex}(td::$(t), col_inds::AbstractVector{T})
             valsDf = getindex(td.vals, col_inds) # dataframe
-            return $(t)(valsDf, dates(td))
+            return $(t)(valsDf, idx(td))
         end
         
         ## multiple rows, multiple columns
@@ -31,7 +31,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
                                                        row_inds::AbstractVector{R},
                                                        col_inds::AbstractVector{T})
             valsDf = getindex(td.vals, row_inds, col_inds) # dataframe
-            dats = dates(td)[row_inds]
+            dats = idx(td)[row_inds]
             return $(t)(valsDf, dats)
         end
         
@@ -40,7 +40,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
                                             col_inds::AbstractVector{T})
             valsDf = getindex(td.vals, row_ind, col_inds) # dataframe
             
-            dat = DataArray([dates(td)[row_ind]])
+            dat = DataArray([idx(td)[row_ind]])
             return $(t)(valsDf, dat)
         end
         
@@ -61,7 +61,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             names!(valsDf, [name])           # names must be given as
             # array 
             
-            return $(t)(valsDf, dates(td))
+            return $(t)(valsDf, idx(td))
         end
         
         ## multiple rows, single column
@@ -78,8 +78,8 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             names!(valsDf, [name])           # names must be given as
             # array 
             
-            ## get dates
-            dats = dates(td)[row_inds]
+            ## get idx
+            dats = idx(td)[row_inds]
             
             return $(t)(valsDf, dats)
         end
@@ -98,7 +98,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             # array 
             
             ## single date needs to be transformed to DataArray
-            dat = DataArray([dates(td)[row_ind]])
+            dat = DataArray([idx(td)[row_ind]])
             
             return $(t)(valDf, dat)
         end
@@ -123,33 +123,33 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             getindex(td, with(td.vals, ex1), with(td.vals, ex2))
 
         #########################
-        ## indexing with dates ##
+        ## indexing with idx ##
         #########################
 
         function getindex(td::$(t), date::Date)
-            row_ind = dates(td) .== date
+            row_ind = idx(td) .== date
             return td[row_ind, :]
         end
         
-        function getindex(td::$(t), dates::Array{Date{ISOCalendar},1})
-            datesDa = DataArray([dates])
-            row_inds = findin(TimeData.dates(td), datesDa)
+        function getindex(td::$(t), idx::Array{Date{ISOCalendar},1})
+            idxDa = DataArray([idx])
+            row_inds = findin(TimeData.idx(td), idxDa)
             return td[row_inds, :]
         end
         
-        function getindex(td::$(t), dates::Array{Date{ISOCalendar},1}, x::Any)
-            datesDa = DataArray([dates])
-            row_inds = findin(TimeData.dates(td), datesDa)
+        function getindex(td::$(t), idx::Array{Date{ISOCalendar},1}, x::Any)
+            idxDa = DataArray([idx])
+            row_inds = findin(TimeData.idx(td), idxDa)
             return td[row_inds, x]
         end
         
-        function getindex(td::$(t), dates::DateRange{ISOCalendar})
-            return getindex(td, [dates])
+        function getindex(td::$(t), idx::DateRange{ISOCalendar})
+            return getindex(td, [idx])
         end
         
-        function getindex(td::$(t), dates::DateRange{ISOCalendar},
+        function getindex(td::$(t), idx::DateRange{ISOCalendar},
                                    x::Any)
-            return getindex(td, [dates], x)
+            return getindex(td, [idx], x)
         end
         
     end

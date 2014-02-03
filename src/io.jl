@@ -27,24 +27,24 @@ function readTimedata(filename::String)
     end
 
     # parse first column that passes the Datetime regex test
-    datesArr = Date{ISOCalendar}[date(d) for d in
+    idxArr = Date{ISOCalendar}[date(d) for d in
                                  df[col_that_pass[1]]] # without
-                                        # Date it would fail chkDates
+                                        # Date it would fail chkIdx
                                         # in constructor
-    dates = DataArray(datesArr)
+    idx = DataArray(idxArr)
     
     delete!(df, [col_that_pass[1]])
 
     ## try whether DataFrame fits subtypes
     try
-        td = Timematr(df, dates)
+        td = Timematr(df, idx)
         return td        
     catch
         try
-            td = Timenum(df, dates)
+            td = Timenum(df, idx)
             return td
         catch
-            td = Timedata(df, dates)
+            td = Timedata(df, idx)
             return td
         end
     end
@@ -52,8 +52,8 @@ end
 
 function writeTimedata(filename::String, td::AbstractTimedata)
     ## create large dataframe
-    datesDf = DataFrame(dates = dates(td));
-    df = [datesDf td.vals];
+    idxDf = DataFrame(idx = idx(td));
+    df = [idxDf td.vals];
     writetable(filename, df)
 end
 

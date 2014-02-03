@@ -4,27 +4,27 @@
 
 ## type preserving symmetric operations and functions
 ##
-## f(b::NAtype, inst::NewType) = NewType(f(b, inst.vals), dates(inst)) 
-## f(inst::NewType, b::NAtype) = NewType(f(inst.vals, b), dates(inst))
-## f(inst::NewType, inst2::NewType) = NewType(f(inst1.vals, inst2.vals), dates(inst))
-## f(inst::NewType, b::Union(String,Number)) = NewType(f(inst.vals, b), dates(inst))
-## f(b::Union(String,Number), inst::NewType) = NewType(f(b, inst.vals), dates(inst))
+## f(b::NAtype, inst::NewType) = NewType(f(b, inst.vals), idx(inst)) 
+## f(inst::NewType, b::NAtype) = NewType(f(inst.vals, b), idx(inst))
+## f(inst::NewType, inst2::NewType) = NewType(f(inst1.vals, inst2.vals), idx(inst))
+## f(inst::NewType, b::Union(String,Number)) = NewType(f(inst.vals, b), idx(inst))
+## f(b::Union(String,Number), inst::NewType) = NewType(f(b, inst.vals), idx(inst))
 macro pres_msSymmetric(f, myType)
     esc(quote
         $(f)(inst::$(myType),b::NAtype) =
-            $(myType)($(f)(inst.vals,b), dates(inst))
+            $(myType)($(f)(inst.vals,b), idx(inst))
         
         $(f)(b::NAtype,inst::$(myType)) =
-            $(myType)($(f)(b,inst.vals), dates(inst))
+            $(myType)($(f)(b,inst.vals), idx(inst))
 
         $(f)(inst::$(myType), inst2::$(myType)) =
-            $(myType)($(f)(inst.vals, inst2.vals), dates(inst))
+            $(myType)($(f)(inst.vals, inst2.vals), idx(inst))
 
         $(f)(inst::$(myType),b::Union(String,Number)) =
-            $(myType)($(f)(inst.vals,b), dates(inst))
+            $(myType)($(f)(inst.vals,b), idx(inst))
         
         $(f)(b::Union(String,Number),inst::$(myType)) =
-            $(myType)($(f)(b,inst.vals), dates(inst))
+            $(myType)($(f)(b,inst.vals), idx(inst))
     end)
 end
 
@@ -53,11 +53,11 @@ end
 #################################################
 
 ## type preserving functions with method signature:
-## f(inst::NewType) = NewType(f(inst.vals), dates(inst))
+## f(inst::NewType) = NewType(f(inst.vals), idx(inst))
 macro pres_msUnitary(f, myType)
     esc(quote
         $(f)(inst::$(myType)) =
-            $(myType)($(f)(inst.vals), dates(inst))
+            $(myType)($(f)(inst.vals), idx(inst))
     end)
 end
 
@@ -86,27 +86,27 @@ end
 ######################################################
 
 ## symmetric operators and functions with method signatures: 
-## f(b::NAtype, inst::NewType) = NewType(f(b, inst.vals), dates(inst))
-## f(inst::NewType, b::NAtype) = NewType(f(inst.vals, b), dates(inst))
-## f(inst::NewType, inst2::NewType) = NewType(f(inst.vals, inst2.vals), dates(inst))
-## f(inst::NewType, b::Union(String,Number)) = NewType(f(inst.vals, b), dates(inst))
-## f(b::Union(String,Number), inst::NewType) = NewType(f(b, inst.vals), dates(inst))
+## f(b::NAtype, inst::NewType) = NewType(f(b, inst.vals), idx(inst))
+## f(inst::NewType, b::NAtype) = NewType(f(inst.vals, b), idx(inst))
+## f(inst::NewType, inst2::NewType) = NewType(f(inst.vals, inst2.vals), idx(inst))
+## f(inst::NewType, b::Union(String,Number)) = NewType(f(inst.vals, b), idx(inst))
+## f(b::Union(String,Number), inst::NewType) = NewType(f(b, inst.vals), idx(inst))
 macro nonpres_msSymmetric(f)
     esc(quote
         $(f)(b::NAtype,inst::AbstractTimedata) =
-            Timedata($(f)(b,inst.vals), dates(inst))
+            Timedata($(f)(b,inst.vals), idx(inst))
 
         $(f)(inst::AbstractTimedata,b::NAtype) =
-            Timedata($(f)(inst.vals,b), dates(inst))
+            Timedata($(f)(inst.vals,b), idx(inst))
         
         $(f)(inst::AbstractTimedata, inst2::AbstractTimedata) =
-            Timedata($(f)(inst.vals, inst2.vals), dates(inst))
+            Timedata($(f)(inst.vals, inst2.vals), idx(inst))
 
         $(f)(inst::AbstractTimedata,b::Union(String,Number)) =
-            Timedata($(f)(inst.vals,b), dates(inst))
+            Timedata($(f)(inst.vals,b), idx(inst))
         
         $(f)(b::Union(String,Number),inst::AbstractTimedata) =
-            Timedata($(f)(b,inst.vals), dates(inst))
+            Timedata($(f)(b,inst.vals), idx(inst))
     end)
 end
 
@@ -130,14 +130,14 @@ end
 #########################################################
 
 ## symmetric operators and functions with method signatures:
-## f(td::NewType) = NewType(f(td.vals), dates(td))
-## f(td::NewType, i::Integer) = NewType(f(td.vals, i), dates(td))
+## f(td::NewType) = NewType(f(td.vals), idx(td))
+## f(td::NewType, i::Integer) = NewType(f(td.vals, i), idx(td))
 macro pres_msSingle_or_extra(f, myType)
     esc(quote
         $(f)(inst::$(myType)) =
-            $(myType)($(f)(inst.vals), dates(inst))
+            $(myType)($(f)(inst.vals), idx(inst))
         $(f)(inst::$(myType), i::Integer) =
-            $(myType)($(f)(inst.vals, i), dates(inst))
+            $(myType)($(f)(inst.vals, i), idx(inst))
     end)
 end
 

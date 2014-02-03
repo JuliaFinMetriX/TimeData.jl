@@ -25,12 +25,12 @@ function setupTestInstance()
     df[2, 2] = NA
     df[3, 4] = NA
     df[4, 4] = NA
-    dates = [date(2013, 7, 1),
+    idx = [date(2013, 7, 1),
              date(2013, 7, 2),
              date(2013, 7, 3),
              date(2013, 7, 4),
              date(2013, 7, 5)]
-    tn = TimeData.Timenum(df, DataArray(dates))
+    tn = TimeData.Timenum(df, DataArray(idx))
     return tn
 end    
 

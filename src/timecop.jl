@@ -1,17 +1,17 @@
 type Timecop <: AbstractTimematr
     vals::DataFrame
-    dates::DataArray
+    idx::DataArray
 
-    function Timecop(vals::DataFrame, dates::DataArray)
-        chkDates(dates)
+    function Timecop(vals::DataFrame, idx::DataArray)
+        chkIdx(idx)
         chkNum(vals)
         chkUnit(vals)
-        if(size(vals, 1) != length(dates))
-            if (length(dates) == 0) | (size(vals, 1) == 0)
+        if(size(vals, 1) != length(idx))
+            if (length(idx) == 0) | (size(vals, 1) == 0)
                 return new(DataFrame([]), DataArray([]))
             end
-            error(length(dates), " dates, but ", size(vals, 1), " rows of data")
+            error(length(idx), " idx, but ", size(vals, 1), " rows of data")
         end
-        return new(vals, dates)
+        return new(vals, idx)
     end
 end

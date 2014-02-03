@@ -16,12 +16,19 @@ println("\n Running timematr tests\n")
 vals = rand(30, 4)
 dats = [date(2013, 7, ii) for ii=1:30]
 nams = ["A", "B", "C", "D"]
+df = DataFrame(vals, nams)
+
+tm = TimeData.Timematr(df, dats)
+tm = TimeData.Timematr(vals, nams, [31:60])
+tm = TimeData.Timematr(vals, nams, dats)
+
+
 
 ## reconstructing Timematr instance from core elements
 tm = TimeData.Timematr(vals, nams, dats)
 vals2 = TimeData.core(tm)
 nams2 = TimeData.names(tm)
-dats2 = TimeData.dates(tm)
+dats2 = TimeData.idx(tm)
 tm2 = TimeData.Timematr(vals2, nams2, dats2)
 @test TimeData.isequal(tm, tm2)
 

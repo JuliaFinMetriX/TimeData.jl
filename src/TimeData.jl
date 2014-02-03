@@ -5,8 +5,8 @@ using DataFrames
 module TimeData
 
 ## list packages whos namespace is used
-using DataFrames
 using DataArrays
+using DataFrames
 using Datetime
 ## using Winston
 
@@ -18,7 +18,7 @@ AbstractTimedata,
 AbstractTimenum,
 AbstractTimematr,
 core,
-dates,
+idx,
 movAvg,
 readTimedata,
 rowmeans,

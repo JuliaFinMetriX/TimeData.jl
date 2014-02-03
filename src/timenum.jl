@@ -4,23 +4,23 @@
 
 ## constraints:
 ## - DataArray, where individual entries are subtype of Date
-## - dates and vals must have same number of observations
+## - idx and vals must have same number of observations
 ## - values must be numeric
 
 type Timenum <: AbstractTimenum
     vals::DataFrame
-    dates::DataArray
+    idx::DataArray
 
-    function Timenum(vals::DataFrame, dates::DataArray)
-        chkDates(dates)
+    function Timenum(vals::DataFrame, idx::DataArray)
+        chkIdx(idx)
         chkNumDf(vals)
-        if(size(vals, 1) != length(dates))
-            if (length(dates) == 0) | (size(vals, 1) == 0)
+        if(size(vals, 1) != length(idx))
+            if (length(idx) == 0) | (size(vals, 1) == 0)
                 return new(DataFrame([]), DataArray([]))
             end
-            error("number of dates must equal number of columns of data")
+            error("number of idx must equal number of columns of data")
         end
-        return new(vals, dates)
+        return new(vals, idx)
     end
 end
 
@@ -31,10 +31,10 @@ end
 
 ## conversion upwards: always works
 function convert(Timedata, tn::Timenum)
-    Timedata(tn.vals, tn.dates)
+    Timedata(tn.vals, tn.idx)
 end
 
 ## conversion downwards: fails for NAs
 function convert(Timematr, tn::Timenum)
-    Timematr(tn.vals, tn.dates)
+    Timematr(tn.vals, tn.idx)
 end

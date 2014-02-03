@@ -20,7 +20,7 @@ for t in allTypes
     eval(quote
         td = $(t)(vals, nams, dats)
         @test isequal(names(td), nams)
-        @test isequal(TimeData.dates(td), DataArray(dats))
+        @test isequal(TimeData.idx(td), DataArray(dats))
     end)
 end
 
