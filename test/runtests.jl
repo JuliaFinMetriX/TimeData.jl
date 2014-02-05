@@ -1,3 +1,9 @@
+module runtests
+
+using Datetime
+using DataFrames
+using DataArrays
+
 tests = ["abstractFuncs.jl",
          "constraints.jl",
          "constructors.jl",
@@ -9,4 +15,6 @@ tests = ["abstractFuncs.jl",
 
 for t in tests
     include(string(Pkg.dir("TimeData"), "/test/", t))
+end
+
 end
