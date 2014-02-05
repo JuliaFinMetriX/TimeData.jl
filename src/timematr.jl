@@ -39,6 +39,8 @@ end
 #############################
 
 ## possible without NAs: extract values as Float64
+## Will always return Array{Float64, 2}, since it is based on
+## DataFrames. array only returns Array{Float, 1} for DataArrays. 
 function core(tm::AbstractTimematr)
     return convert(Array{Float64}, array(tm.vals))
 end
