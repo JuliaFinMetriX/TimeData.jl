@@ -57,7 +57,8 @@ and have two fields, separating time information from observations:</p>
 
 <ul>
 <li><p><strong>vals:</strong> a <code>DataFrame</code></p></li>
-<li><p><strong>dates:</strong> a <code>DataArray</code> composed of <code>dates</code> from package <code>Datetime</code></p></li>
+<li><p><strong>idx:</strong> an <code>Array{T, 1}</code>, consisting of type <code>Integer</code>, or type
+         <code>Date</code> or <code>DateTime</code> from package <code>Datetime</code></p></li>
 </ul><p>However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
 way! Hence, only reference the fields directly if you really know what
@@ -78,8 +79,8 @@ only</p></li>
 </ul><p>Given that these constraints are fulfilled, one is able to define and
 use more specific functions matching the data characteristics more
 closely. For example, <code>Timematr</code> instances can directly make use of
-fast and numerically optimized <code>Array{Float64, 2}</code> methods under the
-hood. Hence, it is important that these constraints are reliably
+fast and numerically optimized methods using <code>Array{Float64, 2}</code> under
+the hood. Hence, it is important that these constraints are reliably
 fulfilled. They are guaranteed as they are hard-coded into variables
 at creation through the individual constructors. And, by now, no
 further <code>setindex</code> methods exist that would allow data manipulation.</p>
@@ -88,51 +89,33 @@ further <code>setindex</code> methods exist that would allow data manipulation.<
 <a name="constructors" class="anchor" href="#constructors"><span class="octicon octicon-link"></span></a>Constructors</h1>
 
 <p>For each type, variables can be created by directly handing over
-observations as <code>DataFrame</code> and time information as <code>DataArray</code> to the
+observations as <code>DataFrame</code> and time information as <code>Array</code> to the
 inner constructor.</p>
 
 <pre><code>using TimeData
 using Datetime
 
 vals = rand(30, 4)
-dats = [date(2013, 7, ii) for ii=1:30]
+dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
 nams = ["A", "B", "C", "D"]
 valsDf = DataFrame(vals, nams)
-datsDa = DataArray(dats)
 
-tm = Timematr(valsDf, datsDa)
+tm = Timematr(valsDf, dats)
 </code></pre>
 
 <p>Besides, there also exist several outer constructors for each type,
-allowing more convenient creation. In particular, if observations or
-dates do not entail any <code>NAs</code>, there is no need to wrap them up into
-<code>DataFrames</code> or <code>DataArrays</code> previously, but <code>TimeData</code> objects can
-simply be created from <code>Arrays</code>. Also, there might be situations where
-variable names and / or dates are missing. For these cases, there
-exist more convenient outer constructors, too, which generally follow
-the convention that dates do never precede variable names as
-arguments.</p>
+allowing more convenient creation. In particular, if observations do
+not entail any <code>NAs</code>, there is no need to wrap them up into
+<code>DataFrames</code> previously, but <code>TimeData</code> objects can simply be created
+from <code>Arrays</code>. Also, there might be situations where variable names
+and / or dates are missing. For these cases, there exist more
+convenient outer constructors, too, which generally follow the
+convention that dates do never precede variable names as arguments.</p>
 
 <pre><code>tm = Timematr(vals, nams, dats)
 tm = Timematr(vals, nams)
 tm = Timematr(vals, dats)
 tm = Timematr(vals)
-</code></pre>
-
-<p>Alternatively, you could also initialize either observations or dates
-directly with the correct type, while using more convenient inputs for
-the other components. For example, a <code>DataFrame</code> of observations could
-either be used alone or in combination with an array of dates.</p>
-
-<pre><code>tm = Timematr(valsDf)
-tm = Timematr(valsDf, dats)
-</code></pre>
-
-<p>With dates already given as <code>DataArray</code>, observations could be given
-as <code>Array</code> with or without names given as <code>Array</code> as well.</p>
-
-<pre><code>tm = Timematr(vals, datsDa)
-tm = Timematr(vals, nams, datsDa)
 </code></pre>
 
 <h1>
@@ -164,13 +147,13 @@ typeof(tm[4:3, 5:4])
 <p>This will print:</p>
 
 <pre><code>DataArray{Float64,1} (constructor with 1 method)
-Timematr (constructor with 9 methods)
+Timematr{Date{ISOCalendar}} (constructor with 1 method)
 
 Float64
-Timematr (constructor with 9 methods)
+Timematr{Date{ISOCalendar}} (constructor with 1 method)
 
 
-Timematr (constructor with 9 methods)
+Timematr{Date{ISOCalendar}} (constructor with 1 method)
 </code></pre>
 
 <p>Possible ways of indexing are:</p>
@@ -183,12 +166,9 @@ tmp = tm[2]
 tmp = tm[5:8, 2]
 tmp = tm[5, 3]
 
-## indexing with column names
-tmp = tm["A"]
-tmp = tm[5, ["A", "B"]]
-
 ## indexing with column names as symbols
-tmp = tm[4:10, :A]
+tmp = tm[:A]
+tmp = tm[5, [:A, :B]]
 
 ## logical indexing
 logicCol = [true, false, true, false]
@@ -204,12 +184,11 @@ tmp = tm[ex, :]
 ## indexing by date
 tmp = tm[date(2013, 07, 04)]
 
-datesToFind = [date(2013, 07, ii) for ii=12:18]
+datesToFind = Date{ISOCalendar}[date(2013, 07, ii) for ii=12:18]
 tmp = tm[datesToFind]
-tm[date(2013,01,03):date(2013,07,12)]
-tm[date(2013,01,03):date(2013,07,12), ["B", "C"]]
-tm[date(2013,01,03):date(2013,07,12), :D]
-tm[date(2013,01,03):date(2013,07,12),
+tm[date(2013,07,03):date(2013,07,12)]
+tm[date(2013,07,03):date(2013,07,12), :D]
+tm[date(2013,07,03):date(2013,07,12),
              [true, false, false, true]]
 </code></pre>
 
@@ -229,7 +208,7 @@ identifier. </p>
 <p>After loading the data, Julia will call the standard <code>display</code> method
 to show information about the data:</p>
 
-<pre><code>type: Timematr
+<pre><code>type: Timematr{Date{ISOCalendar}}
 dimensions: (333,348)
 333x6 DataFrame:
                dates      MMM      ABT      ACE      ACT     ADBE
@@ -293,9 +272,9 @@ which will print:</p>
 <pre><code>str(tm)
 
 
-type: Timematr
+type: Timematr{Date{ISOCalendar}}
 :vals         DataFrame
-:dates        DataArray{T,N}
+:idx          Array{Date{ISOCalendar},1}
 
 dimensions: (333,348)
 
@@ -349,7 +328,7 @@ From: 2012-01-03, To: 2013-05-01
 </code></pre>
 
 <p>This will additionally show the names of the fields of any object, and
-also explicitly displays the time period of the data. </p>
+also explicitly display the time period of the data.</p>
 
 <p>To save an object to disk, simply call function <code>writeTimedata</code>, which
 internally uses <code>writetable</code> from the <code>DataFrame</code> package. In
@@ -439,8 +418,8 @@ For example, you can retrieve individual components of your variable
 with the following functions:</p>
 
 <ul>
-<li><p><strong>dates:</strong> returns time information as <code>DataArray</code></p></li>
-<li><p><strong>colnames:</strong> returns variable names as
+<li><p><strong>idx:</strong> returns time information as <code>Array</code></p></li>
+<li><p><strong>names:</strong> returns variable names as
               <code>Array{Union(UTF8String,ASCIIString),1}</code></p></li>
 <li><p><strong>core:</strong> implemented for subtypes of <code>AbstractTimematr</code>, it returns a
 matrix of numeric values</p></li>
@@ -473,7 +452,7 @@ programming language!</p></li>
 <li><p>the <strong>DataFrames</strong> package, which definitely provides the best
 representation for general types of data in data analysis. It's a
 role model that every last bit of code of <code>TimeData</code> depends on, and
-the interface that every statistics package show use.</p></li>
+the interface that every statistics package should use.</p></li>
 <li><p>the <strong>Datetime</strong> package, which is a thoughtful implementation of
 dates, time and durations, and the backbone of all time components
 in <code>TimeData</code>.</p></li>
