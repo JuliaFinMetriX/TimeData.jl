@@ -1,4 +1,4 @@
-module TestConstraints
+module TestTimematr
 
 using Base.Test
 using DataArrays
