@@ -20,7 +20,7 @@ df = DataFrame(rand(8, 4))
 ## init test values
 vals = rand(30, 4)
 dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
-nams = ["A", "B", "C", "D"]
+nams = [:A, :B, :C, :D]
 
 for t = (:Timedata, :Timenum, :Timematr)
     eval(quote
@@ -72,9 +72,9 @@ for t = (:Timedata, :Timenum, :Timematr)
         @test isa(tmp, $(t))
 
         ## logical indexing from expression
-        ex = :(A .> 0.5)
-        tmp = tn[ex, :]
-        @test isa(tmp, $(t))
+        ## ex = :(A .> 0.5)
+        ## tmp = tn[ex, :]
+        ## @test isa(tmp, $(t))
         
         ## indexing single row by date
         tmp = tn[date(2013, 07, 04)]

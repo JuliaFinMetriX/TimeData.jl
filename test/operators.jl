@@ -11,7 +11,7 @@ println("\n Running operator tests\n")
 ## init test values
 vals = rand(30, 4)
 dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
-nams = ["A", "B", "C", "D"]
+nams = [:A, :B, :C, :D]
 valsDf = DataFrame(vals, nams)
 
 ###############

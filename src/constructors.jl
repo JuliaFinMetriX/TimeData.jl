@@ -7,6 +7,10 @@
 ## easily with arrays.
 
 FloatArray = Union(Array{Float64, 2}, Array{Float64, 1})
+import DataFrames.convert
+function convert(T::Type{DataFrame}, vals::Array{Float64, 1})
+    df = convert(T, (vals')')
+end
 
 for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     @eval begin
@@ -18,45 +22,46 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         ## no names or dates (just simulated values)
         function $(t)(vals::FloatArray)
             idx = [1:size(vals, 1)]
-            $(t)(DataFrame(vals), idx)
+            $(t)(convert(DataFrame, vals), idx)
         end
         
         ## from core elements
         function $(t)(vals::FloatArray,
-                      names::Array{Union(UTF8String,ASCIIString),1},
+                      nams::Array{Symbol, 1},
                       idx::Array)
-            df = DataFrame(vals, names)
-            return $(t)(df, idx)
-        end
-        function $(t)(vals::FloatArray,
-                      names::Array{ASCIIString,1},
-                      idx::Array)
-            df = DataFrame(vals, names)
+            df = convert(DataFrame, vals)
+            rename!(df, names(df), nams)
             return $(t)(df, idx)
         end
         
         ## comprehensive constructor: very general, all elements
         ## required for Timedata type
-        function $(t)(vals::Array, names::Array, idx::Array) 
-            df = DataFrame(vals)
-            names!(df, names)
+        function $(t)(vals::Array, nams::Array, idx::Array) 
+            df = convert(DataFrame, vals)
+            rename!(df, names(df), nams)
             return $(t)(df, idx)
         end
         
         ## two inputs only, general form
-        function $(t)(vals::Array, names::Array)
-            if isa(names[1], Union(UTF8String,ASCIIString))
-                $(t)(DataFrame(vals, names))
+        function $(t)(vals::Array, nams::Array)
+            if isa(nams[1], Symbol)
+                df = convert(DataFrame, vals)
+                rename!(df, names(df), nams)
+                $(t)(df)
             else
-                $(t)(DataFrame(vals), names)
+                df = convert(DataFrame, vals)
+                $(t)(df, nams)
             end
         end
 
-        function $(t)(vals::DataFrame, names::Array)
-            if isa(names[1], Union(UTF8String,ASCIIString))
-                $(t)(DataFrame(vals, names))
+        function $(t)(vals::DataFrame, nams::Array)
+            if isa(nams[1], Symbol)
+                df = convert(DataFrame, vals)
+                rename!(df, names(df), nams)
+                $(t)(df)
             else
-                $(t)(DataFrame(vals), names)
+                df = convert(DataFrame, vals)
+                $(t)(df, nams)
             end
         end
 

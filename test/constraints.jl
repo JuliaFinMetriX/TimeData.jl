@@ -7,6 +7,8 @@ using Datetime
 using TimeData
 ## using TimeData
 
+println("\n Running constraints tests\n")
+
 ############
 ## chkIdx ##
 ############
@@ -41,43 +43,37 @@ invalidIdx = today()
 #########################
 
 ## numeric DataFrame with NAs
-naDf = DataFrame(quote
-    a = [1, 2, 3]
-    b = [4, 5, 6]
-    end)
+a = [1, 2, 3]
+b = [4, 5, 6]
+naDf = DataFrame(a, b)
 naDf[1, 2] = NA
 naDf[3, 1] = NA
 TimeData.chkNumDf(naDf)
 @test_throws TimeData.chkNum(naDf)
 
-numDf = DataFrame(quote
-    a = [1, 2, 3]
-    b = [4, 5, 6]
-    end)
+numDf = DataFrame(a, b)
 TimeData.chkNumDf(numDf)
 TimeData.chkNum(numDf)
 
 ## invalid DataFrame with strings
-invalidDf = DataFrame(quote
-    a = [1, 2, 3]
-    b = ["hello", "world", "hello"]
-    end)
+a = [1, 2, 3]
+b = ["hello", "world", "hello"]
+invalidDf = DataFrame(a, b)
 @test_throws TimeData.chkNumDf(invalidDf)
 @test_throws TimeData.chkNum(invalidDf)
 
-invalidDf = DataFrame(quote
-    a = [true, false, true]
-    end)
+a = [true, false, true]
+invalidDf = DataFrame(a)
 @test_throws TimeData.chkNumDf(invalidDf)    
 
 #############
 ## chkUnit ##
 #############
 
-validDf = DataFrame(rand(8, 3))
+validDf = convert(DataFrame, rand(8, 3))
 TimeData.chkUnit(validDf)
 
-invalidDf = DataFrame(rand(8, 3))
+invalidDf = convert(DataFrame, rand(8, 3))
 invalidDf[2, 2] = -0.2
 @test_throws TimeData.chkUnit(invalidDf)
 end

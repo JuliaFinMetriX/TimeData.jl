@@ -19,11 +19,11 @@ function chkNumDf(df::DataFrame)
     n = ncol(df)
     for ii=1:n
         ## check for numeric values
-        if(!issubtype(types(df)[ii], Number) &
-    !isequal(types(df)[ii], NAtype))
+        if(!issubtype(eltypes(df)[ii], Number) &
+    !isequal(eltypes(df)[ii], NAtype))
             error("all columns must be numeric for conversion")
         end
-        if(issubtype(types(df)[ii], Bool))
+        if(issubtype(eltypes(df)[ii], Bool))
             error("all columns must be numeric for conversion")
         end
     end
@@ -34,8 +34,10 @@ end
 ############################################
 
 function chkNum(df::DataFrame)
-    if any(isna(df))
-        error("no NAs allowed in TimeMatr")
+    for ii=1:size(df, 2)
+        if any(isna(df[ii]))
+            error("no NAs allowed in TimeMatr")
+        end
     end
     chkNumDf(df)
 end

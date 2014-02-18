@@ -8,7 +8,8 @@ type Timecop{T} <: AbstractTimematr
         chkUnit(vals)
         if(size(vals, 1) != length(idx))
             if (length(idx) == 0) | (size(vals, 1) == 0)
-                return new(DataFrame([]), Array{T, 1}[])
+                df = convert(DataFrame, rand(2, 2))
+                return new(df[1:2, []], Array{T, 1}[])
             end
             error(length(idx), " idx, but ", size(vals, 1), " rows of data")
         end
