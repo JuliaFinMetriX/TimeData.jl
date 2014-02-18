@@ -7,19 +7,20 @@ function readTimedata(filename::String)
     df = readtable(filename, nastrings=[".", "", "NA"])
     
     # find columns that have been parsed as Strings by readtable
-    col_to_test = String[]
+    col_to_test = Array(Symbol, 0)
 
-    for col_data in df[1,:]
-        typeof(df[1,col_data[1]]) == UTF8String?
-        push!(col_to_test, col_data[1]):
+    nCols = size(df, 2)
+    for ii=1:nCols
+        typeof(df[1, ii]) == UTF8String?
+        push!(col_to_test, names(df)[ii]):
         nothing
     end
 
     # test each column's data to see if Datetime will parse it
-    col_that_pass = String[]
+    col_that_pass = Array(Symbol, 0)
 
     for colname in col_to_test
-        d = match(r"[-|\s|\/|.]", df[1,colname])
+        d = match(r"[-|\s|\/|.]", df[1, colname])
         d !== nothing? (bar = split(df[1, colname], d.match)): (bar = [])
         if length(bar) == 3
             push!(col_that_pass, colname)
