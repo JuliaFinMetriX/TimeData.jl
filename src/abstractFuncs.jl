@@ -20,7 +20,7 @@ function str(tn::AbstractTimedata)
         println(":$fieldname  \t\t  $tp")
     end
 
-    print("\ndimensions: ")
+    print("\ndimensions of vals: ")
     print(size(tn))
 
     
