@@ -121,3 +121,28 @@ import DataFrames.isna
 function isna(tn::AbstractTimedata)
     return Timedata(isna(tn.vals), idx(tn))
 end
+
+##########
+## hcat ##
+##########
+
+import Base.hcat
+function hcat(tm::Timematr, tm2::Timematr)
+    ## check for equal indices
+    if idx(tm) != idx(tm2)
+        error("indices must coincide for hcat")
+    end
+
+    tmNew = Timematr(hcat(core(tm), core(tm2)), idx(tm))
+    return tmNew
+end
+
+function hcat(tm::Timedata, tm2::Timedata)
+    ## check for equal indices
+    if idx(tm) != idx(tm2)
+        error("indices must coincide for hcat")
+    end
+
+    tmNew = Timedata(hcat(core(tm), core(tm2)), idx(tm))
+    return tmNew
+end

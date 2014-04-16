@@ -6,8 +6,10 @@
 ## f(inst::NewType, inst2::NewType)
 ## f(inst::NewType, b::Number)
 ## f(b::Number, inst::NewType)
-    
-const element_wise_operators = [:(+), :(.+), :(-), :(.-), :(*), :(.*),
+
+## :(+) and :(-) removed -> follow-up costs
+
+const element_wise_operators = [:(.+), :(.-), :(*), :(.*),
                                      :(/), :(./), :(.^)]
 const element_wise_operators_ext = [:(div), :(mod), :(fld), :(rem)]
 
