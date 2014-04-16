@@ -23,7 +23,7 @@ tm = TimeData.Timematr(vals, nams, dats)
 ## mathematical operators
 -tm
 +tm
-tm + 2
+tm .+ 2
 tm/3
 5*tm
 
@@ -57,10 +57,10 @@ floor(tm)
 trunc(tm)
 
 ## arithmetics with scalar values
-@test (tm + 1 == 1 + tm)
+@test (tm .+ 1 == 1 .+ tm)
 
 ## careful: -0.0 != 0.0
-@test ((-(tm - 1.5)) == (1.5 - tm))
+@test ((-(tm .- 1.5)) == (1.5 .- tm))
 
 @test (tm * 3 == 3 * tm)
 
