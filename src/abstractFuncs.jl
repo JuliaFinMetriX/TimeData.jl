@@ -133,7 +133,7 @@ function hcat(tm::Timematr, tm2::Timematr)
         error("indices must coincide for hcat")
     end
 
-    tmNew = Timematr(hcat(core(tm), core(tm2)), idx(tm))
+    tmNew = Timematr(hcat(tm.vals, tm2.vals), idx(tm))
     return tmNew
 end
 
@@ -143,6 +143,6 @@ function hcat(tm::Timedata, tm2::Timedata)
         error("indices must coincide for hcat")
     end
 
-    tmNew = Timedata(hcat(core(tm), core(tm2)), idx(tm))
+    tmNew = Timedata(hcat(tm.vals, tm2.vals), idx(tm))
     return tmNew
 end
