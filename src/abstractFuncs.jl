@@ -146,3 +146,31 @@ function hcat(tm::Timedata, tm2::Timedata)
     tmNew = Timedata(hcat(tm.vals, tm2.vals), idx(tm))
     return tmNew
 end
+
+########################
+## DataFrame handling ##
+########################
+
+function composeDataFrame(vals, nams)
+    ## compose DataFrame from data and column names
+    ##
+    ## Input:
+    ## 	vals 		Array{Float64,2} of values
+    ## 	nams		column names as Array{Symbol,1} as returned by
+    ## 				names(df) 
+    ## 
+    ## Output:
+    ## 	DataFrame with values given by vals and column names given by
+    ## 	nams 
+
+    if size(vals, 2) != length(nams)
+        error("to compose DataFrame, number of columns and number of
+names must match")
+    end
+    
+    df = convert(DataFrame, vals)
+    rename!(df, names(df), nams)
+
+    return df
+end
+

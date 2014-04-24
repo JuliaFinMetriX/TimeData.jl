@@ -17,6 +17,7 @@ export #
 AbstractTimedata,
 AbstractTimenum,
 AbstractTimematr,
+composeDataFrame,
 core,
 idx,
 movAvg,
