@@ -139,7 +139,7 @@ function cumsum(tm::Timematr, dim::Integer)
 end
 
 import Base.cumprod
-function cumsum(tm::Timematr, dim::Integer)
+function cumprod(tm::Timematr, dim::Integer)
     cumulated = cumprod(core(tm), dim)
     return Timematr(composeDataFrame(cumulated, names(tm)), idx(tm))
 end
