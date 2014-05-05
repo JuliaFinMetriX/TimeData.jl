@@ -111,7 +111,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         getindex(td::$(t), ex::Expr, c::ColumnIndex) =
             getindex(td, with(td.vals, ex), c)
         
-        ## typealias ColumnIndex Union(Real, String, Symbol)
+        ## typealias ColumnIndex Union(Real, Symbol)
         getindex{T <: ColumnIndex}(td::$(t), ex::Expr, c::AbstractVector{T}) =
             getindex(td, with(td.vals, ex), c)
         
