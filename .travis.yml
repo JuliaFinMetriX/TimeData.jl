@@ -18,5 +18,8 @@ script:
   - julia -e 'using TimeData; @assert isdefined(:TimeData); @assert typeof(TimeData) === Module'
   - mkdir -p ~/.julia/TimeData
   - cp -R ./* ~/.julia/TimeData/
-  - julia ./test/runtests.jl
+  - julia --code-coverage ./test/runtests.jl
+after_success:
+  - if [ $JULIAVERSION = "julianightlies" ]; then julia -e 'cd(Pkg.dir("TimeData")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
+
 
