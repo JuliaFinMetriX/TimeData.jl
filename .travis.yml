@@ -20,6 +20,6 @@ script:
   - cp -R ./* ~/.julia/TimeData/
   - julia --code-coverage ./test/runtests.jl
 after_success:
-  - if [ $JULIAVERSION = "julianightlies" ]; then julia -e 'cd(Pkg.dir("TimeData")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
+  - julia -e 'cd(Pkg.dir("TimeData")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
 
 
