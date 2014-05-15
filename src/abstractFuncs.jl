@@ -113,6 +113,15 @@ function isequal(tn::AbstractTimedata, tn2::AbstractTimedata)
     return equ
 end
 
+import Base.==
+function ==(tn::AbstractTimedata, tn2::AbstractTimedata)
+    typeEqu = ==(typeof(tn), typeof(tn2))
+    valsEqu = ==(tn.vals, tn2.vals)
+    idxEqu = ==(tn.idx, tn2.idx)
+    equ = (valsEqu & idxEqu & typeEqu)
+    return equ
+end
+
 ##########
 ## isna ##
 ##########
