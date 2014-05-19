@@ -61,7 +61,7 @@ function mean(tm::Timematr, dim::Int = 1)
         error("For rowwise mean use rowmeans function")
     end
     meanVals = mean(core(tm), dim)
-    means = DataFrame(meanVals, names(tm))
+    means = composeDataFrame(meanVals, names(tm))
 end
 
 function rowmeans(tm::Timematr)
