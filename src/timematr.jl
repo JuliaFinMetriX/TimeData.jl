@@ -98,7 +98,7 @@ end
 import Base.cov
 function cov(tm::Timematr)
     ## output: DataFrame
-    covDf = DataFrame(cov(core(tm)), names(tm.vals))
+    covDf = composeDataFrame(cov(core(tm)), names(tm.vals))
     return covDf
 end
 
