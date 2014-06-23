@@ -34,12 +34,12 @@ end
 ## Conversions ##
 #################
 
-## conversion upwards: always works
-function convert(Timedata, tn::Timenum)
-    Timedata(tn.vals, tn.idx)
-end
+## ## conversion upwards: always works
+## function convert(::Type{Timedata}, tn::Timenum)
+##     Timedata(tn.vals, tn.idx)
+## end
 
-## conversion downwards: fails for NAs
-function convert(Timematr, tn::Timenum)
-    Timematr(tn.vals, tn.idx)
-end
+## ## conversion downwards: fails for NAs
+## function convert(::Type{Timematr}, tn::Timenum)
+##     Timematr(tn.vals, tn.idx)
+## end

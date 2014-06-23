@@ -25,14 +25,14 @@ end
 #################
 
 ## conversion downwards: fails for non-numeric values
-function convert(Timenum, td::Timedata)
-    Timenum(td.vals, td.idx)
-end
+## function convert(::Type{Timenum}, td::Timedata)
+    ## Timenum(td.vals, td.idx)
+## end
 
 ## conversion downwards: fails for NAs
-function convert(Timematr, td::Timedata)
-    Timematr(td.vals, td.idx)
-end
+## function convert(::Type{Timematr}, td::Timedata)
+    ## Timematr(td.vals, td.idx)
+## end
 
 #######################
 ## find boolean true ##

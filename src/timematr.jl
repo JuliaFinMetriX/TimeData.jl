@@ -25,15 +25,15 @@ end
 ## Conversions ##
 #################
 
-## conversion upwards: always works
-function convert(Timedata, tm::Timematr)
-    Timedata(tm.vals, tm.idx)
-end
+## ## conversion upwards: always works
+## function convert(::Type{Timedata}, tm::Timematr)
+##     Timedata(tm.vals, tm.idx)
+## end
 
-## conversion upwards: always works
-function convert(Timenum, tm::Timematr)
-    Timenum(tm.vals, tm.idx)
-end
+## ## conversion upwards: always works
+## function convert(::Type{Timenum}, tm::Timematr)
+##     Timenum(tm.vals, tm.idx)
+## end
 
 #############################
 ## get numeric values only ##

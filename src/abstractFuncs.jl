@@ -183,3 +183,24 @@ names must match")
     return df
 end
 
+import Base.convert
+function convert(::Type{DataFrame}, td::AbstractTimedata)
+    df = [DataFrame(id = td.idx) td.vals]
+end
+
+#######################
+## display in IJulia ##
+#######################
+
+import Base.writemime
+function Base.writemime(io::IO,
+                        ::MIME"text/html",
+                        td::AbstractTimedata)
+    ## set display parameters
+    maxDispCols = 5;
+    (nrow, ncol) = size(td)        
+    showCols = minimum([maxDispCols (ncol+1)]);
+
+    df = convert(DataFrame, td)
+    writemime(io, "text/html", df[:, 1:showCols])
+end
