@@ -196,9 +196,26 @@ import Base.writemime
 function Base.writemime(io::IO,
                         ::MIME"text/html",
                         td::AbstractTimedata)
+
+    typ = typeof(td)
+
     ## set display parameters
     maxDispCols = 5;
-    (nrow, ncol) = size(td)        
+    (nrow, ncol) = size(td)
+
+    write(io, "<p><strong>$typ</strong></p>")
+    ## write(io, "<p><strong>Dimensions</strong>: ($nrow, $ncol)</p>")
+    write(io, "<p>Dimensions: <strong>($nrow, $ncol)</strong></p>")
+
+    fromDate = td.idx[1];
+    toDate = td.idx[end];
+    
+    ## write(io, "<p>-------------------------------------------</p>")
+    ## write(io, "<p><strong>From</strong>: $fromDate,
+    ## <strong>To</strong>: $toDate</p>")
+    write(io, "<p>From: <strong>$fromDate</strong>, To: <strong>$toDate</strong></p>")    
+    ## write(io, "<p>-------------------------------------------</p>")
+
     showCols = minimum([maxDispCols (ncol+1)]);
 
     df = convert(DataFrame, td)

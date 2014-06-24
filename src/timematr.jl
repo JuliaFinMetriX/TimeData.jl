@@ -204,3 +204,78 @@ function movAvg(tm::Timematr, nPeriods::Integer)
     movAvgTm = Timematr(scaledVals, names(tm), dats)
     return movAvgTm
 end
+
+######################################
+## aggregating to lower frequencies ##
+######################################
+
+function aggrRets(tm::Timematr; freq = "monthly",
+                  logRet = true,
+                  percent = true)
+    ## aggregate returns to lower frequency
+
+    (nObs, nAss) = size(tm)
+    valsArr = core(tm)
+
+    ## define aggregation function
+    aggrFun = x -> x
+    if logRet == true
+        if percent == true
+            aggrFun = x -> sum(x, 1)
+        end
+    elseif logRet == false
+        if percent == true
+            aggrFun = x -> (prod(1 + x./100, 1) - 1)*100
+        else
+            aggrFun = x -> (prod(1 + x, 1) - 1)
+        end
+    end
+
+    # assign equal aggregation ID for days within same period 
+    aggrId = Array(Float64, nObs)
+    nAggrPeriods = 1 # current number of aggregation periods
+    lastDayOfPeriod = []
+
+    dayAsAggregationPeriod = []
+    
+    if freq == "monthly"
+        ## get year and month for each day
+        dayAsAggregationPeriod =
+            [(year(dateEntry), month(dateEntry)) for dateEntry in
+             idx(tm)] 
+    elseif freq == "yearly"
+        ## get year for each day
+        dayAsAggregationPeriod =
+            [year(dateEntry) for dateEntry in idx(tm)] 
+    end
+        
+    for ii=1:nObs
+        aggrId[ii] = nUnique
+        if ii < nObs
+            if dayAsAggregationPeriod[ii] != dayAsAggregationPeriod[ii+1] 
+                # next day is of next aggregation period
+                nUnique = nUnique + 1
+                lastDayOfPeriod = [lastDayOfPeriod; ii]
+            end
+        end
+    end
+    lastDayOfPeriod = [0; lastDayOfPeriod; nObs]
+    nPeriods = length(lastDayOfPeriod)-1
+
+   # for each period, get aggregated values
+    aggrVals = Array(Float64, nPeriods, nAss)
+    origDates = idx(tm)
+    newDates = origDates[lastDayOfPeriod[2:end]]
+
+    for ii=1:nPeriods
+        # get values
+        currPeriod =
+            valsArr[(lastDayOfPeriod[ii]+1):lastDayOfPeriod[ii+1], :]
+        # apply aggregation function
+        aggrVals[ii, :] = aggrFun(currPeriod)
+    end
+
+    # put everything together in timematr
+    df = composeDataFrame(aggrVals, names(tm))
+    tmNew = Timematr(df, newDates)
+end
