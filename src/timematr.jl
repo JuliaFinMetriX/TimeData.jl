@@ -233,6 +233,7 @@ function aggrRets(tm::Timematr; freq = "monthly",
 
     # assign equal aggregation ID for days within same period 
     aggrId = Array(Float64, nObs)
+    nUnique = 1
     nAggrPeriods = 1 # current number of aggregation periods
     lastDayOfPeriod = []
 
