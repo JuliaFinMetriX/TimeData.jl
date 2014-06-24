@@ -6,7 +6,7 @@
 ## isa(df[1:2], DataFrame)
 ## isa(df[1:2, 3:4], DataFrame)
 ## isa(df[1, 3:4], DataFrame)
-## isa(df[1], DataArray{Float64,1})        # loses column name
+## isa(df[1], Array{Float64,1})        # loses column name
 ## isa(df[2:4, 1], DataArray{Float64,1})   # loses column name
 ## isa(df[2, 2], Float64)                  # loses column name
 
@@ -57,7 +57,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
-            valsDf = convert(DataFrame, array(vals))
+            valsDf = convert(DataFrame, vals)
             names!(valsDf, [name])           # names must be given as
             # array 
             
