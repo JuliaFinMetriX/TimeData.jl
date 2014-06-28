@@ -57,7 +57,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
-            valsDf = convert(DataFrame, vals)
+            valsDf = convert(DataFrame, array(vals))
             names!(valsDf, [name])           # names must be given as
             # array 
             
