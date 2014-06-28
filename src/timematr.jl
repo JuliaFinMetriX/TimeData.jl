@@ -70,6 +70,26 @@ function rowmeans(tm::Timematr)
     means = Timematr(meanVals, idx(tm))
 end
 
+#######################
+## Timematr get prod ##
+#######################
+
+import Base.prod
+function prod(tm::Timematr, dim::Int = 1)
+    ## output: DataFrame, since date dimension is lost
+    if dim == 2
+        error("For rowwise prod use rowprods function")
+    end
+    prodVals = prod(core(tm), dim)
+    prods = composeDataFrame(prodVals, names(tm))
+end
+
+function rowprods(tm::Timematr)
+    ## output: Timematr
+    prodVals = prod(core(tm), 2)
+    prods = Timematr(prodVals, idx(tm))
+end
+
 ######################################
 ## Timematr get row and column sums ##
 ######################################
@@ -113,6 +133,31 @@ function cor(tm::Timematr)
     return corDf
 end
 
+##########################
+## Timematr std ##
+##########################
+
+import Base.std
+function std(tm::Timematr)
+    ## output: DataFrame
+    stdDf = DataFrame(std(core(tm), 1), names(tm.vals))
+    return stdDf
+end
+
+function std(tm::Timematr, dim::Integer)
+    ## output: DataFrame
+    if dim == 2
+        error("For rowwise standard deviations use rowstds")
+    end
+    stdDf = DataFrame(std(core(tm), 1), names(tm.vals))
+    return stdDf
+end
+
+function rowstds(tm::Timematr)
+    rowStd = Timematr(std(core(tm), 2), idx(tm))
+    return rowStd
+end
+   
 #########################
 ## minimum and maximum ##
 #########################
@@ -173,6 +218,30 @@ end
 ## function plot(tm::Timematr)
 ##     plot(core(tm))
 ## end
+
+####################
+## geometric mean ##
+####################
+
+function geomMean(x::Timematr; percent = true)
+    nObs = size(x, 1)
+    if percent
+        vals = (prod(1 + core(x)./100, 1).^(1/nObs) - 1)*100
+    else
+        vals = prod(1 + core(x), 1).^(1/nObs) - 1
+    end
+    return composeDataFrame(vals, names(x))
+end
+
+function geomMean(x; percent = true)
+    nObs = size(x, 1)
+    if percent
+        vals = (prod(1 + x./100, 1).^(1/nObs) - 1)*100
+    else
+        vals = prod(1 + x./100, 1).^(1/nObs) - 1
+    end
+    return vals
+end
 
 #####################
 ## moving averages ##
