@@ -2,5 +2,3 @@ julia 0.3-
 DataArrays 0.1.11-
 DataFrames 0.5.6-
 Datetime 0.1.6-
-Winston 0.11.0-
-Gadfly 0.3.0-

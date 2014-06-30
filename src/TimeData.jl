@@ -8,8 +8,8 @@ module TimeData
 using DataArrays
 using DataFrames
 using Datetime
-using Winston
-using Gadfly
+## using Winston
+## using Gadfly
 
 importall Base
 ## importall Stats
@@ -64,7 +64,7 @@ include("getindex.jl")
 ## include("operators.jl")
 include("abstractFuncs.jl")
 include("io.jl")
-include("plotting.jl")
+## include("plotting.jl")
 include("econometrics.jl")
 include("dataframe_extensions.jl")
 include("ijulia_utilities.jl")
