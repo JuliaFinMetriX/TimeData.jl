@@ -140,7 +140,7 @@ end
 import Base.std
 function std(tm::Timematr)
     ## output: DataFrame
-    stdDf = DataFrame(std(core(tm), 1), names(tm.vals))
+    stdDf = composeDataFrame(std(core(tm), 1), names(tm.vals))
     return stdDf
 end
 
@@ -149,7 +149,7 @@ function std(tm::Timematr, dim::Integer)
     if dim == 2
         error("For rowwise standard deviations use rowstds")
     end
-    stdDf = DataFrame(std(core(tm), 1), names(tm.vals))
+    stdDf = composeDataFrame(std(core(tm), 1), names(tm.vals))
     return stdDf
 end
 
@@ -170,7 +170,7 @@ function minimum(tm::Timematr, dim::Integer)
     if dim == 2
         error("For rowwise minimum use rowmin function")
     end
-    return DataFrame(minimum(core(tm), 1), names(tm))
+    return composeDataFrame(minimum(core(tm), 1), names(tm))
 end
 
 ############
@@ -209,15 +209,6 @@ function getVars(tm::Timematr, mapF::Function, crit::Function)
     return df
 end
 
-
-##################################
-## plotting numeric time series ##
-##################################
-
-## import Winston.plot
-## function plot(tm::Timematr)
-##     plot(core(tm))
-## end
 
 ####################
 ## geometric mean ##
@@ -274,78 +265,44 @@ function movAvg(tm::Timematr, nPeriods::Integer)
     return movAvgTm
 end
 
-######################################
-## aggregating to lower frequencies ##
-######################################
 
-function aggrRets(tm::Timematr; freq = "monthly",
-                  logRet = true,
-                  percent = true)
-    ## aggregate returns to lower frequency
+#######################
+## display in IJulia ##
+#######################
 
-    (nObs, nAss) = size(tm)
-    valsArr = core(tm)
+import Base.writemime
+function Base.writemime(io::IO,
+                        ::MIME"text/html",
+                        tm::Timematr)
 
-    ## define aggregation function
-    aggrFun = x -> x
-    if logRet == true
-        if percent == true
-            aggrFun = x -> sum(x, 1)
-        end
-    elseif logRet == false
-        if percent == true
-            aggrFun = x -> (prod(1 + x./100, 1) - 1)*100
-        else
-            aggrFun = x -> (prod(1 + x, 1) - 1)
-        end
-    end
+    # show only rounded values
+    signDigits = 3
 
-    # assign equal aggregation ID for days within same period 
-    aggrId = Array(Float64, nObs)
-    nUnique = 1
-    nAggrPeriods = 1 # current number of aggregation periods
-    lastDayOfPeriod = []
+    typ = typeof(tm)
 
-    dayAsAggregationPeriod = []
+    ## set display parameters
+    maxDispCols = 8;
+    (nrow, ncol) = size(tm)
+
+    write(io, "<p><strong>$typ</strong></p>")
+    ## write(io, "<p><strong>Dimensions</strong>: ($nrow, $ncol)</p>")
+    write(io, "<p>Dimensions: <strong>($nrow, $ncol)</strong></p>")
+
+    fromDate = tm.idx[1];
+    toDate = tm.idx[end];
     
-    if freq == "monthly"
-        ## get year and month for each day
-        dayAsAggregationPeriod =
-            [(year(dateEntry), month(dateEntry)) for dateEntry in
-             idx(tm)] 
-    elseif freq == "yearly"
-        ## get year for each day
-        dayAsAggregationPeriod =
-            [year(dateEntry) for dateEntry in idx(tm)] 
-    end
-        
-    for ii=1:nObs
-        aggrId[ii] = nUnique
-        if ii < nObs
-            if dayAsAggregationPeriod[ii] != dayAsAggregationPeriod[ii+1] 
-                # next day is of next aggregation period
-                nUnique = nUnique + 1
-                lastDayOfPeriod = [lastDayOfPeriod; ii]
-            end
-        end
-    end
-    lastDayOfPeriod = [0; lastDayOfPeriod; nObs]
-    nPeriods = length(lastDayOfPeriod)-1
+    ## write(io, "<p>-------------------------------------------</p>")
+    ## write(io, "<p><strong>From</strong>: $fromDate,
+    ## <strong>To</strong>: $toDate</p>")
+    write(io, "<p>From: <strong>$fromDate</strong>, To: <strong>$toDate</strong></p>")    
+    ## write(io, "<p>-------------------------------------------</p>")
 
-   # for each period, get aggregated values
-    aggrVals = Array(Float64, nPeriods, nAss)
-    origDates = idx(tm)
-    newDates = origDates[lastDayOfPeriod[2:end]]
+    showCols = minimum([maxDispCols (ncol+1)]);
 
-    for ii=1:nPeriods
-        # get values
-        currPeriod =
-            valsArr[(lastDayOfPeriod[ii]+1):lastDayOfPeriod[ii+1], :]
-        # apply aggregation function
-        aggrVals[ii, :] = aggrFun(currPeriod)
-    end
+    rndVals = round(core(tm), signDigits)
+    tm2 = Timematr(rndVals, names(tm), idx(tm))
 
-    # put everything together in timematr
-    df = composeDataFrame(aggrVals, names(tm))
-    tmNew = Timematr(df, newDates)
+    df = convert(DataFrame, tm2)
+
+    writemime(io, "text/html", df[:, 1:showCols])
 end
