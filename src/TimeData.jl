@@ -8,12 +8,16 @@ module TimeData
 using DataArrays
 using DataFrames
 using Datetime
-## using Winston
+using Winston
+using Gadfly
 
 importall Base
 ## importall Stats
 
 export #
+@bootstrap,
+@roundDf,
+@table,
 AbstractTimedata,
 AbstractTimenum,
 AbstractTimematr,
@@ -25,12 +29,16 @@ cov,
 cumprod,
 cumsum,
 geomMean,
+HTML,
 idx,
 mean,
 minimum,
 movAvg,
+plot,
 prod,
 readTimedata,
+resample,
+round,
 rowmeans,
 rowprods,
 rowstds,
@@ -56,5 +64,9 @@ include("getindex.jl")
 ## include("operators.jl")
 include("abstractFuncs.jl")
 include("io.jl")
+include("plotting.jl")
+include("econometrics.jl")
+include("dataframe_extensions.jl")
+include("ijulia_utilities.jl")
 
 end
