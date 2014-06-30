@@ -156,42 +156,13 @@ function hcat(tm::Timedata, tm2::Timedata)
     return tmNew
 end
 
-########################
-## DataFrame handling ##
-########################
-
-function composeDataFrame(vals, nams)
-    ## compose DataFrame from data and column names
-    ##
-    ## Input:
-    ## 	vals 		Array{Float64,2} of values
-    ## 	nams		column names as Array{Symbol,1} as returned by
-    ## 				names(df) 
-    ## 
-    ## Output:
-    ## 	DataFrame with values given by vals and column names given by
-    ## 	nams 
-
-    if size(vals, 2) != length(nams)
-        error("to compose DataFrame, number of columns and number of
-names must match")
-    end
-    
-    df = convert(DataFrame, vals)
-    rename!(df, names(df), nams)
-
-    return df
-end
-
-import Base.convert
-function convert(::Type{DataFrame}, td::AbstractTimedata)
-    df = [DataFrame(id = td.idx) td.vals]
-end
 
 #######################
 ## display in IJulia ##
 #######################
 
+
+### Remark: timematr has its own display function!!
 import Base.writemime
 function Base.writemime(io::IO,
                         ::MIME"text/html",
@@ -219,5 +190,7 @@ function Base.writemime(io::IO,
     showCols = minimum([maxDispCols (ncol+1)]);
 
     df = convert(DataFrame, td)
+
     writemime(io, "text/html", df[:, 1:showCols])
 end
+
