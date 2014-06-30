@@ -50,14 +50,14 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         
         ## select single column
         function getindex(td::$(t), col_ind::ColumnIndex)
-            vals = getindex(td.vals, col_ind) # dataarray
+            vals = getindex(td.vals, col_ind) # array
             
             ## manually get column name
             selected_column = td.vals.colindex[col_ind]
             name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
-            valsDf = convert(DataFrame, array(vals))
+            valsDf = convert(DataFrame, vals)
             names!(valsDf, [name])           # names must be given as
             # array 
             
