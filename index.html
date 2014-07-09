@@ -71,12 +71,14 @@ observations. Sorted from most general to most specific case, the
 following types are introduced:</p>
 
 <ul>
-<li><p><strong><code>Timedata</code>:</strong> no further restrictions on observations</p></li>
-<li><p><strong><code>Timenum</code>:</strong> observations may consist of numeric values or missing
-values only</p></li>
-<li><p><strong><code>Timematr</code>:</strong> observations must be numeric values only</p></li>
-<li><p><strong><code>Timecop</code>:</strong> observations must be numeric values between 0 and 1
-only</p></li>
+<li>
+<strong><code>Timedata</code>:</strong> no further restrictions on observations</li>
+<li>
+<strong><code>Timenum</code>:</strong> observations may consist of numeric values or missing
+values only</li>
+<li>  <strong><code>Timematr</code>:</strong> observations must be numeric values only</li>
+<li>  <strong><code>Timecop</code>:</strong> observations must be numeric values between 0 and 1
+only</li>
 </ul><p>Given that these constraints are fulfilled, one is able to define and
 use more specific functions matching the data characteristics more
 closely. For example, <code>Timematr</code> instances can directly make use of
