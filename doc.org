@@ -10,10 +10,11 @@
 All types introduced are subtypes of abstract type ~AbstractTimedata~
 and have two fields, separating time information from observations:
 - vals :: a ~DataFrame~ 
-- idx :: an ~Array{T, 1}~, consisting of type ~Integer~, or type
-         ~Date~ or ~DateTime~ from package ~Datetime~
+- idx :: an ~Array{T, 1}~, consisting of either type
+  - ~Integer~,
+  - ~Date~, or
+  - ~DateTime~ (from package ~Datetime~)
          
-
 However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
 way! Hence, only reference the fields directly if you really know what
@@ -52,8 +53,8 @@ inner constructor.
 #+BEGIN_SRC julia :results silent :tangle yes
    vals = rand(30, 4)
    dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
-   nams = ["A", "B", "C", "D"]
-   valsDf = DataFrame(vals, nams)
+   nams = [:A, :B, :C, :D]
+   valsDf = composeDataFrame(vals, nams)
    
    tm = Timematr(valsDf, dats)
 #+END_SRC
