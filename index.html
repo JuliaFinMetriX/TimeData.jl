@@ -53,9 +53,13 @@
 and have two fields, separating time information from observations:</p>
 
 <ul>
-<li><p><strong>vals:</strong> a <code>DataFrame</code></p></li>
-<li><p><strong>idx:</strong> an <code>Array{T, 1}</code>, consisting of type <code>Integer</code>, or type
-         <code>Date</code> or <code>DateTime</code> from package <code>Datetime</code></p></li>
+<li>
+<strong>vals:</strong> a <code>DataFrame</code>
+</li>
+<li>
+<strong>idx:</strong> an <code>Array{T, 1}</code>, consisting of type <code>Integer</code>, or type
+         <code>Date</code> or <code>DateTime</code> from package <code>Datetime</code>
+</li>
 </ul><p>However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
 way! Hence, only reference the fields directly if you really know what
