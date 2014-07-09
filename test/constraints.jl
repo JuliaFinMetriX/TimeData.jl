@@ -43,9 +43,7 @@ invalidIdx = today()
 #########################
 
 ## numeric DataFrame with NAs
-a = [1, 2, 3]
-b = [4, 5, 6]
-naDf = DataFrame(a, b)
+naDf = DataFrame(a = [1, 2, 3], b = [4, 5, 6])
 naDf[1, 2] = NA
 naDf[3, 1] = NA
 TimeData.chkNumDf(naDf)
