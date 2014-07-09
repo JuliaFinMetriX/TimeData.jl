@@ -46,118 +46,84 @@
 <p></p>
 </div>
 
-<div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> TimeData types</h2>
-<div class="outline-text-2" id="text-1">
-<p>
-All types introduced are subtypes of abstract type <code>AbstractTimedata</code>
-and have two fields, separating time information from observations:
-</p>
-<ul class="org-ul">
-<li><b>vals:</b> a <code>DataFrame</code> 
-</li>
-<li><b>idx:</b> an <code>Array{T, 1}</code>, consisting of either type
-<ul class="org-ul">
-<li><code>Integer</code>,
-</li>
-<li><code>Date</code>, or
-</li>
-<li><code>DateTime</code> (from package <code>Datetime</code>)
-</li>
-</ul>
-</li>
-</ul>
+<h1>
+<a name="timedata-types" class="anchor" href="#timedata-types"><span class="octicon octicon-link"></span></a>TimeData types</h1>
 
-<p>
-However, accessing these fields directly is considered poor style, as
+<p>All types introduced are subtypes of abstract type <code>AbstractTimedata</code>
+and have two fields, separating time information from observations:</p>
+
+<ul>
+<li><strong>vals:</strong> a <code>DataFrame</code></li>
+<li><strong>idx:</strong> an <code>Array{T, 1}</code>, consisting of either type</li>
+
+<ul>
+<li><p><code>Integer</code>,</p></li>
+<li><p><code>Date</code>, or</p></li>
+<li><p><code>DateTime</code> (from package <code>Datetime</code>)</p></li>
+</ul>
+</ul><p>However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
 way! Hence, only reference the fields directly if you really know what
-you are doing.
-</p>
+you are doing.</p>
 
-<p>
-Given these commonalities of all <code>TimeData</code> types, there exist several
+<p>Given these commonalities of all <code>TimeData</code> types, there exist several
 distinct types that implement different constraints on the
 observations. Sorted from most general to most specific case, the
-following types are introduced:
-</p>
-<ul class="org-ul">
-<li><b>Timedata:</b> no further restrictions on observations
-</li>
-<li><b>Timenum:</b> observations may consist of numeric values or missing
-values only
-</li>
-<li><b>Timematr:</b> observations must be numeric values only
-</li>
-<li><b>Timecop:</b> observations must be numeric values between 0 and 1
-only
-</li>
-</ul>
+following types are introduced:</p>
 
-<p>
-Given that these constraints are fulfilled, one is able to define and
+<ul>
+<li><p><strong>Timedata:</strong> no further restrictions on observations</p></li>
+<li><p><strong>Timenum:</strong> observations may consist of numeric values or missing
+values only</p></li>
+<li><p><strong>Timematr:</strong> observations must be numeric values only</p></li>
+<li><p><strong>Timecop:</strong> observations must be numeric values between 0 and 1
+only</p></li>
+</ul><p>Given that these constraints are fulfilled, one is able to define and
 use more specific functions matching the data characteristics more
 closely. For example, <code>Timematr</code> instances can directly make use of
 fast and numerically optimized methods using <code>Array{Float64, 2}</code> under
 the hood. Hence, it is important that these constraints are reliably
 fulfilled. They are guaranteed as they are hard-coded into variables
 at creation through the individual constructors. And, by now, no
-further <code>setindex</code> methods exist that would allow data manipulation.
-</p>
-</div>
-</div>
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> Constructors</h2>
-<div class="outline-text-2" id="text-2">
-<p>
-For each type, variables can be created by directly handing over
+further <code>setindex</code> methods exist that would allow data manipulation.</p>
+
+<h1>
+<a name="constructors" class="anchor" href="#constructors"><span class="octicon octicon-link"></span></a>Constructors</h1>
+
+<p>For each type, variables can be created by directly handing over
 observations as <code>DataFrame</code> and time information as <code>Array</code> to the
-inner constructor.
-</p>
-<div class="org-src-container">
+inner constructor.</p>
 
-<pre class="src src-julia"><span style="color: #ff0000;">using</span> TimeData
-<span style="color: #ff0000;">using</span> Datetime
-</pre>
-</div>
+<pre><code>using TimeData
+using Datetime
 
-<div class="org-src-container">
-
-<pre class="src src-julia">vals = <span style="color: #00ffff;">rand</span>(30, 4)
-dats = Date{ISOCalendar}[<span style="color: #00ffff;">date</span>(2013, 7, ii) <span style="color: #ff0000;">for</span> ii=1:30]
+vals = rand(30, 4)
+dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
 nams = [:A, :B, :C, :D]
-valsDf = <span style="color: #00ffff;">composeDataFrame</span>(vals, nams)
+valsDf = composeDataFrame(vals, nams)
 
-tm = <span style="color: #00ffff;">Timematr</span>(valsDf, dats)
-</pre>
-</div>
+tm = Timematr(valsDf, dats)
+</code></pre>
 
-<p>
-Besides, there also exist several outer constructors for each type,
+<p>Besides, there also exist several outer constructors for each type,
 allowing more convenient creation. In particular, if observations do
 not entail any <code>NAs</code>, there is no need to wrap them up into
 <code>DataFrames</code> previously, but <code>TimeData</code> objects can simply be created
 from <code>Arrays</code>. Also, there might be situations where variable names
 and / or dates are missing. For these cases, there exist more
 convenient outer constructors, too, which generally follow the
-convention that dates do never precede variable names as arguments.
-</p>
+convention that dates do never precede variable names as arguments.</p>
 
-<div class="org-src-container">
+<pre><code>tm = Timematr(vals, nams, dats)
+tm = Timematr(vals, nams)
+tm = Timematr(vals, dats)
+tm = Timematr(vals)
+</code></pre>
 
-<pre class="src src-julia">tm = <span style="color: #00ffff;">Timematr</span>(vals, nams, dats)
-tm = <span style="color: #00ffff;">Timematr</span>(vals, nams)
-tm = <span style="color: #00ffff;">Timematr</span>(vals, dats)
-tm = <span style="color: #00ffff;">Timematr</span>(vals)
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Indexing</h2>
-<div class="outline-text-2" id="text-3">
-<p>
-The idea of <code>getindex</code> is to stick with the behavior of <code>DataFrames</code>
+<h1>
+<a name="indexing" class="anchor" href="#indexing"><span class="octicon octicon-link"></span></a>Indexing</h1>
+
+<p>The idea of <code>getindex</code> is to stick with the behavior of <code>DataFrames</code>
 as far as possible for the basics, while extending it to allow
 indexing of rows by dates. Hence, indexing <code>TimeData</code> types should
 hopefully fit seamlessly into behavior familiar from other important
@@ -168,27 +134,21 @@ on a <code>Timematr</code> variable, it will also return a <code>Timematr</code>
 and if you call it on type <code>Timenum</code> it will return <code>Timenum</code> as well.
 Although this seems to be quite logically, this behavior does deviate
 from <code>DataFrame</code> behavior in such that, for example, <code>DataFrames</code>
-return <code>DataArray</code> for single columns.
-</p>
+return <code>DataArray</code> for single columns.</p>
 
-<div class="org-src-container">
+<pre><code>typeof(valsDf[:, 1])
+typeof(tm[:, 1])
 
-<pre class="src src-julia"><span style="color: #00ffff;">typeof</span>(valsDf[:, 1])
-<span style="color: #00ffff;">typeof</span>(tm[:, 1])
+typeof(valsDf[1, 1])
+typeof(tm[1, 1])
 
-<span style="color: #00ffff;">typeof</span>(valsDf[1, 1])
-<span style="color: #00ffff;">typeof</span>(tm[1, 1])
+## empty instance
+typeof(tm[4:3, 5:4])
+</code></pre>
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">empty instance</span>
-<span style="color: #00ffff;">typeof</span>(tm[4:3, 5:4])
-</pre>
-</div>
+<p>This will print:</p>
 
-<p>
-This will print:
-</p>
-<pre class="example">
-DataArray{Float64,1} (constructor with 1 method)
+<pre><code>DataArray{Float64,1} (constructor with 1 method)
 Timematr{Date{ISOCalendar}} (constructor with 1 method)
 
 Float64
@@ -196,15 +156,11 @@ Timematr{Date{ISOCalendar}} (constructor with 1 method)
 
 
 Timematr{Date{ISOCalendar}} (constructor with 1 method)
-</pre>
+</code></pre>
 
+<p>Possible ways of indexing are:</p>
 
-<p>
-Possible ways of indexing are:
-</p>
-<div class="org-src-container">
-
-<pre class="src src-julia"><span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing by numeric indices</span>
+<pre><code>## indexing by numeric indices
 tmp = tm[2:4]
 tmp = tm[3:5, 1:2]
 tmp = tm[5, :]
@@ -212,58 +168,49 @@ tmp = tm[2]
 tmp = tm[5:8, 2]
 tmp = tm[5, 3]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing with column names as symbols</span>
+## indexing with column names as symbols
 tmp = tm[:A]
 tmp = tm[5, [:A, :B]]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">logical indexing</span>
-logicCol = [<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>]
-logicRow = <span style="color: #00ffff;">repmat</span>([<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">true</span>], 10, 1)[:]
+## logical indexing
+logicCol = [true, false, true, false]
+logicRow = repmat([true, false, true], 10, 1)[:]
 tmp = tm[logicCol]
 tmp = tm[logicRow, logicCol]
 tmp = tm[logicRow, :]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">logically indexing rows directly from expression</span>
+## logically indexing rows directly from expression
 ex = :(A .&gt; 0.5)
 tmp = tm[ex, :]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing by date</span>
-tmp = tm[<span style="color: #00ffff;">date</span>(2013, 07, 04)]
+## indexing by date
+tmp = tm[date(2013, 07, 04)]
 
-datesToFind = Date{ISOCalendar}[<span style="color: #00ffff;">date</span>(2013, 07, ii) <span style="color: #ff0000;">for</span> ii=12:18]
+datesToFind = Date{ISOCalendar}[date(2013, 07, ii) for ii=12:18]
 tmp = tm[datesToFind]
-tm[<span style="color: #00ffff;">date</span>(2013,07,03):<span style="color: #00ffff;">date</span>(2013,07,12)]
-tm[<span style="color: #00ffff;">date</span>(2013,07,03):<span style="color: #00ffff;">date</span>(2013,07,12), :D]
-tm[<span style="color: #00ffff;">date</span>(2013,07,03):<span style="color: #00ffff;">date</span>(2013,07,12),
-             [<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">true</span>]]
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> Read, write, io</h2>
-<div class="outline-text-2" id="text-4">
-<p>
-Data can easily be imported from csv-files using function
+tm[date(2013,07,03):date(2013,07,12)]
+tm[date(2013,07,03):date(2013,07,12), :D]
+tm[date(2013,07,03):date(2013,07,12),
+             [true, false, false, true]]
+</code></pre>
+
+<h1>
+<a name="read-write-io" class="anchor" href="#read-write-io"><span class="octicon octicon-link"></span></a>Read, write, io</h1>
+
+<p>Data can easily be imported from csv-files using function
 <code>readTimedata</code>. Under the hood, the function makes use of <code>readtable</code>
 from the <code>DataFrames</code> package. Additionally, columns are parsed for
 dates similar to function <code>readtime</code> from package <code>TimeSeries</code>. The
 first column matching the regexp for dates will be chosen as time
-identifier. 
-</p>
-<div class="org-src-container">
+identifier. </p>
 
-<pre class="src src-julia">tm = <span style="color: #00ffff;">readTimedata</span>(<span style="color: #00ff00;">"data/logRet.csv"</span>)
-</pre>
-</div>
+<pre><code>tm = readTimedata("data/logRet.csv")
+</code></pre>
 
-<p>
-After loading the data, Julia will call the standard <code>display</code> method
-to show information about the data:
-</p>
+<p>After loading the data, Julia will call the standard <code>display</code> method
+to show information about the data:</p>
 
-<pre class="example">
-type: Timematr{Date{ISOCalendar}}
+<pre><code>type: Timematr{Date{ISOCalendar}}
 dimensions: (333,348)
 333x6 DataFrame:
                dates      MMM      ABT      ACE      ACT     ADBE
@@ -308,10 +255,9 @@ dimensions: (333,348)
 [331,]    2013-04-29  0.03897  0.74085 -0.02261  4.49427  0.33344
 [332,]    2013-04-30  0.84381  0.51807  0.24845  0.14197  0.04438
 [333,]    2013-05-01 -0.14498 -0.08162 -0.94057 -1.27548 -0.82415
-</pre>
+</code></pre>
 
-<p>
-As one can see, the <code>display</code> method will show the type of the
+<p>As one can see, the <code>display</code> method will show the type of the
 variable, together with its dimensions and a snippet into the first
 values. Note that the number of columns does not entail the dates
 column, but does only count the columns of the remaining variables.
@@ -319,25 +265,18 @@ Inherently, <code>display</code> makes use of the method that is implemented for
 <code>DataFrames</code>, which is the reason for the somewhat misleading output
 line <code>333x6 DataFrame:</code>. An issue that still remains to be fixed. In
 contrast to the standard output of <code>DataFrames</code>, there is no explicit
-information for the rest of the columns. 
-</p>
+information for the rest of the columns. </p>
 
-<p>
-An even more elaborate way of looking at the data contained in a
+<p>An even more elaborate way of looking at the data contained in a
 <code>TimeData</code> type is function <code>str</code> (following the name used in R),
-which will print:
-</p>
+which will print:</p>
 
-<div class="org-src-container">
+<pre><code>str(tm)
 
-<pre class="src src-julia"><span style="color: #00ffff;">str</span>(tm)
-</pre>
-</div>
 
-<pre class="example">
 type: Timematr{Date{ISOCalendar}}
-:vals  		  DataFrame
-:idx  		  Array{Date{ISOCalendar},1}
+:vals         DataFrame
+:idx          Array{Date{ISOCalendar},1}
 
 dimensions: (333,348)
 
@@ -388,32 +327,23 @@ From: 2012-01-03, To: 2013-05-01
 [331,]    2013-04-29  0.03897  0.74085 -0.02261  4.49427  0.33344
 [332,]    2013-04-30  0.84381  0.51807  0.24845  0.14197  0.04438
 [333,]    2013-05-01 -0.14498 -0.08162 -0.94057 -1.27548 -0.82415
-</pre>
+</code></pre>
 
-<p>
-This will additionally show the names of the fields of any object, and
-also explicitly display the time period of the data.
-</p>
+<p>This will additionally show the names of the fields of any object, and
+also explicitly display the time period of the data.</p>
 
-<p>
-To save an object to disk, simply call function <code>writeTimedata</code>, which
+<p>To save an object to disk, simply call function <code>writeTimedata</code>, which
 internally uses <code>writetable</code> from the <code>DataFrame</code> package. In
 accordance with <code>writetable</code>, the first argument is the filename as
-string, while the second argument is the variable to be saved.
-</p>
+string, while the second argument is the variable to be saved.</p>
 
-<div class="org-src-container">
+<pre><code>writeTimedata("data/logRet2.csv", tm)
+</code></pre>
 
-<pre class="src src-julia"><span style="color: #00ffff;">writeTimedata</span>(<span style="color: #00ff00;">"data/logRet2.csv"</span>, tm)
-</pre>
-</div>
-</div>
-</div>
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> Functions and operators inherited from DataFrames</h2>
-<div class="outline-text-2" id="text-5">
-<p>
-Most of the standard functions and mathematical operators that are
+<h1>
+<a name="functions-and-operators-inherited-from-dataframes" class="anchor" href="#functions-and-operators-inherited-from-dataframes"><span class="octicon octicon-link"></span></a>Functions and operators inherited from DataFrames</h1>
+
+<p>Most of the standard functions and mathematical operators that are
 defined for <code>DataFrames</code> are also implemented for <code>TimeData</code> types and
 should behave as expected. Whenever possible, functions apply
 elementwise to observations only, and you should get back the same
@@ -421,38 +351,26 @@ type that you did use to call the function. In case that this is not
 possible, the type that you get back should be the natural first
 choice. For example, elementwise comparisons should return a logical
 value for each entry, which by definition could not be of type
-<code>Timenum</code> where only numeric values are allowed. 
-</p>
+<code>Timenum</code> where only numeric values are allowed. </p>
 
-<div class="org-src-container">
+<pre><code>typeof(tm + tm)
+typeof(tm .&gt; 0.5)
 
-<pre class="src src-julia"><span style="color: #00ffff;">typeof</span>(tm + tm)
-<span style="color: #00ffff;">typeof</span>(tm .&gt; 0.5)
-</pre>
-</div>
-
-<pre class="example">
 Timematr (constructor with 9 methods)
 Timedata (constructor with 9 methods)
-</pre>
+</code></pre>
 
-<p>
-The standard library for <code>TimeData</code> comprises all standard operators
+<p>The standard library for <code>TimeData</code> comprises all standard operators
 and mathematical functions. As expected, these functions all apply
 elementwise, and leave the time information untouched. Where
 additional arguments are allowed for <code>DataFrames</code>, they are allowed
-for <code>TimeData</code> types as well.
-</p>
+for <code>TimeData</code> types as well.</p>
 
-<div class="org-src-container">
+<pre><code>tm[1:3, 1:3] .&gt; 0.5
+exp(tm[1:3, 1:3])
+round(tm[1:3, 1:3], 2)
 
-<pre class="src src-julia">tm[1:3, 1:3] .&gt; 0.5
-<span style="color: #00ffff;">exp</span>(tm[1:3, 1:3])
-<span style="color: #00ffff;">round</span>(tm[1:3, 1:3], 2)
-</pre>
-</div>
 
-<pre class="example">
 type: Timedata
 dimensions: (3,3)
 3x4 DataFrame:
@@ -476,14 +394,11 @@ dimensions: (3,3)
 [1,]    2013-07-01 0.47 0.44 0.37
 [2,]    2013-07-02 0.74 0.89 0.79
 [3,]    2013-07-03 0.61 0.41 0.81
-</pre>
+</code></pre>
 
-<p>
-A most likely not exhaustive list of basic functions is
-</p>
-<div class="org-src-container">
+<p>A most likely not exhaustive list of basic functions is</p>
 
-<pre class="src src-julia">TimeDataFunctions = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/),
+<pre><code>TimeDataFunctions = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/),
                      :(./), :(.^),
                      :(div), :(mod), :(fld), :(rem),
                      :abs, :sign, :acos, :acosh, :asin, :asinh, :atan,
@@ -494,82 +409,60 @@ A most likely not exhaustive list of basic functions is
                      :(.==), :(.!=), :(.&gt;), :(.&gt;=), :(.&lt;), :(.&lt;=),
                      :(&amp;), :(|), :($),
                      :round, :ceil, :floor, :trunc]
-</pre>
-</div>
-</div>
-</div>
+</code></pre>
 
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> Additional functions</h2>
-<div class="outline-text-2" id="text-6">
-<p>
-Beside basic mathematical functions and operators, there are some
+<h1>
+<a name="additional-functions" class="anchor" href="#additional-functions"><span class="octicon octicon-link"></span></a>Additional functions</h1>
+
+<p>Beside basic mathematical functions and operators, there are some
 additional basic functions that are defined for each <code>TimeData</code> type.
 For example, you can retrieve individual components of your variable
-with the following functions:
-</p>
-<ul class="org-ul">
-<li><b>idx:</b> returns time information as <code>Array</code>
-</li>
-<li><b>names:</b> returns variable names as
-              <code>Array{Union(UTF8String,ASCIIString),1}</code> 
-</li>
-<li><b>core:</b> implemented for subtypes of <code>AbstractTimematr</code>, it returns a
-matrix of numeric values
-</li>
-</ul>
-<p>
-These functions shall help to inhibit direct access of <code>TimeData</code>
-fields, which should be avoided.
-</p>
+with the following functions:</p>
 
-<p>
-Some further implemented functions are: 
-</p>
-<ul class="org-ul">
-<li><code>isequal</code> 
-</li>
-<li><code>size</code>
-</li>
-<li><code>isna</code>
-</li>
-</ul>
+<ul>
+<li><p><strong>idx:</strong> returns time information as <code>Array</code></p></li>
+<li><p><strong>names:</strong> returns variable names as
+              <code>Array{Union(UTF8String,ASCIIString),1}</code></p></li>
+<li><p><strong>core:</strong> implemented for subtypes of <code>AbstractTimematr</code>, it returns a
+matrix of numeric values</p></li>
+</ul><p>These functions shall help to inhibit direct access of <code>TimeData</code>
+fields, which should be avoided.</p>
 
-<p>
-Furthermore, subtypes of type <code>AbstractTimematr</code> should already
+<p>Some further implemented functions are: </p>
+
+<ul>
+<li><p><code>isequal</code></p></li>
+<li><p><code>size</code></p></li>
+<li><p><code>isna</code></p></li>
+</ul><p>Furthermore, subtypes of type <code>AbstractTimematr</code> should already
 provide functionality for basic statistical functions like <code>mean</code>,
-<code>var</code> and <code>cov</code>.
-</p>
-</div>
-</div>
-<div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> Acknowledgement</h2>
-<div class="outline-text-2" id="text-7">
-<p>
-Of course, any package can only be as good as the individual parts
+<code>var</code> and <code>cov</code>.</p>
+
+<h1>
+<a name="acknowledgement" class="anchor" href="#acknowledgement"><span class="octicon octicon-link"></span></a>Acknowledgement</h1>
+
+<p>Of course, any package can only be as good as the individual parts
 that it builds on. Accordingly, I'd like to thank all people that
 were involved in the development of all the functions that were made
 ready to use for me to build this package upon. In particular, I want
-to thank the developers of
-</p>
-<ul class="org-ul">
-<li>the <b>Julia language</b>, for their continuous and tremendous efforts
+to thank the developers of</p>
+
+<ul>
+<li><p>the <strong>Julia language</strong>, for their continuous and tremendous efforts
 during the creation of this free, fast and highly flexible
-programming language!
-</li>
-<li>the <b>DataFrames</b> package, which definitely provides the best
+programming language!</p></li>
+<li><p>the <strong>DataFrames</strong> package, which definitely provides the best
 representation for general types of data in data analysis. It's a
 role model that every last bit of code of <code>TimeData</code> depends on, and
-the interface that every statistics package should use.
-</li>
-<li>the <b>Datetime</b> package, which is a thoughtful implementation of
+the interface that every statistics package should use.</p></li>
+<li><p>the <strong>Datetime</strong> package, which is a thoughtful implementation of
 dates, time and durations, and the backbone of all time components
-in <code>TimeData</code>.
-</li>
-<li>the <b>TimeSeries</b> package, which follows a different approach to
+in <code>TimeData</code>.</p></li>
+<li><p>the <strong>TimeSeries</strong> package, which follows a different approach to
 handling time series data by storing time information as a column of
 a DataFrame. Having a quite similar goal in mind, the package was a
 great inspiration for me, and occasionally I even could borrow parts
+<<<<<<< HEAD
 of code from it (for example, function <code>readTimedata</code>).
 </li>
 </ul>
@@ -596,4 +489,51 @@ of code from it (for example, function <code>readTimedata</code>).
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
+=======
+of code from it (for example, function <code>readTimedata</code>).</p></li>
+</ul><p> </p>
+
+<p><a href="https://github.com/cgroll/TimeData.jl/zipball/master"></a></p>
+
+<p>Download</p>
+
+<p>.zip file</p>
+
+<p></p>
+
+<p><a href="https://github.com/cgroll/TimeData.jl/tarball/master"></a></p>
+
+<p>Download</p>
+
+<p>.tar.gz file</p>
+
+<p></p>
+
+<p><a href="https://github.com/cgroll/TimeData.jl"></a> is maintained by <a href="https://github.com/cgroll">cgroll</a>.</p>
+
+<p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+
+<p></p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/cgroll/TimeData.jl/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/cgroll/TimeData.jl/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/cgroll/TimeData.jl"></a> is maintained by <a href="https://github.com/cgroll">cgroll</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+>>>>>>> d6685732c59c9a7c22cf6b283ad61b0243c538bd
 </html>
