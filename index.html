@@ -1,38 +1,151 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>TimeData documentation</title>
+<!-- 2014-07-09 Wed 19:41 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Christian Groll" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<meta charset='utf-8'>
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
 
-    <title>TimeData.jl by cgroll</title>
-  </head>
+Copyright (C) 2012  Free Software Foundation, Inc.
 
-  <body>
-    <header>
-      <div class="inner">
-        <h1>TimeData.jl</h1>
-        <h2>TimeData package for Julia language</h2>
-        <a href="https://github.com/cgroll/TimeData.jl" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <div>
-<h2>
-<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
-<div>
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
 
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">TimeData documentation</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
 <ul>
 <li><a href="#sec-1">1. TimeData types</a></li>
 <li><a href="#sec-2">2. Constructors</a></li>
@@ -52,10 +165,10 @@
 All types introduced are subtypes of abstract type <code>AbstractTimedata</code>
 and have two fields, separating time information from observations:
 </p>
-<dl class="org-dl">
-<dt> vals </dt><dd>a <code>DataFrame</code> 
-</dd>
-<dt> idx </dt><dd>an <code>Array{T, 1}</code>, consisting of either type
+<ul class="org-ul">
+<li><b>vals:</b> a <code>DataFrame</code> 
+</li>
+<li><b>idx:</b> an <code>Array{T, 1}</code>, consisting of either type
 <ul class="org-ul">
 <li><code>Integer</code>,
 </li>
@@ -64,19 +177,11 @@ and have two fields, separating time information from observations:
 <li><code>DateTime</code> (from package <code>Datetime</code>)
 </li>
 </ul>
-</dd>
-</dl>
-
-<ul>
-<li>
-<strong>vals:</strong> a <code>DataFrame</code>
 </li>
-<li>
-<strong>idx:</strong> an <code>Array{T, 1}</code>, consisting of type <code>Integer</code>, or type
-         <code>Date</code> or <code>DateTime</code> from package <code>Datetime</code>
-</li>
-</ul><p>However, accessing these fields directly is considered poor style, as
+</ul>
 
+<p>
+However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
 way! Hence, only reference the fields directly if you really know what
 you are doing.
@@ -86,19 +191,23 @@ you are doing.
 Given these commonalities of all <code>TimeData</code> types, there exist several
 distinct types that implement different constraints on the
 observations. Sorted from most general to most specific case, the
-following types are introduced:</p>
+following types are introduced:
+</p>
+<ul class="org-ul">
+<li><b>Timedata:</b> no further restrictions on observations
+</li>
+<li><b>Timenum:</b> observations may consist of numeric values or missing
+values only
+</li>
+<li><b>Timematr:</b> observations must be numeric values only
+</li>
+<li><b>Timecop:</b> observations must be numeric values between 0 and 1
+only
+</li>
+</ul>
 
-<ul>
-<li>
-<strong><code>Timedata</code>:</strong> no further restrictions on observations</li>
-<li>
-<strong><code>Timenum</code>:</strong> observations may consist of numeric values or missing
-values only</li>
-<li>  <strong><code>Timematr</code>:</strong> observations must be numeric values only</li>
-<li>  <strong><code>Timecop</code>:</strong> observations must be numeric values between 0 and 1
-only</li>
-</ul><p>Given that these constraints are fulfilled, one is able to define and
-
+<p>
+Given that these constraints are fulfilled, one is able to define and
 use more specific functions matching the data characteristics more
 closely. For example, <code>Timematr</code> instances can directly make use of
 fast and numerically optimized methods using <code>Array{Float64, 2}</code> under
@@ -511,16 +620,16 @@ additional basic functions that are defined for each <code>TimeData</code> type.
 For example, you can retrieve individual components of your variable
 with the following functions:
 </p>
-<dl class="org-dl">
-<dt> idx </dt><dd>returns time information as <code>Array</code>
-</dd>
-<dt> names </dt><dd>returns variable names as
+<ul class="org-ul">
+<li><b>idx:</b> returns time information as <code>Array</code>
+</li>
+<li><b>names:</b> returns variable names as
               <code>Array{Union(UTF8String,ASCIIString),1}</code> 
-</dd>
-<dt> core </dt><dd>implemented for subtypes of <code>AbstractTimematr</code>, it returns a
+</li>
+<li><b>core:</b> implemented for subtypes of <code>AbstractTimematr</code>, it returns a
 matrix of numeric values
-</dd>
-</dl>
+</li>
+</ul>
 <p>
 These functions shall help to inhibit direct access of <code>TimeData</code>
 fields, which should be avoided.
@@ -576,26 +685,14 @@ great inspiration for me, and occasionally I even could borrow parts
 of code from it (for example, function <code>readTimedata</code>).
 </li>
 </ul>
-        </section>
-
-        <aside id="sidebar">
-          <a href="https://github.com/cgroll/TimeData.jl/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/cgroll/TimeData.jl/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
-
-          <p class="repo-owner"><a href="https://github.com/cgroll/TimeData.jl"></a> is maintained by <a href="https://github.com/cgroll">cgroll</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
-    </div>
-
-  
-  </body>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Christian Groll</p>
+<p class="date">Created: 2014-07-09 Wed 19:41</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 23.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.1)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
 </html>
-
