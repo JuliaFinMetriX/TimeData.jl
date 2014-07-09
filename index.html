@@ -1,23 +1,38 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta name="google-site-verification" content="wesnQ_u6aHgwXz9EDeX-8SnIFVGuZgFiP79F45OhTmI" />
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="TimeData.jl : TimeData package for Julia language" />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-    <title>TimeData.jl</title>
+    <title>TimeData.jl by cgroll</title>
   </head>
 
-<body>
-<div id="content">
-<h1 class="title">TimeData documentation</h1>
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
+  <body>
+    <header>
+      <div class="inner">
+        <h1>TimeData.jl</h1>
+        <h2>TimeData package for Julia language</h2>
+        <a href="https://github.com/cgroll/TimeData.jl" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <div>
+<h2>
+<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h2>
+<div>
+
 <ul>
 <li><a href="#sec-1">1. TimeData types</a></li>
 <li><a href="#sec-2">2. Constructors</a></li>
@@ -52,8 +67,16 @@ and have two fields, separating time information from observations:
 </dd>
 </dl>
 
-<p>
-However, accessing these fields directly is considered poor style, as
+<ul>
+<li>
+<strong>vals:</strong> a <code>DataFrame</code>
+</li>
+<li>
+<strong>idx:</strong> an <code>Array{T, 1}</code>, consisting of type <code>Integer</code>, or type
+         <code>Date</code> or <code>DateTime</code> from package <code>Datetime</code>
+</li>
+</ul><p>However, accessing these fields directly is considered poor style, as
+
 one could circumvent any constraints on the individual fields this
 way! Hence, only reference the fields directly if you really know what
 you are doing.
@@ -63,23 +86,19 @@ you are doing.
 Given these commonalities of all <code>TimeData</code> types, there exist several
 distinct types that implement different constraints on the
 observations. Sorted from most general to most specific case, the
-following types are introduced:
-</p>
-<dl class="org-dl">
-<dt> <code>Timedata</code> </dt><dd>no further restrictions on observations
-</dd>
-<dt> <code>Timenum</code> </dt><dd>observations may consist of numeric values or missing
-values only
-</dd>
-<dt> <code>Timematr</code> </dt><dd>observations must be numeric values only
-</dd>
-<dt> <code>Timecop</code> </dt><dd>observations must be numeric values between 0 and 1
-only
-</dd>
-</dl>
+following types are introduced:</p>
 
-<p>
-Given that these constraints are fulfilled, one is able to define and
+<ul>
+<li>
+<strong><code>Timedata</code>:</strong> no further restrictions on observations</li>
+<li>
+<strong><code>Timenum</code>:</strong> observations may consist of numeric values or missing
+values only</li>
+<li>  <strong><code>Timematr</code>:</strong> observations must be numeric values only</li>
+<li>  <strong><code>Timecop</code>:</strong> observations must be numeric values between 0 and 1
+only</li>
+</ul><p>Given that these constraints are fulfilled, one is able to define and
+
 use more specific functions matching the data characteristics more
 closely. For example, <code>Timematr</code> instances can directly make use of
 fast and numerically optimized methods using <code>Array{Float64, 2}</code> under
@@ -557,14 +576,26 @@ great inspiration for me, and occasionally I even could borrow parts
 of code from it (for example, function <code>readTimedata</code>).
 </li>
 </ul>
-</div>
-</div>
-</div>
-<div id="postamble" class="status">
-<p class="author">Author: Christian Groll</p>
-<p class="date">Created: 2014-07-09 Wed 18:28</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 23.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.1)</p>
-<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
-</div>
-</body>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/cgroll/TimeData.jl/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/cgroll/TimeData.jl/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/cgroll/TimeData.jl"></a> is maintained by <a href="https://github.com/cgroll">cgroll</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
 </html>
+
