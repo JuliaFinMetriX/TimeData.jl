@@ -28,15 +28,15 @@ TimeData.chkIdx(validIdx)
 
 ## test invalid idx
 invalidIdx = [1. 2 3]
-@test_throws TimeData.chkIdx(invalidIdx)
+@test_throws TypeError TimeData.chkIdx(invalidIdx)
 
 ## array of element type Any
 invalidIdx = [datetime(2010,02,ii,00,00,00) for ii=1:10]
-@test_throws TimeData.chkIdx(invalidIdx)
+@test_throws TypeError TimeData.chkIdx(invalidIdx)
 
 ## idx must be array!
 invalidIdx = today()
-@test_throws TimeData.chkIdx(invalidIdx)
+@test_throws TypeError TimeData.chkIdx(invalidIdx)
 
 #########################
 ## chkNum and chkNumDf ##
@@ -49,7 +49,7 @@ naDf = DataFrame(a, b)
 naDf[1, 2] = NA
 naDf[3, 1] = NA
 TimeData.chkNumDf(naDf)
-@test_throws TimeData.chkNum(naDf)
+@test_throws ArgumentError TimeData.chkNum(naDf)
 
 numDf = DataFrame(a, b)
 TimeData.chkNumDf(numDf)
@@ -59,12 +59,12 @@ TimeData.chkNum(numDf)
 a = [1, 2, 3]
 b = ["hello", "world", "hello"]
 invalidDf = DataFrame(a, b)
-@test_throws TimeData.chkNumDf(invalidDf)
-@test_throws TimeData.chkNum(invalidDf)
+@test_throws ArgumentError TimeData.chkNumDf(invalidDf)
+@test_throws ArgumentError TimeData.chkNum(invalidDf)
 
 a = [true, false, true]
 invalidDf = DataFrame(a)
-@test_throws TimeData.chkNumDf(invalidDf)    
+@test_throws ArgumentError TimeData.chkNumDf(invalidDf)
 
 #############
 ## chkUnit ##
@@ -75,5 +75,5 @@ TimeData.chkUnit(validDf)
 
 invalidDf = convert(DataFrame, rand(8, 3))
 invalidDf[2, 2] = -0.2
-@test_throws TimeData.chkUnit(invalidDf)
+@test_throws ArgumentError TimeData.chkUnit(invalidDf)
 end

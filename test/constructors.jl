@@ -80,19 +80,19 @@ end
 
 ## idx initialized with wrong type
 vals = DataFrame([2, 3, 4])
-invalidIdx = DataArray([1, 2, 3])
+invalidIdx = [1., 2, 3]
 for t in allTypes
     eval(quote
-        @test_throws $(t)(vals, idx)        
+        @test_throws TypeError $(t)(vals, invalidIdx)
     end)
 end
 
 ## idx and vals sizes not matching
-idx = [date(2013, 7, ii) for ii=1:30]
+idxVals = [date(2013, 7, ii) for ii=1:30]
 valsArr = rand(20, 4)
 for t in allTypes
     eval(quote
-        @test_throws $(t)(valsArr, idx)
+        @test_throws Exception $(t)(valsArr, idxVals)
     end)
 end
 

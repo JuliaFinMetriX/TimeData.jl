@@ -3,11 +3,19 @@
 ####################################
 
 function chkIdx(idx)
+    ## check for Array and entry type
+    ## Array is already checked through Timedata definition itself
     if !isa(idx, Array)
-        error("time index must be given as array")
+        throw(TypeError(:chkIdx,
+                        "passed time index: must be given as array\n",
+                        Array,
+                        typeof(idx)))
     end
     if !issubtype(eltype(idx), Union(Integer, Date, DateTime))
-        error("time index must be either Integer or TimeType")
+        throw(TypeError(:chkIdx,
+                        "passed time index: entries must be either Integer or TimeType\n",
+                        Union(Integer, Date, DateTime),
+                        eltype(idx)))
     end
 end
 
@@ -16,15 +24,18 @@ end
 ###########################################
 
 function chkNumDf(df::DataFrame)
+    ## check for numeric values or NAs
+    
     n = ncol(df)
+    errMsg = "all columns must be numeric for conversion"
     for ii=1:n
         ## check for numeric values
         if(!issubtype(eltypes(df)[ii], Number) &
     !isequal(eltypes(df)[ii], NAtype))
-            error("all columns must be numeric for conversion")
+            throw(ArgumentError(errMsg))
         end
         if(issubtype(eltypes(df)[ii], Bool))
-            error("all columns must be numeric for conversion")
+            throw(ArgumentError(errMsg))
         end
     end
 end
@@ -34,9 +45,11 @@ end
 ############################################
 
 function chkNum(df::DataFrame)
+    ## check for numeric values, no NAs allowed
+    
     for ii=1:size(df, 2)
         if any(isna(df[ii]))
-            error("no NAs allowed in TimeMatr")
+            throw(ArgumentError("no NAs allowed in Timematr"))
         end
     end
     chkNumDf(df)
@@ -49,6 +62,6 @@ end
 function chkUnit(df::DataFrame)
     vals = array(df)
     if (any(vals .< 0) | any(vals .> 1))
-        error("values must be inside of unit interval")
+        throw(ArgumentError("values must be inside of unit interval"))
     end
 end
