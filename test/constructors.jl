@@ -79,7 +79,7 @@ end
 ######################################
 
 ## idx initialized with wrong type
-vals = DataFrame([2, 3, 4])
+vals = DataFrame(a = [2, 3, 4])
 invalidIdx = [1., 2, 3]
 for t in allTypes
     eval(quote

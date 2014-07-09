@@ -49,19 +49,18 @@ naDf[3, 1] = NA
 TimeData.chkNumDf(naDf)
 @test_throws ArgumentError TimeData.chkNum(naDf)
 
-numDf = DataFrame(a, b)
+numDf = DataFrame(a = [1, 2, 3], b = [4, 5, 6])
 TimeData.chkNumDf(numDf)
 TimeData.chkNum(numDf)
 
 ## invalid DataFrame with strings
-a = [1, 2, 3]
-b = ["hello", "world", "hello"]
-invalidDf = DataFrame(a, b)
+
+
+invalidDf = DataFrame(a = [1, 2, 3], b = ["hello", "world", "hello"]) 
 @test_throws ArgumentError TimeData.chkNumDf(invalidDf)
 @test_throws ArgumentError TimeData.chkNum(invalidDf)
 
-a = [true, false, true]
-invalidDf = DataFrame(a)
+invalidDf = DataFrame(a = [true, false, true])
 @test_throws ArgumentError TimeData.chkNumDf(invalidDf)
 
 #############

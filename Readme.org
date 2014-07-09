@@ -5,6 +5,7 @@
 
 [[https://travis-ci.org/cgroll/TimeData.jl][https://travis-ci.org/cgroll/TimeData.jl.png]]
 [[https://coveralls.io/r/cgroll/TimeData.jl?branch=master][https://coveralls.io/repos/cgroll/TimeData.jl/badge.png?branch=master]]
+[[http://pkg.julialang.org/?pkg=TimeData&ver=0.3][http://pkg.julialang.org/badges/TimeData_0.3.svg]]
 
 * What? Why
 

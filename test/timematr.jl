@@ -16,7 +16,7 @@ println("\n Running timematr tests\n")
 vals = rand(30, 4)
 dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
 nams = [:A, :B, :C, :D]
-df = DataFrame(vals, nams)
+df = composeDataFrame(vals, nams)
 
 tm = TimeData.Timematr(df, dats)
 tm = TimeData.Timematr(vals, nams, [31:60])
