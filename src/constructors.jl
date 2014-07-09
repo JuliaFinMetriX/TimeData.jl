@@ -29,24 +29,21 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         function $(t)(vals::FloatArray,
                       nams::Array{Symbol, 1},
                       idx::Array)
-            df = convert(DataFrame, vals)
-            rename!(df, names(df), nams)
+            df = composeDataFrame(vals, nams)
             return $(t)(df, idx)
         end
         
         ## comprehensive constructor: very general, all elements
         ## required for Timedata type
         function $(t)(vals::Array, nams::Array, idx::Array) 
-            df = convert(DataFrame, vals)
-            rename!(df, names(df), nams)
+            df = composeDataFrame(vals, nams)
             return $(t)(df, idx)
         end
         
         ## two inputs only, general form
         function $(t)(vals::Array, nams::Array)
             if isa(nams[1], Symbol)
-                df = convert(DataFrame, vals)
-                rename!(df, names(df), nams)
+                df = composeDataFrame(vals, nams)
                 $(t)(df)
             else
                 df = convert(DataFrame, vals)
@@ -56,8 +53,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
 
         function $(t)(vals::DataFrame, nams::Array)
             if isa(nams[1], Symbol)
-                df = convert(DataFrame, vals)
-                rename!(df, names(df), nams)
+                df = composeDataFrame(vals, nams)
                 $(t)(df)
             else
                 df = convert(DataFrame, vals)
