@@ -24,14 +24,18 @@ names must match"
     end
     
     df = convert(DataFrame, vals)
-    rename!(df, names(df), nams)
+    try
+        rename!(df, names(df), nams)
+    catch
+        # renaming didn't work - leave as is
+    end
 
     return df
 end
 
 import Base.convert
 function convert(::Type{DataFrame}, td::AbstractTimedata)
-    df = [DataFrame(id = td.idx) td.vals]
+    df = [DataFrame(idx = td.idx) td.vals]
 end
 
 ############################
