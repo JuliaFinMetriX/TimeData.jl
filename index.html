@@ -53,6 +53,8 @@
   pre.src-sql:before   { content: 'SQL'; }
 
   table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
   td, th { vertical-align:top;  }
   th.right  { text-align: center;  }
   th.left   { text-align: center;   }
@@ -118,7 +120,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012  Free Software Foundation, Inc.
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -162,7 +164,6 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">TimeData.jl</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -239,6 +240,7 @@ manipulation.
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> Constructors</h2>
 <div class="outline-text-2" id="text-2">
@@ -249,15 +251,15 @@ inner constructor.
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia"><span style="color: #ff0000;">using</span> TimeData
-<span style="color: #ff0000;">using</span> Datetime
+<pre class="src src-julia">using TimeData
+using Datetime
 
-vals = <span style="color: #00ffff;">rand</span>(4, 3);
-dats = Date{ISOCalendar}[<span style="color: #00ffff;">date</span>(2013, 7, ii) <span style="color: #ff0000;">for</span> ii=1:4];
+vals = rand(4, 3);
+dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4];
 nams = [:A, :B, :C];
-valsDf = <span style="color: #00ffff;">composeDataFrame</span>(vals, nams);
+valsDf = composeDataFrame(vals, nams);
 
-tm = <span style="color: #00ffff;">Timematr</span>(valsDf, dats)
+tm = Timematr(valsDf, dats)
 </pre>
 </div>
 
@@ -286,10 +288,10 @@ convention that dates never precede variable names as arguments.
 
 <div class="org-src-container">
 
-<pre class="src src-julia">td = <span style="color: #00ffff;">Timedata</span>(vals, nams, dats)
-td = <span style="color: #00ffff;">Timedata</span>(vals, nams)
-td = <span style="color: #00ffff;">Timedata</span>(vals, dats)
-td = <span style="color: #00ffff;">Timedata</span>(vals)
+<pre class="src src-julia">td = Timedata(vals, nams, dats)
+td = Timedata(vals, nams)
+td = Timedata(vals, dats)
+td = Timedata(vals)
 </pre>
 </div>
 
@@ -336,6 +338,7 @@ dimensions: (4,3)
 </pre>
 </div>
 </div>
+
 <div id="outline-container-sec-3" class="outline-2">
 <h2 id="sec-3"><span class="section-number-2">3</span> Indexing</h2>
 <div class="outline-text-2" id="text-3">
@@ -355,14 +358,14 @@ example, <code>DataFrames</code> return <code>Array</code> for single columns.
 
 <div class="org-src-container">
 
-<pre class="src src-julia"><span style="color: #00ffff;">typeof</span>(valsDf[:, 1])
-<span style="color: #00ffff;">typeof</span>(td[:, 1])
+<pre class="src src-julia">typeof(valsDf[:, 1])
+typeof(td[:, 1])
 
-<span style="color: #00ffff;">typeof</span>(valsDf[1, 1])
-<span style="color: #00ffff;">typeof</span>(td[1, 1])
+typeof(valsDf[1, 1])
+typeof(td[1, 1])
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">empty instance</span>
-<span style="color: #00ffff;">typeof</span>(td[4:3, 5:4])
+## empty instance
+typeof(td[4:3, 5:4])
 </pre>
 </div>
 
@@ -386,7 +389,7 @@ Possible ways of indexing are:
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia"><span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing by numeric indices</span>
+<pre class="src src-julia">## indexing by numeric indices
 tmp = tm[2:3]
 tmp = tm[1:3, 1:2]
 tmp = tm[2, :]
@@ -394,27 +397,28 @@ tmp = tm[2]
 tmp = tm[1:2, 2]
 tmp = tm[3, 3]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing with column names as symbols</span>
+## indexing with column names as symbols
 tmp = tm[:A]
 tmp = tm[2, [:A, :B]]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">logical indexing</span>
-logicCol = [<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">true</span>]
-logicRow = <span style="color: #00ffff;">repmat</span>([<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>], 2, 1)[:]
+## logical indexing
+logicCol = [true, false, true]
+logicRow = repmat([true, false], 2, 1)[:]
 tmp = tm[logicCol]
 tmp = tm[logicRow, logicCol]
 tmp = tm[logicRow, :]
 
-<span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing with dates</span>
-datesToFind = Date{ISOCalendar}[<span style="color: #00ffff;">date</span>(2013, 7, ii) <span style="color: #ff0000;">for</span> ii=2:3]
+## indexing with dates
+datesToFind = Date{ISOCalendar}[date(2013, 7, ii) for ii=2:3]
 tmp = tm[datesToFind]
-tm[<span style="color: #00ffff;">date</span>(2013,7,1):<span style="color: #00ffff;">date</span>(2013,7,3)]
-tm[<span style="color: #00ffff;">date</span>(2013,7,2):<span style="color: #00ffff;">date</span>(2013,7,3), :B]
-tm[<span style="color: #00ffff;">date</span>(2013,7,3):<span style="color: #00ffff;">date</span>(2013,7,12), [<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">false</span>]]
+tm[date(2013,7,1):date(2013,7,3)]
+tm[date(2013,7,2):date(2013,7,3), :B]
+tm[date(2013,7,3):date(2013,7,12), [true, false, false]]
 </pre>
 </div>
 </div>
 </div>
+
 
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> Read, write, io</h2>
@@ -428,8 +432,8 @@ as time identifier.
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia">filePath = <span style="color: #00ffff;">joinpath</span>(Pkg.<span style="color: #00ffff;">dir</span>(<span style="color: #00ff00;">"TimeData"</span>), <span style="color: #00ff00;">"data"</span>, <span style="color: #00ff00;">"logRet.csv"</span>);
-tm = <span style="color: #00ffff;">readTimedata</span>(filePath)
+<pre class="src src-julia">filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
+tm = readTimedata(filePath)
 </pre>
 </div>
 
@@ -484,7 +488,7 @@ which will print:
 
 <div class="org-src-container">
 
-<pre class="src src-julia"><span style="color: #00ffff;">#   </span><span style="color: #00ffff;">str(tm) # uncomment for execution</span>
+<pre class="src src-julia">#   str(tm) # uncomment for execution
 </pre>
 </div>
 
@@ -536,11 +540,12 @@ string, while the second argument is the variable to be saved.
 
 <div class="org-src-container">
 
-<pre class="src src-julia"><span style="color: #00ffff;">#   </span><span style="color: #00ffff;">writeTimedata("data/logRet2.csv", tm) # uncomment for execution</span>
+<pre class="src src-julia">#   writeTimedata("data/logRet2.csv", tm) # uncomment for execution
 </pre>
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-5" class="outline-2">
 <h2 id="sec-5"><span class="section-number-2">5</span> Functions and operators</h2>
 <div class="outline-text-2" id="text-5">
@@ -562,8 +567,8 @@ are allowed.
 
 <div class="org-src-container">
 
-<pre class="src src-julia"><span style="color: #00ffff;">typeof</span>(tm .+ tm)
-<span style="color: #00ffff;">typeof</span>(tm .&gt; 0.5)
+<pre class="src src-julia">typeof(tm .+ tm)
+typeof(tm .&gt; 0.5)
 </pre>
 </div>
 
@@ -583,8 +588,8 @@ additional arguments are allowed for <code>Arrays</code>, they are allowed for
 <div class="org-src-container">
 
 <pre class="src src-julia">tm[1:3, 1:3] .&gt; 0.5
-<span style="color: #00ffff;">exp</span>(tm[1:3, 1:3])
-<span style="color: #00ffff;">round</span>(tm[1:3, 1:3], 2)
+exp(tm[1:3, 1:3])
+round(tm[1:3, 1:3], 2)
 </pre>
 </div>
 
@@ -637,6 +642,7 @@ A most likely not exhaustive list of basic functions is
 </div>
 </div>
 
+
 <div id="outline-container-sec-6" class="outline-2">
 <h2 id="sec-6"><span class="section-number-2">6</span> Additional functions</h2>
 <div class="outline-text-2" id="text-6">
@@ -650,7 +656,7 @@ the following functions:
 <li><code>idx</code>: returns time information as <code>Array</code>
 </li>
 <li><code>names</code>: returns variable names as
-  <code>Array{Union(UTF8String,ASCIIString),1}</code>  
+<code>Array{Union(UTF8String,ASCIIString),1}</code>  
 </li>
 <li><code>core</code>: implemented for subtypes of <code>AbstractTimematr</code>, it returns a
 matrix of numeric values
@@ -680,6 +686,7 @@ provide functionality for basic statistical functions like <code>mean</code>,
 </p>
 </div>
 </div>
+
 <div id="outline-container-sec-7" class="outline-2">
 <h2 id="sec-7"><span class="section-number-2">7</span> Acknowledgement</h2>
 <div class="outline-text-2" id="text-7">
@@ -715,7 +722,7 @@ of function <code>readtime</code>).
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 23.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.1)</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.7)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
