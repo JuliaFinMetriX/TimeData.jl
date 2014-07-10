@@ -6,7 +6,7 @@ using DataFrames
 using Datetime
 using TimeData
 
-println("\nRunning getindex tests:")
+println("\n Running getindex tests:")
 
 ## test for changes in DataFrame behaviour
 df = convert(DataFrame, rand(8, 4))
@@ -27,7 +27,7 @@ nams = [:A, :B, :C, :D]
 for t = (:Timedata, :Timenum, :Timematr)
     eval(quote
 
-        println("Running getindex for ", $t)        
+        println("   Running getindex for ", $t)        
         
         tn = $(t)(vals, nams, dats)
         

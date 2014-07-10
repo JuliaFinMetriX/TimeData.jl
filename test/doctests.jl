@@ -1,4 +1,12 @@
 
+module TestDocumentation
+
+using Base.Test
+using DataArrays
+using DataFrames
+
+println("\n Running documentation tests\n")
+
 using TimeData
 using Datetime
 
@@ -52,7 +60,7 @@ tm[date(2013,7,3):date(2013,7,12), [true, false, false]]
 filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
 tm = readTimedata(filePath)
 
-str(tm)
+#   str(tm) # uncomment for execution
 
 #   writeTimedata("data/logRet2.csv", tm) # uncomment for execution
 
@@ -62,3 +70,5 @@ typeof(tm .> 0.5)
 tm[1:3, 1:3] .> 0.5
 exp(tm[1:3, 1:3])
 round(tm[1:3, 1:3], 2)
+
+end

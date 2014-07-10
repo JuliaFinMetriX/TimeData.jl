@@ -7,6 +7,7 @@ using DataArrays
 tests = ["abstractFuncs.jl",
          "constraints.jl",
          "constructors.jl",
+         "doctests.jl",
          "getindex.jl",
          "timematr.jl",
          "timenum.jl",

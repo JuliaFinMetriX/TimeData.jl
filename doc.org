@@ -51,6 +51,17 @@ The only post-processing that needs to be done is removing the h1
 title in the html. This is the second time that the word title occurs. 
 #+END_COMMENT
 
+#+BEGIN_SRC julia :exports none :results output :tangle test/doctests.jl
+module TestDocumentation
+
+using Base.Test
+using DataArrays
+using DataFrames
+
+println("\n Running documentation tests\n")
+
+#+END_SRC
+
 
 * TimeData types
 
@@ -314,7 +325,7 @@ An even more elaborate way of looking at the data contained in a
 which will print:
 
 #+BEGIN_SRC julia :tangle test/doctests.jl :results output
-   str(tm)
+#   str(tm) # uncomment for execution
 #+END_SRC
 
 #+RESULTS:
@@ -490,3 +501,7 @@ to thank the developers of
   package was a great inspiration for me, and occasionally I even
   could borrow parts of code from it (for example, from an old version
   of function ~readtime~).
+
+#+BEGIN_SRC julia :exports none :results output :tangle test/doctests.jl
+end
+#+END_SRC
