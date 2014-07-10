@@ -3,7 +3,7 @@
 #+PROPERTY: exports both
 #+PROPERTY: results silent
 #+PROPERTY: session *julia-docs*
-#+OPTIONS: :tangle yes
+#+OPTIONS: tangle:doctests.jl
 #+OPTIONS: author:nil
 #+OPTIONS: title:nil
 #+OPTIONS: email:nil
@@ -92,12 +92,12 @@ further ~setindex~ methods exist that would allow data manipulation.
 For each type, variables can be created by directly handing over
 observations as ~DataFrame~ and time information as ~Array~ to the
 inner constructor.
-#+BEGIN_SRC julia :results silent :tangle yes
+#+BEGIN_SRC julia :results silent :tangle test/doctests.jl
    using TimeData
    using Datetime
 #+END_SRC
 
-#+BEGIN_SRC julia :results silent :tangle yes
+#+BEGIN_SRC julia :results silent :tangle test/doctests.jl
    vals = rand(30, 4)
    dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
    nams = [:A, :B, :C, :D]
@@ -115,7 +115,7 @@ and / or dates are missing. For these cases, there exist more
 convenient outer constructors, too, which generally follow the
 convention that dates do never precede variable names as arguments.
 
-#+BEGIN_SRC julia :results silent :tangle yes
+#+BEGIN_SRC julia :results silent :tangle test/doctests.jl
    tm = Timematr(vals, nams, dats)
    tm = Timematr(vals, nams)
    tm = Timematr(vals, dats)
@@ -137,7 +137,7 @@ Although this seems to be quite logically, this behavior does deviate
 from ~DataFrame~ behavior in such that, for example, ~DataFrames~
 return ~DataArray~ for single columns.
 
-#+BEGIN_SRC julia :tangle yes :exports both :results output
+#+BEGIN_SRC julia :tangle test/doctests.jl :exports both :results output
    typeof(valsDf[:, 1])
    typeof(tm[:, 1])
    
@@ -162,7 +162,7 @@ This will print:
 
 
 Possible ways of indexing are:
-#+BEGIN_SRC julia :tangle yes
+#+BEGIN_SRC julia :tangle test/doctests.jl
    ## indexing by numeric indices
    tmp = tm[2:4]
    tmp = tm[3:5, 1:2]
@@ -205,7 +205,7 @@ from the ~DataFrames~ package. Additionally, columns are parsed for
 dates similar to function ~readtime~ from package ~TimeSeries~. The
 first column matching the regexp for dates will be chosen as time
 identifier. 
-#+BEGIN_SRC julia :tangle yes
+#+BEGIN_SRC julia :tangle test/doctests.jl
    tm = readTimedata("data/logRet.csv")
 #+END_SRC
 
@@ -276,7 +276,7 @@ An even more elaborate way of looking at the data contained in a
 ~TimeData~ type is function ~str~ (following the name used in R),
 which will print:
 
-#+BEGIN_SRC julia :tangle yes
+#+BEGIN_SRC julia :tangle test/doctests.jl
    str(tm)
 #+END_SRC
 
@@ -346,7 +346,7 @@ internally uses ~writetable~ from the ~DataFrame~ package. In
 accordance with ~writetable~, the first argument is the filename as
 string, while the second argument is the variable to be saved.
 
-#+BEGIN_SRC julia :tangle yes :results silent
+#+BEGIN_SRC julia :tangle test/doctests.jl :results silent
    writeTimedata("data/logRet2.csv", tm)
 #+END_SRC
 
@@ -362,7 +362,7 @@ choice. For example, elementwise comparisons should return a logical
 value for each entry, which by definition could not be of type
 ~Timenum~ where only numeric values are allowed. 
 
-#+BEGIN_SRC julia :results output :tangle yes
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
    typeof(tm + tm)
    typeof(tm .> 0.5)
 #+END_SRC
@@ -377,7 +377,7 @@ elementwise, and leave the time information untouched. Where
 additional arguments are allowed for ~DataFrames~, they are allowed
 for ~TimeData~ types as well.
 
-#+BEGIN_SRC julia :results output :tangle yes
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
 tm[1:3, 1:3] .> 0.5
 exp(tm[1:3, 1:3])
 round(tm[1:3, 1:3], 2)
