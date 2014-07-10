@@ -162,6 +162,7 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
+<h1 class="title">TimeData.jl</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -170,13 +171,12 @@ for the JavaScript code in this tag.
 <li><a href="#sec-2">2. Constructors</a></li>
 <li><a href="#sec-3">3. Indexing</a></li>
 <li><a href="#sec-4">4. Read, write, io</a></li>
-<li><a href="#sec-5">5. Functions and operators inherited from DataFrames</a></li>
+<li><a href="#sec-5">5. Functions and operators</a></li>
 <li><a href="#sec-6">6. Additional functions</a></li>
 <li><a href="#sec-7">7. Acknowledgement</a></li>
 </ul>
 </div>
 </div>
-
 
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> TimeData types</h2>
@@ -214,14 +214,14 @@ observations. Sorted from most general to most specific case, the
 following types are introduced:
 </p>
 <ul class="org-ul">
-<li><b>Timedata:</b> no further restrictions on observations
+<li><code>Timedata</code>: no further restrictions on observations
 </li>
-<li><b>Timenum:</b> observations may consist of numeric values or missing
+<li><code>Timenum</code>: observations may consist of numeric values or missing
 values only
 </li>
-<li><b>Timematr:</b> observations must be numeric values only
+<li><code>Timematr</code>: observations must be numeric values only
 </li>
-<li><b>Timecop:</b> observations must be numeric values between 0 and 1
+<li><code>Timecop</code>: observations must be numeric values between 0 and 1
 only
 </li>
 </ul>
@@ -233,8 +233,9 @@ closely. For example, <code>Timematr</code> instances can directly make use of
 fast and numerically optimized methods using <code>Array{Float64, 2}</code> under
 the hood. Hence, it is important that these constraints are reliably
 fulfilled. They are guaranteed as they are hard-coded into variables
-at creation through the individual constructors. And, by now, no
-further <code>setindex</code> methods exist that would allow data manipulation.
+at time of creation through the individual constructors. And, by now,
+no further <code>setindex</code> methods exist that would allow data
+manipulation.
 </p>
 </div>
 </div>
@@ -248,21 +249,29 @@ inner constructor.
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia">using TimeData
-using Datetime
+<pre class="src src-julia"><span style="color: #ff0000;">using</span> TimeData
+<span style="color: #ff0000;">using</span> Datetime
+
+vals = <span style="color: #00ffff;">rand</span>(4, 3);
+dats = Date{ISOCalendar}[<span style="color: #00ffff;">date</span>(2013, 7, ii) <span style="color: #ff0000;">for</span> ii=1:4];
+nams = [:A, :B, :C];
+valsDf = <span style="color: #00ffff;">composeDataFrame</span>(vals, nams);
+
+tm = <span style="color: #00ffff;">Timematr</span>(valsDf, dats)
 </pre>
 </div>
 
-<div class="org-src-container">
-
-<pre class="src src-julia">vals = rand(30, 4)
-dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
-nams = [:A, :B, :C, :D]
-valsDf = composeDataFrame(vals, nams)
-
-tm = Timematr(valsDf, dats)
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|------------|-----------|----------|----------|
+| Row # | idx        | A         | B        | C        |
+| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
 </pre>
-</div>
 
 <p>
 Besides, there also exist several outer constructors for each type,
@@ -272,17 +281,59 @@ not entail any <code>NAs</code>, there is no need to wrap them up into
 from <code>Arrays</code>. Also, there might be situations where variable names
 and / or dates are missing. For these cases, there exist more
 convenient outer constructors, too, which generally follow the
-convention that dates do never precede variable names as arguments.
+convention that dates never precede variable names as arguments.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-julia">tm = Timematr(vals, nams, dats)
-tm = Timematr(vals, nams)
-tm = Timematr(vals, dats)
-tm = Timematr(vals)
+<pre class="src src-julia">td = <span style="color: #00ffff;">Timedata</span>(vals, nams, dats)
+td = <span style="color: #00ffff;">Timedata</span>(vals, nams)
+td = <span style="color: #00ffff;">Timedata</span>(vals, dats)
+td = <span style="color: #00ffff;">Timedata</span>(vals)
 </pre>
 </div>
+
+<pre class="example">
+type: Timedata{Date{ISOCalendar}}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|------------|-----------|----------|----------|
+| Row # | idx        | A         | B        | C        |
+| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
+
+type: Timedata{Int64}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|-----|-----------|----------|----------|
+| Row # | idx | A         | B        | C        |
+| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
+
+type: Timedata{Date{ISOCalendar}}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|------------|-----------|----------|----------|
+| Row # | idx        | x1        | x2       | x3       |
+| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
+
+type: Timedata{Int64}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|-----|-----------|----------|----------|
+| Row # | idx | x1        | x2       | x3       |
+| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
+</pre>
 </div>
 </div>
 <div id="outline-container-sec-3" class="outline-2">
@@ -298,21 +349,20 @@ note that indexing deviates from <code>DataFrame</code> behavior in one aspect:
 <code>getindex</code> will NEVER change the type of the variable! If you call it
 on a <code>Timematr</code> variable, it will also return a <code>Timematr</code> variable,
 and if you call it on type <code>Timenum</code> it will return <code>Timenum</code> as well.
-Although this seems to be quite logically, this behavior does deviate
-from <code>DataFrame</code> behavior in such that, for example, <code>DataFrames</code>
-return <code>DataArray</code> for single columns.
+This behavior does deviate from <code>DataFrame</code> behavior in such that, for
+example, <code>DataFrames</code> return <code>Array</code> for single columns.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-julia">typeof(valsDf[:, 1])
-typeof(tm[:, 1])
+<pre class="src src-julia"><span style="color: #00ffff;">typeof</span>(valsDf[:, 1])
+<span style="color: #00ffff;">typeof</span>(td[:, 1])
 
-typeof(valsDf[1, 1])
-typeof(tm[1, 1])
+<span style="color: #00ffff;">typeof</span>(valsDf[1, 1])
+<span style="color: #00ffff;">typeof</span>(td[1, 1])
 
-## empty instance
-typeof(tm[4:3, 5:4])
+<span style="color: #00ffff;">## </span><span style="color: #00ffff;">empty instance</span>
+<span style="color: #00ffff;">typeof</span>(td[4:3, 5:4])
 </pre>
 </div>
 
@@ -320,14 +370,14 @@ typeof(tm[4:3, 5:4])
 This will print:
 </p>
 <pre class="example">
-DataArray{Float64,1} (constructor with 1 method)
-Timematr{Date{ISOCalendar}} (constructor with 1 method)
+Array{Float64,1}
+Timedata{Int64} (constructor with 1 method)
 
 Float64
-Timematr{Date{ISOCalendar}} (constructor with 1 method)
+Timedata{Int64} (constructor with 1 method)
 
 
-Timematr{Date{ISOCalendar}} (constructor with 1 method)
+Timedata{Int64} (constructor with 1 method)
 </pre>
 
 
@@ -336,42 +386,36 @@ Possible ways of indexing are:
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia">## indexing by numeric indices
-tmp = tm[2:4]
-tmp = tm[3:5, 1:2]
-tmp = tm[5, :]
+<pre class="src src-julia"><span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing by numeric indices</span>
+tmp = tm[2:3]
+tmp = tm[1:3, 1:2]
+tmp = tm[2, :]
 tmp = tm[2]
-tmp = tm[5:8, 2]
-tmp = tm[5, 3]
+tmp = tm[1:2, 2]
+tmp = tm[3, 3]
 
-## indexing with column names as symbols
+<span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing with column names as symbols</span>
 tmp = tm[:A]
-tmp = tm[5, [:A, :B]]
+tmp = tm[2, [:A, :B]]
 
-## logical indexing
-logicCol = [true, false, true, false]
-logicRow = repmat([true, false, true], 10, 1)[:]
+<span style="color: #00ffff;">## </span><span style="color: #00ffff;">logical indexing</span>
+logicCol = [<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">true</span>]
+logicRow = <span style="color: #00ffff;">repmat</span>([<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>], 2, 1)[:]
 tmp = tm[logicCol]
 tmp = tm[logicRow, logicCol]
 tmp = tm[logicRow, :]
 
-## logically indexing rows directly from expression
-ex = :(A .&gt; 0.5)
-tmp = tm[ex, :]
-
-## indexing by date
-tmp = tm[date(2013, 07, 04)]
-
-datesToFind = Date{ISOCalendar}[date(2013, 07, ii) for ii=12:18]
+<span style="color: #00ffff;">## </span><span style="color: #00ffff;">indexing with dates</span>
+datesToFind = Date{ISOCalendar}[<span style="color: #00ffff;">date</span>(2013, 7, ii) <span style="color: #ff0000;">for</span> ii=2:3]
 tmp = tm[datesToFind]
-tm[date(2013,07,03):date(2013,07,12)]
-tm[date(2013,07,03):date(2013,07,12), :D]
-tm[date(2013,07,03):date(2013,07,12),
-             [true, false, false, true]]
+tm[<span style="color: #00ffff;">date</span>(2013,7,1):<span style="color: #00ffff;">date</span>(2013,7,3)]
+tm[<span style="color: #00ffff;">date</span>(2013,7,2):<span style="color: #00ffff;">date</span>(2013,7,3), :B]
+tm[<span style="color: #00ffff;">date</span>(2013,7,3):<span style="color: #00ffff;">date</span>(2013,7,12), [<span style="color: #ff00ff;">true</span>, <span style="color: #ff00ff;">false</span>, <span style="color: #ff00ff;">false</span>]]
 </pre>
 </div>
 </div>
 </div>
+
 <div id="outline-container-sec-4" class="outline-2">
 <h2 id="sec-4"><span class="section-number-2">4</span> Read, write, io</h2>
 <div class="outline-text-2" id="text-4">
@@ -379,13 +423,13 @@ tm[date(2013,07,03):date(2013,07,12),
 Data can easily be imported from csv-files using function
 <code>readTimedata</code>. Under the hood, the function makes use of <code>readtable</code>
 from the <code>DataFrames</code> package. Additionally, columns are parsed for
-dates similar to function <code>readtime</code> from package <code>TimeSeries</code>. The
-first column matching the regexp for dates will be chosen as time
-identifier. 
+dates. The first column matching the regexp for dates will be chosen
+as time identifier.
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia">tm = readTimedata("data/logRet.csv")
+<pre class="src src-julia">filePath = <span style="color: #00ffff;">joinpath</span>(Pkg.<span style="color: #00ffff;">dir</span>(<span style="color: #00ff00;">"TimeData"</span>), <span style="color: #00ff00;">"data"</span>, <span style="color: #00ff00;">"logRet.csv"</span>);
+tm = <span style="color: #00ffff;">readTimedata</span>(filePath)
 </pre>
 </div>
 
@@ -397,61 +441,39 @@ to show information about the data:
 <pre class="example">
 type: Timematr{Date{ISOCalendar}}
 dimensions: (333,348)
-333x6 DataFrame:
-               dates      MMM      ABT      ACE      ACT     ADBE
-[1,]      2012-01-03  2.12505  0.88718  0.29744  0.47946   1.0556
-[2,]      2012-01-04  0.82264 -0.38476 -0.95495 -0.52919 -1.02024
-[3,]      2012-01-05 -0.44787 -0.23157  0.28445  2.74752  0.70472
-[4,]      2012-01-06 -0.51253 -0.93168  0.23891  1.94894  0.83917
-[5,]      2012-01-09  0.58732      0.0  0.46128  0.28436 -0.66376
-[6,]      2012-01-10  0.52193  0.46693  1.31261  1.85986  2.32125
-[7,]      2012-01-11 -0.63413 -0.38895 -1.52066 -3.06604  0.41012
-[8,]      2012-01-12  0.60934 -0.46875  0.50453 -0.93039 -0.30743
-[9,]      2012-01-13 -0.80912  0.50771 -0.47478  0.25752 -0.89348
-[10,]     2012-01-17  0.74711  0.50515    0.297 -7.04176  1.30317
-[11,]     2012-01-18  0.98754  -0.6611  0.17778 -0.06901  1.82314
-[12,]     2012-01-19  0.85617  0.15595   1.1918  3.92605  1.16416
-[13,]     2012-01-20 -0.17065  0.58264  2.42751 -3.58146  0.85611
-[14,]     2012-01-23 -0.04881 -0.07749 -1.20639 -1.61252 -0.88919
-[15,]     2012-01-24  0.37766  0.46404 -0.98738 -2.33432  2.35382
-[16,]     2012-01-25  0.63031 -1.35951  0.81384  3.03107  1.25222
-[17,]     2012-01-26  1.26075  -0.6277  -0.5952  1.78914 -0.51184
-[18,]     2012-01-27 -0.13134   0.2751  -2.5512  1.84142 -0.41781
-[19,]     2012-01-30 -0.14347 -1.02565 -0.68945  0.26747 -0.16116
-[20,]     2012-01-31 -0.72046 -0.59654  0.89834   -2.143 -0.16142
-  :
-[314,]    2013-04-04  0.13388  0.88398  1.18103  0.59652  1.16029
-[315,]    2013-04-05 -0.03823 -0.91173 -0.09035  1.39877 -1.89525
-[316,]    2013-04-08 -0.02868   0.6639  1.19062  1.19664   0.9407
-[317,]    2013-04-09  0.19108  0.27533  0.54563 -0.66303  0.86403
-[318,]    2013-04-10  1.62836  1.20253  0.44321 -0.51303  1.19277
-[319,]    2013-04-11  0.51515  0.83864  1.06671  0.56419  1.13448
-[320,]    2013-04-12 -0.52454 -0.37787  0.08747 -0.44082 -0.39894
-[321,]    2013-04-15 -1.80048  -2.7414 -3.52592 -1.34466 -0.95951
-[322,]    2013-04-16  0.37223  0.74762   1.1929   0.9741  1.51316
-[323,]    2013-04-17 -0.63074  2.39859 -1.07975  0.78069 -0.84276
-[324,]    2013-04-18 -0.48049 -1.08314 -0.63528  -1.0802 -0.98479
-[325,]    2013-04-19  0.69118  0.86745  0.77089  1.84469   0.6278
-[326,]    2013-04-22  0.08606 -0.84023  0.27067 -0.64178 -0.47048
-[327,]    2013-04-23  1.48952  0.86721   0.8188  0.93582  0.76063
-[328,]    2013-04-24    0.451  -1.8794 -0.51518 -0.49734 -0.44673
-[329,]    2013-04-25 -2.81414 -0.08252 -0.04492  0.61876  0.84708
-[330,]    2013-04-26 -1.04683 -0.08259 -0.63106  2.05182 -0.31125
-[331,]    2013-04-29  0.03897  0.74085 -0.02261  4.49427  0.33344
-[332,]    2013-04-30  0.84381  0.51807  0.24845  0.14197  0.04438
-[333,]    2013-05-01 -0.14498 -0.08162 -0.94057 -1.27548 -0.82415
+333x6 DataFrame
+|-------|------------|----------|----------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      | ACT      | ADBE     |
+| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  | 1.0556   |
+| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 | -1.02024 |
+| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  | 0.70472  |
+| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  | 0.83917  |
+| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  | -0.66376 |
+| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  | 2.32125  |
+| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 | 0.41012  |
+| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 | -0.30743 |
+⋮
+| 325   | 2013-04-19 | 0.69118  | 0.86745  | 0.77089  | 1.84469  | 0.6278   |
+| 326   | 2013-04-22 | 0.08606  | -0.84023 | 0.27067  | -0.64178 | -0.47048 |
+| 327   | 2013-04-23 | 1.48952  | 0.86721  | 0.8188   | 0.93582  | 0.76063  |
+| 328   | 2013-04-24 | 0.451    | -1.8794  | -0.51518 | -0.49734 | -0.44673 |
+| 329   | 2013-04-25 | -2.81414 | -0.08252 | -0.04492 | 0.61876  | 0.84708  |
+| 330   | 2013-04-26 | -1.04683 | -0.08259 | -0.63106 | 2.05182  | -0.31125 |
+| 331   | 2013-04-29 | 0.03897  | 0.74085  | -0.02261 | 4.49427  | 0.33344  |
+| 332   | 2013-04-30 | 0.84381  | 0.51807  | 0.24845  | 0.14197  | 0.04438  |
+| 333   | 2013-05-01 | -0.14498 | -0.08162 | -0.94057 | -1.27548 | -0.82415 |
 </pre>
 
 <p>
 As one can see, the <code>display</code> method will show the type of the
-variable, together with its dimensions and a snippet into the first
+variable, together with its dimensions and a snippet of the first
 values. Note that the number of columns does not entail the dates
 column, but does only count the columns of the remaining variables.
-Inherently, <code>display</code> makes use of the method that is implemented for
-<code>DataFrames</code>, which is the reason for the somewhat misleading output
-line <code>333x6 DataFrame:</code>. An issue that still remains to be fixed. In
-contrast to the standard output of <code>DataFrames</code>, there is no explicit
-information for the rest of the columns. 
+Inherently, <code>display</code> makes use of the display method that is
+implemented for <code>DataFrames</code>, which is the reason for the somewhat
+misleading output line <code>333x6 DataFrame:</code>. An issue that still needs
+to be fixed. However, html display in IJulia already shows an improved
+table output.
 </p>
 
 <p>
@@ -462,7 +484,7 @@ which will print:
 
 <div class="org-src-container">
 
-<pre class="src src-julia">str(tm)
+<pre class="src src-julia"><span style="color: #00ffff;">#   </span><span style="color: #00ffff;">str(tm) # uncomment for execution</span>
 </pre>
 </div>
 
@@ -471,60 +493,38 @@ type: Timematr{Date{ISOCalendar}}
 :vals  		  DataFrame
 :idx  		  Array{Date{ISOCalendar},1}
 
-dimensions: (333,348)
+dimensions of vals: (333,348)
 
 -------------------------------------------
 From: 2012-01-03, To: 2013-05-01
 -------------------------------------------
 
-333x6 DataFrame:
-               dates      MMM      ABT      ACE      ACT     ADBE
-[1,]      2012-01-03  2.12505  0.88718  0.29744  0.47946   1.0556
-[2,]      2012-01-04  0.82264 -0.38476 -0.95495 -0.52919 -1.02024
-[3,]      2012-01-05 -0.44787 -0.23157  0.28445  2.74752  0.70472
-[4,]      2012-01-06 -0.51253 -0.93168  0.23891  1.94894  0.83917
-[5,]      2012-01-09  0.58732      0.0  0.46128  0.28436 -0.66376
-[6,]      2012-01-10  0.52193  0.46693  1.31261  1.85986  2.32125
-[7,]      2012-01-11 -0.63413 -0.38895 -1.52066 -3.06604  0.41012
-[8,]      2012-01-12  0.60934 -0.46875  0.50453 -0.93039 -0.30743
-[9,]      2012-01-13 -0.80912  0.50771 -0.47478  0.25752 -0.89348
-[10,]     2012-01-17  0.74711  0.50515    0.297 -7.04176  1.30317
-[11,]     2012-01-18  0.98754  -0.6611  0.17778 -0.06901  1.82314
-[12,]     2012-01-19  0.85617  0.15595   1.1918  3.92605  1.16416
-[13,]     2012-01-20 -0.17065  0.58264  2.42751 -3.58146  0.85611
-[14,]     2012-01-23 -0.04881 -0.07749 -1.20639 -1.61252 -0.88919
-[15,]     2012-01-24  0.37766  0.46404 -0.98738 -2.33432  2.35382
-[16,]     2012-01-25  0.63031 -1.35951  0.81384  3.03107  1.25222
-[17,]     2012-01-26  1.26075  -0.6277  -0.5952  1.78914 -0.51184
-[18,]     2012-01-27 -0.13134   0.2751  -2.5512  1.84142 -0.41781
-[19,]     2012-01-30 -0.14347 -1.02565 -0.68945  0.26747 -0.16116
-[20,]     2012-01-31 -0.72046 -0.59654  0.89834   -2.143 -0.16142
-  :
-[314,]    2013-04-04  0.13388  0.88398  1.18103  0.59652  1.16029
-[315,]    2013-04-05 -0.03823 -0.91173 -0.09035  1.39877 -1.89525
-[316,]    2013-04-08 -0.02868   0.6639  1.19062  1.19664   0.9407
-[317,]    2013-04-09  0.19108  0.27533  0.54563 -0.66303  0.86403
-[318,]    2013-04-10  1.62836  1.20253  0.44321 -0.51303  1.19277
-[319,]    2013-04-11  0.51515  0.83864  1.06671  0.56419  1.13448
-[320,]    2013-04-12 -0.52454 -0.37787  0.08747 -0.44082 -0.39894
-[321,]    2013-04-15 -1.80048  -2.7414 -3.52592 -1.34466 -0.95951
-[322,]    2013-04-16  0.37223  0.74762   1.1929   0.9741  1.51316
-[323,]    2013-04-17 -0.63074  2.39859 -1.07975  0.78069 -0.84276
-[324,]    2013-04-18 -0.48049 -1.08314 -0.63528  -1.0802 -0.98479
-[325,]    2013-04-19  0.69118  0.86745  0.77089  1.84469   0.6278
-[326,]    2013-04-22  0.08606 -0.84023  0.27067 -0.64178 -0.47048
-[327,]    2013-04-23  1.48952  0.86721   0.8188  0.93582  0.76063
-[328,]    2013-04-24    0.451  -1.8794 -0.51518 -0.49734 -0.44673
-[329,]    2013-04-25 -2.81414 -0.08252 -0.04492  0.61876  0.84708
-[330,]    2013-04-26 -1.04683 -0.08259 -0.63106  2.05182 -0.31125
-[331,]    2013-04-29  0.03897  0.74085 -0.02261  4.49427  0.33344
-[332,]    2013-04-30  0.84381  0.51807  0.24845  0.14197  0.04438
-[333,]    2013-05-01 -0.14498 -0.08162 -0.94057 -1.27548 -0.82415
+333x6 DataFrame
+|-------|------------|----------|----------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      | ACT      | ADBE     |
+| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  | 1.0556   |
+| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 | -1.02024 |
+| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  | 0.70472  |
+| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  | 0.83917  |
+| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  | -0.66376 |
+| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  | 2.32125  |
+| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 | 0.41012  |
+| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 | -0.30743 |
+⋮
+| 325   | 2013-04-19 | 0.69118  | 0.86745  | 0.77089  | 1.84469  | 0.6278   |
+| 326   | 2013-04-22 | 0.08606  | -0.84023 | 0.27067  | -0.64178 | -0.47048 |
+| 327   | 2013-04-23 | 1.48952  | 0.86721  | 0.8188   | 0.93582  | 0.76063  |
+| 328   | 2013-04-24 | 0.451    | -1.8794  | -0.51518 | -0.49734 | -0.44673 |
+| 329   | 2013-04-25 | -2.81414 | -0.08252 | -0.04492 | 0.61876  | 0.84708  |
+| 330   | 2013-04-26 | -1.04683 | -0.08259 | -0.63106 | 2.05182  | -0.31125 |
+| 331   | 2013-04-29 | 0.03897  | 0.74085  | -0.02261 | 4.49427  | 0.33344  |
+| 332   | 2013-04-30 | 0.84381  | 0.51807  | 0.24845  | 0.14197  | 0.04438  |
+| 333   | 2013-05-01 | -0.14498 | -0.08162 | -0.94057 | -1.27548 | -0.82415 |
 </pre>
 
 <p>
-This will additionally show the names of the fields of any object, and
-also explicitly display the time period of the data.
+This additionally shows the names of the fields of the object, and
+also explicitly displays the time period of the data.
 </p>
 
 <p>
@@ -536,78 +536,85 @@ string, while the second argument is the variable to be saved.
 
 <div class="org-src-container">
 
-<pre class="src src-julia">writeTimedata("data/logRet2.csv", tm)
+<pre class="src src-julia"><span style="color: #00ffff;">#   </span><span style="color: #00ffff;">writeTimedata("data/logRet2.csv", tm) # uncomment for execution</span>
 </pre>
 </div>
 </div>
 </div>
 <div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> Functions and operators inherited from DataFrames</h2>
+<h2 id="sec-5"><span class="section-number-2">5</span> Functions and operators</h2>
 <div class="outline-text-2" id="text-5">
 <p>
-Most of the standard functions and mathematical operators that are
-defined for <code>DataFrames</code> are also implemented for <code>TimeData</code> types and
-should behave as expected. Whenever possible, functions apply
-elementwise to observations only, and you should get back the same
-type that you did use to call the function. In case that this is not
-possible, the type that you get back should be the natural first
-choice. For example, elementwise comparisons should return a logical
-value for each entry, which by definition could not be of type
-<code>Timenum</code> where only numeric values are allowed. 
+Mathematical operators and functions are only implemented on for
+Timematr types, since they are not well defined operations for general
+data (strings, &#x2026;).
+</p>
+
+<p>
+Whenever possible, functions apply elementwise to observations only,
+and you should get back the same type that you did call the function
+on. In case that this is not possible, the type that you get back
+should be the natural first choice. For example, elementwise
+comparisons should return a logical value for each entry, which by
+definition could not be of type <code>Timenum</code> where only numeric values
+are allowed.
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-julia">typeof(tm + tm)
-typeof(tm .&gt; 0.5)
+<pre class="src src-julia"><span style="color: #00ffff;">typeof</span>(tm .+ tm)
+<span style="color: #00ffff;">typeof</span>(tm .&gt; 0.5)
 </pre>
 </div>
 
 <pre class="example">
-Timematr (constructor with 9 methods)
-Timedata (constructor with 9 methods)
+Timematr{Date{ISOCalendar}} (constructor with 1 method)
+Timedata{Date{ISOCalendar}} (constructor with 1 method)
 </pre>
 
 <p>
 The standard library for <code>TimeData</code> comprises all standard operators
 and mathematical functions. As expected, these functions all apply
 elementwise, and leave the time information untouched. Where
-additional arguments are allowed for <code>DataFrames</code>, they are allowed
-for <code>TimeData</code> types as well.
+additional arguments are allowed for <code>Arrays</code>, they are allowed for
+<code>TimeData</code> types as well.
 </p>
 
 <div class="org-src-container">
 
 <pre class="src src-julia">tm[1:3, 1:3] .&gt; 0.5
-exp(tm[1:3, 1:3])
-round(tm[1:3, 1:3], 2)
+<span style="color: #00ffff;">exp</span>(tm[1:3, 1:3])
+<span style="color: #00ffff;">round</span>(tm[1:3, 1:3], 2)
 </pre>
 </div>
 
 <pre class="example">
-type: Timedata
+type: Timedata{Date{ISOCalendar}}
 dimensions: (3,3)
-3x4 DataFrame:
-             dates     A     B     C
-[1,]    2013-07-01 false false false
-[2,]    2013-07-02  true  true  true
-[3,]    2013-07-03  true false  true
+3x4 DataFrame
+|-------|------------|-------|-------|-------|
+| Row # | idx        | MMM   | ABT   | ACE   |
+| 1     | 2012-01-03 | true  | true  | false |
+| 2     | 2012-01-04 | true  | false | false |
+| 3     | 2012-01-05 | false | false | false |
 
-type: Timematr
+type: Timematr{Date{ISOCalendar}}
 dimensions: (3,3)
-3x4 DataFrame:
-             dates       A       B       C
-[1,]    2013-07-01 1.59726   1.547 1.45007
-[2,]    2013-07-02 2.09634 2.42551 2.20417
-[3,]    2013-07-03 1.84294 1.50174 2.25843
+3x4 DataFrame
+|-------|------------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      |
+| 1     | 2012-01-03 | 8.37332  | 2.42827  | 1.34641  |
+| 2     | 2012-01-04 | 2.2765   | 0.680614 | 0.384831 |
+| 3     | 2012-01-05 | 0.638988 | 0.793287 | 1.32903  |
 
-type: Timematr
+type: Timematr{Date{ISOCalendar}}
 dimensions: (3,3)
-3x4 DataFrame:
-             dates    A    B    C
-[1,]    2013-07-01 0.47 0.44 0.37
-[2,]    2013-07-02 0.74 0.89 0.79
-[3,]    2013-07-03 0.61 0.41 0.81
+3x4 DataFrame
+|-------|------------|-------|-------|-------|
+| Row # | idx        | MMM   | ABT   | ACE   |
+| 1     | 2012-01-03 | 2.13  | 0.89  | 0.3   |
+| 2     | 2012-01-04 | 0.82  | -0.38 | -0.95 |
+| 3     | 2012-01-05 | -0.45 | -0.23 | 0.28  |
 </pre>
 
 <p>
@@ -615,16 +622,15 @@ A most likely not exhaustive list of basic functions is
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia">TimeDataFunctions = [:(+), :(.+), :(-), :(.-), :(*), :(.*), :(/),
-                     :(./), :(.^),
+<pre class="src src-julia">TimeDataFunctions = [:(.+), :(.-), :(.*), :(./), :(.^),
+                     :(.==), :(.!=), :(.&gt;), :(.&gt;=), :(.&lt;), :(.&lt;=),
+                     :(&amp;), :(|), :($),
                      :(div), :(mod), :(fld), :(rem),
                      :abs, :sign, :acos, :acosh, :asin, :asinh, :atan,
                      :atanh, :sin, :sinh, :cos, :cosh, :tan, :tanh,
                      :exp, :exp2, :expm1, :log, :log10, :log1p, :log2,
                      :exponent, :sqrt, :gamma, :lgamma, :digamma,
                      :erf, :erfc,
-                     :(.==), :(.!=), :(.&gt;), :(.&gt;=), :(.&lt;), :(.&lt;=),
-                     :(&amp;), :(|), :($),
                      :round, :ceil, :floor, :trunc]
 </pre>
 </div>
@@ -635,18 +641,18 @@ A most likely not exhaustive list of basic functions is
 <h2 id="sec-6"><span class="section-number-2">6</span> Additional functions</h2>
 <div class="outline-text-2" id="text-6">
 <p>
-Beside basic mathematical functions and operators, there are some
-additional basic functions that are defined for each <code>TimeData</code> type.
-For example, you can retrieve individual components of your variable
-with the following functions:
+Besides basic mathematical functions and operators, there are some
+additional functions that are defined for each <code>TimeData</code> type. For
+example, you can retrieve individual components of your variable with
+the following functions:
 </p>
 <ul class="org-ul">
-<li><b>idx:</b> returns time information as <code>Array</code>
+<li><code>idx</code>: returns time information as <code>Array</code>
 </li>
-<li><b>names:</b> returns variable names as
-              <code>Array{Union(UTF8String,ASCIIString),1}</code> 
+<li><code>names</code>: returns variable names as
+  <code>Array{Union(UTF8String,ASCIIString),1}</code>  
 </li>
-<li><b>core:</b> implemented for subtypes of <code>AbstractTimematr</code>, it returns a
+<li><code>core</code>: implemented for subtypes of <code>AbstractTimematr</code>, it returns a
 matrix of numeric values
 </li>
 </ul>
@@ -699,10 +705,10 @@ dates, time and durations, and the backbone of all time components
 in <code>TimeData</code>.
 </li>
 <li>the <b>TimeSeries</b> package, which follows a different approach to
-handling time series data by storing time information as a column of
-a DataFrame. Having a quite similar goal in mind, the package was a
-great inspiration for me, and occasionally I even could borrow parts
-of code from it (for example, function <code>readTimedata</code>).
+handling time series data. Having a quite similar goal in mind, the
+package was a great inspiration for me, and occasionally I even
+could borrow parts of code from it (for example, from an old version
+of function <code>readtime</code>).
 </li>
 </ul>
 </div>
