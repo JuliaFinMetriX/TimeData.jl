@@ -47,8 +47,14 @@
 
 
 #+BEGIN_COMMENT
-The only post-processing that needs to be done is removing the h1
-title in the html. This is the second time that the word title occurs. 
+Manual post-processing:
+- removing the h1 title in the html. This is the second time that the
+  word title occurs.  
+
+- copy index.html file to gh-pages branch:
+  - git checkout gh-pages
+  - git checkout master index.html
+  - git commit index.html
 #+END_COMMENT
 
 #+BEGIN_SRC julia :exports none :results output :tangle test/doctests.jl
