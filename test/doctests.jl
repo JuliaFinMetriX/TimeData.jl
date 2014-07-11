@@ -9,6 +9,19 @@ println("\n Running documentation tests\n")
 
 using TimeData
 using Datetime
+tm = TimeData.readTimedata("data/logRet.csv")[1:10, 1:4]
+
+tm[date(2012, 1, 4):date(2012, 1, 10), 1:2]
+
+tm[3:8, 2:3]
+
+tm[3:8, [:ABT, :MMM]]
+
+newTm = 2.*tm
+
+mean(tm, 1)
+
+TimeData.rowmeans(tm)
 
 vals = rand(4, 3);
 dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4];

@@ -62,6 +62,179 @@ println("\n Running documentation tests\n")
 
 #+END_SRC
 
+* Getting started
+
+The goal of the package TimeData is to provide *fast*, *robust* and
+*convenient* representation of time series data. This shall be
+achieved through introduction of several new composite types, matching
+the characteristics of various types of time series data more closely.
+
+Behavior of ~TimeData~ types in most cases borrows heavily from
+~DataFrames~, as this package provides an excellent way of
+representing quite general data. In particular, ~DataFrames~ already
+allow for named columns, as well as missing observations. In many
+situations, however, the time information of the data adds a separate
+and unique dimension to the data. The different characteristics of
+time data and observations then would not be accounted for
+sufficiently, if time was only one further column amongst the other
+observations.
+
+The ~TimeData~ package provides users with the well-known experience
+of ~DataFrames~ whenever possible. It only deviates where additional
+convenience can be achieved through a more explicit separation between
+time information and observations. In particular, the following
+features allow convenient data handling.
+
+** Intuitive indexing
+
+Extending the fabulous ways of indexing already provided by
+~DataFrames~, data can easily be accessed - amongst others - through
+variable names and dates.
+
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   using TimeData
+   using Datetime
+   tm = TimeData.readTimedata("data/logRet.csv")[1:10, 1:4]
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (10,4)
+10x5 DataFrame
+|-------|------------|----------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      | ACT      |
+| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  |
+| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 |
+| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  |
+| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  |
+| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  |
+| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  |
+| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 |
+| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 |
+| 9     | 2012-01-13 | -0.80912 | 0.50771  | -0.47478 | 0.25752  |
+| 10    | 2012-01-17 | 0.74711  | 0.50515  | 0.297    | -7.04176 |
+#+end_example
+
+Using a range of dates:
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   tm[date(2012, 1, 4):date(2012, 1, 10), 1:2]
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (5,2)
+5x3 DataFrame
+|-------|------------|----------|----------|
+| Row # | idx        | MMM      | ABT      |
+| 1     | 2012-01-04 | 0.82264  | -0.38476 |
+| 2     | 2012-01-05 | -0.44787 | -0.23157 |
+| 3     | 2012-01-06 | -0.51253 | -0.93168 |
+| 4     | 2012-01-09 | 0.58732  | 0.0      |
+| 5     | 2012-01-10 | 0.52193  | 0.46693  |
+#+end_example
+
+Using numeric indexing:
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   tm[3:8, 2:3]
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (6,2)
+6x3 DataFrame
+|-------|------------|----------|----------|
+| Row # | idx        | ABT      | ACE      |
+| 1     | 2012-01-05 | -0.23157 | 0.28445  |
+| 2     | 2012-01-06 | -0.93168 | 0.23891  |
+| 3     | 2012-01-09 | 0.0      | 0.46128  |
+| 4     | 2012-01-10 | 0.46693  | 1.31261  |
+| 5     | 2012-01-11 | -0.38895 | -1.52066 |
+| 6     | 2012-01-12 | -0.46875 | 0.50453  |
+#+end_example
+
+Using column names:
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   tm[3:8, [:ABT, :MMM]]
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (6,2)
+6x3 DataFrame
+|-------|------------|----------|----------|
+| Row # | idx        | ABT      | MMM      |
+| 1     | 2012-01-05 | -0.23157 | -0.44787 |
+| 2     | 2012-01-06 | -0.93168 | -0.51253 |
+| 3     | 2012-01-09 | 0.0      | 0.58732  |
+| 4     | 2012-01-10 | 0.46693  | 0.52193  |
+| 5     | 2012-01-11 | -0.38895 | -0.63413 |
+| 6     | 2012-01-12 | -0.46875 | 0.60934  |
+#+end_example
+
+
+** Separate time information
+
+Through the hard-coded distinction between time data and observations,
+code will become cleaner and less error-prone, as users can not mess
+with time information as easily anymore. Functions that apply to
+observations only, do not need to explicitly take into account the
+time information anymore. For example, simply rescaling observations
+by a factor of 2 becomes:
+
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   newTm = 2.*tm
+#+END_SRC
+
+Functions that do not naturally extend to time data can simply be
+overloaded and delegated to observations only.
+
+Calculating mean values for each column:
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   mean(tm, 1)
+#+END_SRC
+
+#+RESULTS:
+: 1x4 DataFrame
+: |-------|----------|-----------|----------|-----------|
+: | Row # | MMM      | ABT       | ACE      | ACT       |
+: | 1     | 0.300974 | -0.003874 | 0.044583 | -0.398972 |
+
+Calculating mean values per date:
+#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+   TimeData.rowmeans(tm)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (10,1)
+10x2 DataFrame
+|-------|------------|------------|
+| Row # | idx        | x1         |
+| 1     | 2012-01-03 | 0.947282   |
+| 2     | 2012-01-04 | -0.261565  |
+| 3     | 2012-01-05 | 0.588133   |
+| 4     | 2012-01-06 | 0.18591    |
+| 5     | 2012-01-09 | 0.33324    |
+| 6     | 2012-01-10 | 1.04033    |
+| 7     | 2012-01-11 | -1.40244   |
+| 8     | 2012-01-12 | -0.0713175 |
+| 9     | 2012-01-13 | -0.129667  |
+| 10    | 2012-01-17 | -1.37312   |
+#+end_example
+
+
 
 * TimeData types
 
@@ -99,14 +272,17 @@ at time of creation through the individual constructors. And, by now,
 no further ~setindex~ methods exist that would allow data
 manipulation.
 
+The package generally tries to achieve high performance by delegating
+functionality to the most specialized case. For example, methods for
+instances of ~Timematr~ are delegated to ~Array{Float64, 2}~, as they
+are not allowed to entail ~NAs~ anyways.
+
 * Constructors
 
 For each type, variables can be created by directly handing over
 observations as ~DataFrame~ and time information as ~Array~ to the
 inner constructor.
 #+BEGIN_SRC julia :results output :tangle test/doctests.jl
-   using TimeData
-   using Datetime
 
    vals = rand(4, 3);
    dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4];
@@ -478,6 +654,31 @@ Some further implemented functions are:
 Furthermore, subtypes of type ~AbstractTimematr~ should already
 provide functionality for basic statistical functions like ~mean~,
 ~var~ and ~cov~.
+
+* Under the hood: implementation
+
+The balancing act between emulating and extending ~DataFrames~ is
+implemented in Julia maybe a bit less naturally than in traditional
+object oriented programming languages. There, one can easily inherit
+behavior from other classes through subclasses, thereby overwriting
+inherited methods whenever desired. In Julia, however, composite types
+are not allowed to be subtypes of other composite types, but only
+abstract types may act as parent. Under the hood, ~TimeData~ types
+hence inherit their behavior by owning a field of type ~DataFrame~.
+This way, functions can easily be delegated to this field whenever
+necessary. For a more elaborate discussion on this topic and the
+interior design of ~TimeData~, take a look at [[http://grollchristian.wordpress.com/2014/01/22/julia-inheriting-behavior/][this post]] on my blog. 
+
+* Current state
+
+So far, only type ~Timematr~ has functionality that goes beyond the
+basic methods inherited from ~DataFrames~. Still, all ~TimeData~ types
+should already provide a convenient way to represent time series data,
+and any ~DataFrame~ functionality in principle can easily be regained
+by delegating functions to field ~vals~. Also, I only tested
+~TimeData~ types with ~date~ type from the ~Datetime~ package myself,
+and not yet with type ~datetime~.
+
 
 * Acknowledgement
 
