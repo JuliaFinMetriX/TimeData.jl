@@ -168,20 +168,152 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1. TimeData types</a></li>
-<li><a href="#sec-2">2. Constructors</a></li>
-<li><a href="#sec-3">3. Indexing</a></li>
-<li><a href="#sec-4">4. Read, write, io</a></li>
-<li><a href="#sec-5">5. Functions and operators</a></li>
-<li><a href="#sec-6">6. Additional functions</a></li>
-<li><a href="#sec-7">7. Acknowledgement</a></li>
+<li><a href="#sec-1">1. Getting started</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Intuitive indexing</a></li>
+<li><a href="#sec-1-2">1.2. Separate time information</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. TimeData types</a></li>
+<li><a href="#sec-3">3. Constructors</a></li>
+<li><a href="#sec-4">4. Indexing</a></li>
+<li><a href="#sec-5">5. Read, write, io</a></li>
+<li><a href="#sec-6">6. Functions and operators</a></li>
+<li><a href="#sec-7">7. Additional functions</a></li>
+<li><a href="#sec-8">8. Under the hood: implementation</a></li>
+<li><a href="#sec-9">9. Current state</a></li>
+<li><a href="#sec-10">10. Acknowledgement</a></li>
 </ul>
 </div>
 </div>
 
 <div id="outline-container-sec-1" class="outline-2">
-<h2 id="sec-1"><span class="section-number-2">1</span> TimeData types</h2>
+<h2 id="sec-1"><span class="section-number-2">1</span> Getting started</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+The goal of the package TimeData is to provide <b>fast</b>, <b>robust</b> and
+<b>convenient</b> representation of time series data. This shall be
+achieved through introduction of several new composite types, matching
+the characteristics of various types of time series data more closely.
+</p>
+
+<p>
+Behavior of <code>TimeData</code> types in most cases borrows heavily from
+<code>DataFrames</code>, as this package provides an excellent way of
+representing quite general data. In particular, <code>DataFrames</code> already
+allow for named columns, as well as missing observations. In many
+situations, however, the time information of the data adds a separate
+and unique dimension to the data. The different characteristics of
+time data and observations then would not be accounted for
+sufficiently, if time was only one further column amongst the other
+observations.
+</p>
+
+<p>
+The <code>TimeData</code> package provides users with the well-known experience
+of <code>DataFrames</code> whenever possible. It only deviates where additional
+convenience can be achieved through a more explicit separation between
+time information and observations. In particular, the following
+features allow convenient data handling.
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Intuitive indexing</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Extending the fabulous ways of indexing already provided by
+<code>DataFrames</code>, data can easily be accessed - amongst others - through
+variable names and dates.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia">using TimeData
+using Datetime
+tm = TimeData.readTimedata("data/logRet.csv")[1:10, 1:4]
+</pre>
+</div>
+
+<p>
+Using a range of dates:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">tm[date(2012, 1, 4):date(2012, 1, 10), 1:2]
+</pre>
+</div>
+
+<p>
+Using numeric indexing:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">tm[3:8, 2:3]
+</pre>
+</div>
+
+<p>
+Using column names:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">tm[3:8, [:ABT, :MMM]]
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Separate time information</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Through the hard-coded distinction between time data and observations,
+code will become cleaner and less error-prone, as users can not mess
+with time information as easily anymore. Functions that apply to
+observations only, do not need to explicitly take into account the
+time information anymore. For example, simply rescaling observations
+by a factor of 2 becomes:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-julia">newTm = 2.*tm
+</pre>
+</div>
+
+<p>
+Functions that do not naturally extend to time data can simply be
+overloaded and delegated to observations only.
+</p>
+
+<p>
+Calculating mean values for each column:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">mean(tm, 1)
+</pre>
+</div>
+
+<p>
+Calculating mean values per date:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">TimeData.rowmeans(tm)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> TimeData types</h2>
+<div class="outline-text-2" id="text-2">
 <p>
 All types introduced are subtypes of abstract type <code>AbstractTimedata</code>
 and have two fields, separating time information from observations:
@@ -238,12 +370,19 @@ at time of creation through the individual constructors. And, by now,
 no further <code>setindex</code> methods exist that would allow data
 manipulation.
 </p>
+
+<p>
+The package generally tries to achieve high performance by delegating
+functionality to the most specialized case. For example, methods for
+instances of <code>Timematr</code> are delegated to <code>Array{Float64, 2}</code>, as they
+are not allowed to entail <code>NAs</code> anyways.
+</p>
 </div>
 </div>
 
-<div id="outline-container-sec-2" class="outline-2">
-<h2 id="sec-2"><span class="section-number-2">2</span> Constructors</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Constructors</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 For each type, variables can be created by directly handing over
 observations as <code>DataFrame</code> and time information as <code>Array</code> to the
@@ -251,10 +390,7 @@ inner constructor.
 </p>
 <div class="org-src-container">
 
-<pre class="src src-julia">using TimeData
-using Datetime
-
-vals = rand(4, 3);
+<pre class="src src-julia">vals = rand(4, 3);
 dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4];
 nams = [:A, :B, :C];
 valsDf = composeDataFrame(vals, nams);
@@ -262,18 +398,6 @@ valsDf = composeDataFrame(vals, nams);
 tm = Timematr(valsDf, dats)
 </pre>
 </div>
-
-<pre class="example">
-type: Timematr{Date{ISOCalendar}}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|------------|-----------|----------|----------|
-| Row # | idx        | A         | B        | C        |
-| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
-</pre>
 
 <p>
 Besides, there also exist several outer constructors for each type,
@@ -294,54 +418,12 @@ td = Timedata(vals, dats)
 td = Timedata(vals)
 </pre>
 </div>
-
-<pre class="example">
-type: Timedata{Date{ISOCalendar}}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|------------|-----------|----------|----------|
-| Row # | idx        | A         | B        | C        |
-| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
-
-type: Timedata{Int64}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|-----|-----------|----------|----------|
-| Row # | idx | A         | B        | C        |
-| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
-
-type: Timedata{Date{ISOCalendar}}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|------------|-----------|----------|----------|
-| Row # | idx        | x1        | x2       | x3       |
-| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
-
-type: Timedata{Int64}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|-----|-----------|----------|----------|
-| Row # | idx | x1        | x2       | x3       |
-| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
-</pre>
 </div>
 </div>
 
-<div id="outline-container-sec-3" class="outline-2">
-<h2 id="sec-3"><span class="section-number-2">3</span> Indexing</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Indexing</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 The idea of <code>getindex</code> is to stick with the behavior of <code>DataFrames</code>
 as far as possible for the basics, while extending it to allow
@@ -420,9 +502,9 @@ tm[date(2013,7,3):date(2013,7,12), [true, false, false]]
 </div>
 
 
-<div id="outline-container-sec-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> Read, write, io</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Read, write, io</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 Data can easily be imported from csv-files using function
 <code>readTimedata</code>. Under the hood, the function makes use of <code>readtable</code>
@@ -492,40 +574,6 @@ which will print:
 </pre>
 </div>
 
-<pre class="example">
-type: Timematr{Date{ISOCalendar}}
-:vals  		  DataFrame
-:idx  		  Array{Date{ISOCalendar},1}
-
-dimensions of vals: (333,348)
-
--------------------------------------------
-From: 2012-01-03, To: 2013-05-01
--------------------------------------------
-
-333x6 DataFrame
-|-------|------------|----------|----------|----------|----------|----------|
-| Row # | idx        | MMM      | ABT      | ACE      | ACT      | ADBE     |
-| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  | 1.0556   |
-| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 | -1.02024 |
-| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  | 0.70472  |
-| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  | 0.83917  |
-| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  | -0.66376 |
-| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  | 2.32125  |
-| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 | 0.41012  |
-| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 | -0.30743 |
-⋮
-| 325   | 2013-04-19 | 0.69118  | 0.86745  | 0.77089  | 1.84469  | 0.6278   |
-| 326   | 2013-04-22 | 0.08606  | -0.84023 | 0.27067  | -0.64178 | -0.47048 |
-| 327   | 2013-04-23 | 1.48952  | 0.86721  | 0.8188   | 0.93582  | 0.76063  |
-| 328   | 2013-04-24 | 0.451    | -1.8794  | -0.51518 | -0.49734 | -0.44673 |
-| 329   | 2013-04-25 | -2.81414 | -0.08252 | -0.04492 | 0.61876  | 0.84708  |
-| 330   | 2013-04-26 | -1.04683 | -0.08259 | -0.63106 | 2.05182  | -0.31125 |
-| 331   | 2013-04-29 | 0.03897  | 0.74085  | -0.02261 | 4.49427  | 0.33344  |
-| 332   | 2013-04-30 | 0.84381  | 0.51807  | 0.24845  | 0.14197  | 0.04438  |
-| 333   | 2013-05-01 | -0.14498 | -0.08162 | -0.94057 | -1.27548 | -0.82415 |
-</pre>
-
 <p>
 This additionally shows the names of the fields of the object, and
 also explicitly displays the time period of the data.
@@ -546,9 +594,9 @@ string, while the second argument is the variable to be saved.
 </div>
 </div>
 
-<div id="outline-container-sec-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> Functions and operators</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Functions and operators</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 Mathematical operators and functions are only implemented on for
 Timematr types, since they are not well defined operations for general
@@ -572,11 +620,6 @@ typeof(tm .&gt; 0.5)
 </pre>
 </div>
 
-<pre class="example">
-Timematr{Date{ISOCalendar}} (constructor with 1 method)
-Timedata{Date{ISOCalendar}} (constructor with 1 method)
-</pre>
-
 <p>
 The standard library for <code>TimeData</code> comprises all standard operators
 and mathematical functions. As expected, these functions all apply
@@ -592,35 +635,6 @@ exp(tm[1:3, 1:3])
 round(tm[1:3, 1:3], 2)
 </pre>
 </div>
-
-<pre class="example">
-type: Timedata{Date{ISOCalendar}}
-dimensions: (3,3)
-3x4 DataFrame
-|-------|------------|-------|-------|-------|
-| Row # | idx        | MMM   | ABT   | ACE   |
-| 1     | 2012-01-03 | true  | true  | false |
-| 2     | 2012-01-04 | true  | false | false |
-| 3     | 2012-01-05 | false | false | false |
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (3,3)
-3x4 DataFrame
-|-------|------------|----------|----------|----------|
-| Row # | idx        | MMM      | ABT      | ACE      |
-| 1     | 2012-01-03 | 8.37332  | 2.42827  | 1.34641  |
-| 2     | 2012-01-04 | 2.2765   | 0.680614 | 0.384831 |
-| 3     | 2012-01-05 | 0.638988 | 0.793287 | 1.32903  |
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (3,3)
-3x4 DataFrame
-|-------|------------|-------|-------|-------|
-| Row # | idx        | MMM   | ABT   | ACE   |
-| 1     | 2012-01-03 | 2.13  | 0.89  | 0.3   |
-| 2     | 2012-01-04 | 0.82  | -0.38 | -0.95 |
-| 3     | 2012-01-05 | -0.45 | -0.23 | 0.28  |
-</pre>
 
 <p>
 A most likely not exhaustive list of basic functions is
@@ -643,9 +657,9 @@ A most likely not exhaustive list of basic functions is
 </div>
 
 
-<div id="outline-container-sec-6" class="outline-2">
-<h2 id="sec-6"><span class="section-number-2">6</span> Additional functions</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Additional functions</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 Besides basic mathematical functions and operators, there are some
 additional functions that are defined for each <code>TimeData</code> type. For
@@ -687,9 +701,44 @@ provide functionality for basic statistical functions like <code>mean</code>,
 </div>
 </div>
 
-<div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> Acknowledgement</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Under the hood: implementation</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+The balancing act between emulating and extending <code>DataFrames</code> is
+implemented in Julia maybe a bit less naturally than in traditional
+object oriented programming languages. There, one can easily inherit
+behavior from other classes through subclasses, thereby overwriting
+inherited methods whenever desired. In Julia, however, composite types
+are not allowed to be subtypes of other composite types, but only
+abstract types may act as parent. Under the hood, <code>TimeData</code> types
+hence inherit their behavior by owning a field of type <code>DataFrame</code>.
+This way, functions can easily be delegated to this field whenever
+necessary. For a more elaborate discussion on this topic and the
+interior design of <code>TimeData</code>, take a look at <a href="http://grollchristian.wordpress.com/2014/01/22/julia-inheriting-behavior/">this post</a> on my blog. 
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> Current state</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+So far, only type <code>Timematr</code> has functionality that goes beyond the
+basic methods inherited from <code>DataFrames</code>. Still, all <code>TimeData</code> types
+should already provide a convenient way to represent time series data,
+and any <code>DataFrame</code> functionality in principle can easily be regained
+by delegating functions to field <code>vals</code>. Also, I only tested
+<code>TimeData</code> types with <code>date</code> type from the <code>Datetime</code> package myself,
+and not yet with type <code>datetime</code>.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> Acknowledgement</h2>
+<div class="outline-text-2" id="text-10">
 <p>
 Of course, any package can only be as good as the individual parts
 that it builds on. Accordingly, I'd like to thank all people that
