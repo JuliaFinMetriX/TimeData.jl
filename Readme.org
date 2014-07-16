@@ -3,8 +3,8 @@
 #+PROPERTY: results output
 #+PROPERTY: session *julia-readme*
 
-[[https://travis-ci.org/cgroll/TimeData.jl][https://travis-ci.org/cgroll/TimeData.jl.png]]
-[[https://coveralls.io/r/cgroll/TimeData.jl?branch=master][https://coveralls.io/repos/cgroll/TimeData.jl/badge.png?branch=master]]
+[[https://travis-ci.org/cgroll/TimeData.jl][https://travis-ci.org/JuliaFinMetriX/TimeData.jl.png]]
+[[https://coveralls.io/r/cgroll/TimeData.jl?branch=master][https://coveralls.io/repos/JuliaFinMetriX/TimeData.jl/badge.png?branch=master]]
 [[http://pkg.julialang.org/?pkg=TimeData&ver=0.3][http://pkg.julialang.org/badges/TimeData_0.3.svg]]
 
 
@@ -14,7 +14,7 @@ An implementation of time series data in Julia.
 
 *Installation*: at the Julia REPL: Pkg.add("TimeData")
 
-*Documentation*: [[http://cgroll.github.io/TimeData.jl][here]].
+*Documentation*: [[http://juliafinmetrix.github.io/TimeData.jl][here]].
 
 
 
