@@ -31,6 +31,9 @@
 #+HTML_HEAD_EXTRA:     <div id="content-wrapper">
 #+HTML_HEAD_EXTRA:       <div class="inner clearfix">
 #+HTML_HEAD_EXTRA: <aside id="sidebar">
+#+HTML_HEAD_EXTRA:    <a href="https://github.com/JuliaFinMetriX">
+#+HTML_HEAD_EXTRA:    <img src="logo.png" width="200" height="114">
+#+HTML_HEAD_EXTRA:    </a>
 #+HTML_HEAD_EXTRA:    <a href="https://github.com/cgroll/TimeData.jl/zipball/master" class="button">
 #+HTML_HEAD_EXTRA:      <small>Download</small>
 #+HTML_HEAD_EXTRA:      .zip file
