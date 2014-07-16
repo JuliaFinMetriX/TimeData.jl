@@ -654,8 +654,17 @@ fields, which should be avoided.
 
 Some further implemented functions are: 
 - ~isequal~ 
+- ~ndims~
 - ~size~
 - ~isna~
+- ~hcat~
+- ~writemime~
+- ~convert~: DataFrame with dates as first column
+
+Some ~DataFrame~ extensions:
+- ~composeDataFrame~: construction from numeric array and column names 
+- ~round~
+- basic mathematical operators
 
 Furthermore, subtypes of type ~AbstractTimematr~ should already
 provide functionality for basic statistical functions like ~mean~,
