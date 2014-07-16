@@ -103,10 +103,15 @@
 <div id="content-wrapper">
 <div class="inner clearfix">
 <aside id="sidebar">
+    <a href="https://github.com/JuliaFinMetriX">
+    <img src="logo.png" width="200" height="114">
+    </a>
+
 <a href="https://github.com/cgroll/TimeData.jl/zipball/master" class="button">
 <small>Download</small>
 .zip file
 </a>
+
 <a href="https://github.com/cgroll/TimeData.jl/tarball/master" class="button">
 <small>Download</small>
 .tar.gz file
@@ -235,6 +240,24 @@ tm = TimeData.readTimedata("data/logRet.csv")[1:10, 1:4]
 </pre>
 </div>
 
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (10,4)
+10x5 DataFrame
+|-------|------------|----------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      | ACT      |
+| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  |
+| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 |
+| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  |
+| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  |
+| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  |
+| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  |
+| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 |
+| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 |
+| 9     | 2012-01-13 | -0.80912 | 0.50771  | -0.47478 | 0.25752  |
+| 10    | 2012-01-17 | 0.74711  | 0.50515  | 0.297    | -7.04176 |
+</pre>
+
 <p>
 Using a range of dates:
 </p>
@@ -243,6 +266,19 @@ Using a range of dates:
 <pre class="src src-julia">tm[date(2012, 1, 4):date(2012, 1, 10), 1:2]
 </pre>
 </div>
+
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (5,2)
+5x3 DataFrame
+|-------|------------|----------|----------|
+| Row # | idx        | MMM      | ABT      |
+| 1     | 2012-01-04 | 0.82264  | -0.38476 |
+| 2     | 2012-01-05 | -0.44787 | -0.23157 |
+| 3     | 2012-01-06 | -0.51253 | -0.93168 |
+| 4     | 2012-01-09 | 0.58732  | 0.0      |
+| 5     | 2012-01-10 | 0.52193  | 0.46693  |
+</pre>
 
 <p>
 Using numeric indexing:
@@ -253,6 +289,20 @@ Using numeric indexing:
 </pre>
 </div>
 
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (6,2)
+6x3 DataFrame
+|-------|------------|----------|----------|
+| Row # | idx        | ABT      | ACE      |
+| 1     | 2012-01-05 | -0.23157 | 0.28445  |
+| 2     | 2012-01-06 | -0.93168 | 0.23891  |
+| 3     | 2012-01-09 | 0.0      | 0.46128  |
+| 4     | 2012-01-10 | 0.46693  | 1.31261  |
+| 5     | 2012-01-11 | -0.38895 | -1.52066 |
+| 6     | 2012-01-12 | -0.46875 | 0.50453  |
+</pre>
+
 <p>
 Using column names:
 </p>
@@ -261,6 +311,20 @@ Using column names:
 <pre class="src src-julia">tm[3:8, [:ABT, :MMM]]
 </pre>
 </div>
+
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (6,2)
+6x3 DataFrame
+|-------|------------|----------|----------|
+| Row # | idx        | ABT      | MMM      |
+| 1     | 2012-01-05 | -0.23157 | -0.44787 |
+| 2     | 2012-01-06 | -0.93168 | -0.51253 |
+| 3     | 2012-01-09 | 0.0      | 0.58732  |
+| 4     | 2012-01-10 | 0.46693  | 0.52193  |
+| 5     | 2012-01-11 | -0.38895 | -0.63413 |
+| 6     | 2012-01-12 | -0.46875 | 0.60934  |
+</pre>
 </div>
 </div>
 
@@ -297,6 +361,13 @@ Calculating mean values for each column:
 </pre>
 </div>
 
+<pre class="example">
+1x4 DataFrame
+|-------|----------|-----------|----------|-----------|
+| Row # | MMM      | ABT       | ACE      | ACT       |
+| 1     | 0.300974 | -0.003874 | 0.044583 | -0.398972 |
+</pre>
+
 <p>
 Calculating mean values per date:
 </p>
@@ -305,6 +376,24 @@ Calculating mean values per date:
 <pre class="src src-julia">TimeData.rowmeans(tm)
 </pre>
 </div>
+
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (10,1)
+10x2 DataFrame
+|-------|------------|------------|
+| Row # | idx        | x1         |
+| 1     | 2012-01-03 | 0.947282   |
+| 2     | 2012-01-04 | -0.261565  |
+| 3     | 2012-01-05 | 0.588133   |
+| 4     | 2012-01-06 | 0.18591    |
+| 5     | 2012-01-09 | 0.33324    |
+| 6     | 2012-01-10 | 1.04033    |
+| 7     | 2012-01-11 | -1.40244   |
+| 8     | 2012-01-12 | -0.0713175 |
+| 9     | 2012-01-13 | -0.129667  |
+| 10    | 2012-01-17 | -1.37312   |
+</pre>
 </div>
 </div>
 </div>
@@ -399,6 +488,18 @@ tm = Timematr(valsDf, dats)
 </pre>
 </div>
 
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|------------|-----------|----------|----------|
+| Row # | idx        | A         | B        | C        |
+| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
+</pre>
+
 <p>
 Besides, there also exist several outer constructors for each type,
 allowing more convenient creation. In particular, if observations do
@@ -418,6 +519,48 @@ td = Timedata(vals, dats)
 td = Timedata(vals)
 </pre>
 </div>
+
+<pre class="example">
+type: Timedata{Date{ISOCalendar}}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|------------|-----------|----------|----------|
+| Row # | idx        | A         | B        | C        |
+| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
+
+type: Timedata{Int64}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|-----|-----------|----------|----------|
+| Row # | idx | A         | B        | C        |
+| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
+
+type: Timedata{Date{ISOCalendar}}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|------------|-----------|----------|----------|
+| Row # | idx        | x1        | x2       | x3       |
+| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
+
+type: Timedata{Int64}
+dimensions: (4,3)
+4x4 DataFrame
+|-------|-----|-----------|----------|----------|
+| Row # | idx | x1        | x2       | x3       |
+| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
+| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
+| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
+| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
+</pre>
 </div>
 </div>
 
@@ -574,6 +717,40 @@ which will print:
 </pre>
 </div>
 
+<pre class="example">
+type: Timematr{Date{ISOCalendar}}
+:vals  		  DataFrame
+:idx  		  Array{Date{ISOCalendar},1}
+
+dimensions of vals: (333,348)
+
+-------------------------------------------
+From: 2012-01-03, To: 2013-05-01
+-------------------------------------------
+
+333x6 DataFrame
+|-------|------------|----------|----------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      | ACT      | ADBE     |
+| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  | 1.0556   |
+| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 | -1.02024 |
+| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  | 0.70472  |
+| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  | 0.83917  |
+| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  | -0.66376 |
+| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  | 2.32125  |
+| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 | 0.41012  |
+| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 | -0.30743 |
+⋮
+| 325   | 2013-04-19 | 0.69118  | 0.86745  | 0.77089  | 1.84469  | 0.6278   |
+| 326   | 2013-04-22 | 0.08606  | -0.84023 | 0.27067  | -0.64178 | -0.47048 |
+| 327   | 2013-04-23 | 1.48952  | 0.86721  | 0.8188   | 0.93582  | 0.76063  |
+| 328   | 2013-04-24 | 0.451    | -1.8794  | -0.51518 | -0.49734 | -0.44673 |
+| 329   | 2013-04-25 | -2.81414 | -0.08252 | -0.04492 | 0.61876  | 0.84708  |
+| 330   | 2013-04-26 | -1.04683 | -0.08259 | -0.63106 | 2.05182  | -0.31125 |
+| 331   | 2013-04-29 | 0.03897  | 0.74085  | -0.02261 | 4.49427  | 0.33344  |
+| 332   | 2013-04-30 | 0.84381  | 0.51807  | 0.24845  | 0.14197  | 0.04438  |
+| 333   | 2013-05-01 | -0.14498 | -0.08162 | -0.94057 | -1.27548 | -0.82415 |
+</pre>
+
 <p>
 This additionally shows the names of the fields of the object, and
 also explicitly displays the time period of the data.
@@ -620,6 +797,11 @@ typeof(tm .&gt; 0.5)
 </pre>
 </div>
 
+<pre class="example">
+Timematr{Date{ISOCalendar}} (constructor with 1 method)
+Timedata{Date{ISOCalendar}} (constructor with 1 method)
+</pre>
+
 <p>
 The standard library for <code>TimeData</code> comprises all standard operators
 and mathematical functions. As expected, these functions all apply
@@ -635,6 +817,35 @@ exp(tm[1:3, 1:3])
 round(tm[1:3, 1:3], 2)
 </pre>
 </div>
+
+<pre class="example">
+type: Timedata{Date{ISOCalendar}}
+dimensions: (3,3)
+3x4 DataFrame
+|-------|------------|-------|-------|-------|
+| Row # | idx        | MMM   | ABT   | ACE   |
+| 1     | 2012-01-03 | true  | true  | false |
+| 2     | 2012-01-04 | true  | false | false |
+| 3     | 2012-01-05 | false | false | false |
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (3,3)
+3x4 DataFrame
+|-------|------------|----------|----------|----------|
+| Row # | idx        | MMM      | ABT      | ACE      |
+| 1     | 2012-01-03 | 8.37332  | 2.42827  | 1.34641  |
+| 2     | 2012-01-04 | 2.2765   | 0.680614 | 0.384831 |
+| 3     | 2012-01-05 | 0.638988 | 0.793287 | 1.32903  |
+
+type: Timematr{Date{ISOCalendar}}
+dimensions: (3,3)
+3x4 DataFrame
+|-------|------------|-------|-------|-------|
+| Row # | idx        | MMM   | ABT   | ACE   |
+| 1     | 2012-01-03 | 2.13  | 0.89  | 0.3   |
+| 2     | 2012-01-04 | 0.82  | -0.38 | -0.95 |
+| 3     | 2012-01-05 | -0.45 | -0.23 | 0.28  |
+</pre>
 
 <p>
 A most likely not exhaustive list of basic functions is
@@ -687,9 +898,29 @@ Some further implemented functions are:
 <ul class="org-ul">
 <li><code>isequal</code> 
 </li>
+<li><code>ndims</code>
+</li>
 <li><code>size</code>
 </li>
 <li><code>isna</code>
+</li>
+<li><code>hcat</code>
+</li>
+<li><code>writemime</code>
+</li>
+<li><code>convert</code>: DataFrame with dates as first column
+</li>
+</ul>
+
+<p>
+Some <code>DataFrame</code> extensions:
+</p>
+<ul class="org-ul">
+<li><code>composeDataFrame</code>: construction from numeric array and column names 
+</li>
+<li><code>round</code>
+</li>
+<li>basic mathematical operators
 </li>
 </ul>
 
