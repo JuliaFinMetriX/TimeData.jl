@@ -103,7 +103,10 @@ variable names and dates.
 #+BEGIN_SRC julia :results output :tangle test/doctests.jl
    using TimeData
    using Datetime
-   tm = TimeData.readTimedata("data/logRet.csv")[1:10, 1:4]
+
+   fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
+   tm = TimeData.readTimedata(fileName)[1:10, 1:4]
+
 #+END_SRC
 
 #+RESULTS:
