@@ -66,8 +66,6 @@ include("operators.jl")
 include("stats_AbstractTimematr.jl")
 include("io.jl")
 ## include("plotting.jl")
-include("econometrics.jl")
 include("dataframe_extensions.jl")
-include("ijulia_utilities.jl")
 
 end
