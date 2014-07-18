@@ -33,7 +33,7 @@ end
 
 ### Remark: timematr has its own display function!!
 import Base.writemime
-function Base.writemime(io::IO,
+function writemime(io::IO,
                         ::MIME"text/html",
                         td::AbstractTimedata)
 
@@ -99,6 +99,27 @@ function Base.writemime(io::IO,
     writemime(io, "text/html", df[:, 1:showCols])
 end
 
+##################
+## html display ##
+##################
+
+type HTML
+   s::String
+end
+import Base.writemime
+writemime(io::IO, ::MIME"text/html", x::HTML) = print(io, x.s)
+
+macro table(title::String, expr::Union(Expr, Symbol))
+    quote
+        titleString = $title
+        htmlTitleString = string("<p><strong><font color=\"blue\">",
+                                 titleString,
+                                 "</font></strong></p>")
+        display(HTML(htmlTitleString))
+        $(esc(expr))
+    end
+end
+
 #########
 ## str ##
 #########
@@ -145,3 +166,4 @@ function str(tn::AbstractTimedata)
     Peek = [Peekidx tn.vals[:, 1:showCols]];
     display(Peek)
 end
+

@@ -53,6 +53,27 @@ function round(df::DataFrame)
     return composeDataFrame(vals, names(df))
 end
 
+
+macro roundDf(expr::Expr)
+    quote 
+        res = $(esc(expr))
+    
+        function tryRound(x)
+            try 
+                round(x, 2)
+            catch
+                x
+            end
+        end
+
+        resRnd = [tryRound(res[ii, jj]) for ii=1:size(res, 1), jj=1:size(res, 2)] |>
+                 x -> composeDataFrame(x, names(res))
+    
+        display(resRnd)
+    end
+end
+
+
 ##################################
 ## basic mathematical operators ##
 ##################################
@@ -70,4 +91,3 @@ for op = (:+, :.+, :-, :.-, :.*, :./)
       end
   end)
 end
-    
