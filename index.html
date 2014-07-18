@@ -84,6 +84,7 @@
     { background-color: #ffff00; color: #000000; font-weight: bold; }
   /*]]>*/-->
 </style>
+<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
 <meta charset='utf-8'>
 <meta http-equiv="X-UA-Compatible" content="chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -232,7 +233,9 @@ variable names and dates.
 
 <pre class="src src-julia">using TimeData
 using Datetime
-tm = TimeData.readTimedata("data/logRet.csv")[1:10, 1:4]
+
+fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
+tm = TimeData.readTimedata(fileName)[1:10, 1:4]
 </pre>
 </div>
 
