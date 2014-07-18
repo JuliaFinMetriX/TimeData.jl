@@ -15,7 +15,6 @@ importall Base
 ## importall Stats
 
 export #
-@bootstrap,
 @roundDf,
 @table,
 AbstractTimedata,
