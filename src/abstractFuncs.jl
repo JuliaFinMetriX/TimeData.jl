@@ -85,4 +85,28 @@ function hcat(tm::Timedata, tm2::Timedata)
     return tmNew
 end
 
+############
+## flipud ##
+############
+
+import Base.flipud
+
+macro pres_flipud(myType)
+    esc(quote
+        function flipud(inst::$(myType))
+            ## flip data upside down
+
+            for colName in names(inst.vals)
+                inst.vals[colName] = flipud(inst.vals[colName])
+            end
+            dats = flipud(idx(inst))
+        
+            flipped = $(myType)(inst.vals, dats)
+        end
+    end)
+end
+
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+    eval(macroexpand(:(@pres_flipud($t))))
+end
 
