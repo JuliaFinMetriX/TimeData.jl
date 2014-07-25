@@ -10,13 +10,14 @@ println("\n Running getindex tests:")
 
 ## test for changes in DataFrame behaviour
 df = convert(DataFrame, rand(8, 4))
+df2 = DataFrame(a = rand(8), b = rand(8))
 @test isa(df[1:2], DataFrame)
 @test isa(df[1:2, 3:4], DataFrame)
 @test isa(df[1, 3:4], DataFrame)
 @test isa(df[1], Array{Float64,1})
 @test isa(df[2:4, 1], Array{Float64,1})   
-## @test isa(df[1], DataArray{Float64,1})        
-## @test isa(df[2:4, 1], DataArray{Float64,1})   
+@test isa(df2[1], DataArray{Float64,1})        
+@test isa(df2[2:4, 1], DataArray{Float64,1})   
 @test isa(df[2, 2], Float64)                  
 
 ## init test values

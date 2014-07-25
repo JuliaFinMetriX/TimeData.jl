@@ -50,14 +50,18 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         
         ## select single column
         function getindex(td::$(t), col_ind::ColumnIndex)
-            vals = getindex(td.vals, col_ind) # array
+            vals = getindex(td.vals, col_ind) # dataarray or array
             
             ## manually get column name
             selected_column = td.vals.colindex[col_ind]
             name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
-            valsDf = convert(DataFrame, vals)
+            if isa(vals, DataArray)
+                valsDf = DataFrame(a = vals)
+            else
+                valsDf = convert(DataFrame, vals)
+            end
             names!(valsDf, [name])           # names must be given as
             # array 
             
@@ -67,14 +71,19 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
         ## multiple rows, single column
         function getindex{T <: Real}(td::$(t), row_inds::AbstractVector{T},
                                      col_ind::ColumnIndex)
-            vals = getindex(td.vals, row_inds, col_ind) # dataarray
+            vals = getindex(td.vals, row_inds, col_ind) # dataarray or array
             
             ## manually get column name
             selected_column = td.vals.colindex[col_ind]
             name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
-            valsDf = convert(DataFrame, vals)
+            if isa(vals, DataArray)
+                valsDf = DataFrame(a = vals)
+            else
+                valsDf = convert(DataFrame, vals)
+            end
+
             names!(valsDf, [name])           # names must be given as
             # array 
             
@@ -93,7 +102,7 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             name = names(td)[selected_column] # ASCIIString
             
             ## create respective dataframe
-            valDf = convert(DataFrame, [val])
+            valDf = DataFrame(a = val)
             names!(valDf, [name])           # names must be given as
             # array 
             
