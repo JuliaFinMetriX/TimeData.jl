@@ -170,6 +170,7 @@ end
 ## complete_cases ##
 ####################
 
+import DataFrames.complete_cases
 function complete_cases(td::AbstractTimedata)
     ## find days without NA
     return complete_cases(td.vals)
