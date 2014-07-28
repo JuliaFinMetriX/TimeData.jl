@@ -26,6 +26,29 @@ function display(tn::AbstractTimedata)
     display(Peek)
 end
 
+function display(tn::AbstractTimedata, nCols::Int)
+    ## display information about an array
+    
+    ## set display parameters
+    maxDispCols = nCols;
+    
+    ## get type and field information
+    typ = typeof(tn)
+    println("\ntype: $typ")    
+    print("dimensions: ")
+    print(size(tn))
+    print("\n")
+    
+    ## get first entries
+    (nrow, ncol) = size(tn)    
+
+    showCols = minimum([maxDispCols ncol]);
+
+    Peekidx = DataFrame(idx = tn.idx);
+    Peek = [Peekidx tn.vals[:, 1:showCols]];
+    display(Peek)
+end
+
 #######################
 ## display in IJulia ##
 #######################

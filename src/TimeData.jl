@@ -30,6 +30,10 @@ cumsum,
 geomMean,
 HTML,
 idx,
+joinSortedIdx_inner,
+joinSortedIdx_left,
+joinSortedIdx_outer,
+joinSortedIdx_right,
 mean,
 minimum,
 movAvg,
@@ -64,6 +68,7 @@ include("abstractFuncs.jl")
 include("operators.jl")
 include("stats_AbstractTimematr.jl")
 include("io.jl")
+include("join.jl")
 ## include("plotting.jl")
 include("dataframe_extensions.jl")
 
