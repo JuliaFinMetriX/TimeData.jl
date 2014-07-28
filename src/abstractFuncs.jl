@@ -17,9 +17,19 @@ function get(td::AbstractTimedata, idx1::Int, idx2::Int)
     return td.vals[idx1, idx2]
 end
 
+function get(td::AbstractTimenum, idx1::Int, idx2::Int)
+    ## return entry of Timenum object
+    return td.vals[idx1, idx2]
+end
+
 function get(td::AbstractTimedata)
     ## return all entries of Timedata object
     return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
+end
+
+function get(td::AbstractTimenum)
+    ## return all entries of Timenum object
+    return float64([get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)])
 end
 
 function core(td::AbstractTimedata)
