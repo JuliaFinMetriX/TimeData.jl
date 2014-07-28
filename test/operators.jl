@@ -18,50 +18,56 @@ valsDf = composeDataFrame(vals, nams)
 ## operators ##
 ###############
 
-tm = TimeData.Timematr(vals, nams, dats)
+macro test_basic_operators(t)
+    esc(quote
+        
+        td = $(t)(vals, nams, dats)
+        
+        ## mathematical operators
+        -td
+        +td
+        @test (td .+ td) == (2.*td)
+        @test td == 3.*(td./3)
+        
+        sign(td)
+        sign(-td)
+        abs(td)
+        exp(td)
+        log(td)
+        
+        td .> 0.5
+        td .== 0.3
+        td .!= 0.3
+        
+        kk = (td .> 0.5) | (td .> 0.7)
+        kk2 = td .> 0.5
+        @test isequal(kk, kk2)
+        
+        td1 = exp(td)
+        td2 = log(td1)
+        @test_approx_eq get(td) get(td2)
+        
+        ## rounding functions
+        round(td)
+        round(td, 2)
+        ceil(td)
+        ceil(td, 2)
+        floor(td)
+        trunc(td)
+        
+        ## arithmetics with scalar values
+        @test (td .+ 1 == 1 .+ td)
+        
+        ## careful: -0.0 != 0.0
+        @test ((-(td .- 1.5)) == (1.5 .- td))
+        
+        @test (td .* 3 == 3 .* td)
+        
+    end)
+end
 
-## mathematical operators
--tm
-+tm
-tm .+ 2
-tm/3
-5*tm
-
-## mathematical functions
-sign(tm)
-sign(-tm)
-abs(tm)
-exp(tm)
-log(tm)
-
-## comparison operators
-tm .> 0.5
-tm .== 0.3
-tm .!= 0.3
-
-kk = (tm .> 0.5) | (tm .> 0.7)
-kk2 = tm .> 0.5
-@test isequal(kk, kk2)
-
-tm1 = exp(tm)
-tm2 = log(tm1)
-@test_approx_eq(TimeData.core(tm[4, 3]), TimeData.core(tm2[4, 3]))
-@test_approx_eq(TimeData.core(tm[1, 2]), TimeData.core(tm2[1, 2]))
-
-## rounding functions
-round(tm)
-round(tm, 2)
-ceil(tm)
-ceil(tm, 2)
-floor(tm)
-trunc(tm)
-
-## arithmetics with scalar values
-@test (tm .+ 1 == 1 .+ tm)
-
-## careful: -0.0 != 0.0
-@test ((-(tm .- 1.5)) == (1.5 .- tm))
-
-@test (tm * 3 == 3 * tm)
+for t = (:Timenum, :Timematr)
+    eval(macroexpand(:(@test_basic_operators($t))))        
+end
 
 end

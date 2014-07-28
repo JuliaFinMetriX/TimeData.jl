@@ -9,11 +9,12 @@
 
 ## :(+) and :(-) removed -> follow-up costs
 
-const element_wise_operators = [:(.+), :(.-), :(*), :(.*),
-                                     :(/), :(./), :(.^)]
+const element_wise_operators = [:(.+), :(.-), :(.*), :(./), :(.^)]
+const matrix_mult = [:(*), :(/)] # not implemented for Timenum yet
 const element_wise_operators_ext = [:(div), :(mod), :(fld), :(rem)]
 
 pres_msSymmetric_functions = [element_wise_operators,
+                              matrix_mult,
                               element_wise_operators_ext]
 
 macro pres_msSymmetric(f, myType)
@@ -32,7 +33,7 @@ end
 
 
 importall Base
-for t = (:Timematr, :Timecop)
+for t = (:Timematr, :AbstractTimematr)
     for f in pres_msSymmetric_functions
         eval(macroexpand(:(@pres_msSymmetric($f, $t))))        
     end
@@ -69,6 +70,10 @@ macro pres_msSymmetric_Timenum(f)
 
     end)
 end
+
+## no matrix multiplication implemented yet for Timenum
+pres_msSymmetric_functions = [element_wise_operators,
+                              element_wise_operators_ext]
 
 for f in pres_msSymmetric_functions
     eval(macroexpand(:(@pres_msSymmetric_Timenum($f))))        
