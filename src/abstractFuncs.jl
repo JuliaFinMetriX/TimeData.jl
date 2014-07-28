@@ -11,6 +11,26 @@ function names(tn::AbstractTimedata)
     return names(tn.vals)
 end
 
+import Base.get
+function get(td::AbstractTimedata, idx1::Int, idx2::Int)
+    ## return entry of Timedata object
+    return td.vals[idx1, idx2]
+end
+
+function get(td::AbstractTimedata)
+    ## return all entries of Timedata object
+    return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
+end
+
+function core(td::AbstractTimedata)
+    ## return all entries of Timedata object
+    return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
+end
+
+function idxtype(td::AbstractTimedata)
+    return typeof(idx(td))
+end
+
 ###################
 ## Timedata size ##
 ###################
@@ -65,24 +85,50 @@ end
 ##########
 
 import Base.hcat
-function hcat(tm::Timematr, tm2::Timematr)
-    ## check for equal indices
-    if idx(tm) != idx(tm2)
-        error("indices must coincide for hcat")
-    end
-
-    tmNew = Timematr(hcat(tm.vals, tm2.vals), idx(tm))
-    return tmNew
+macro pres_hcat(myType)
+    esc(quote
+        function hcat(inst::$(myType), inst2::$(myType))
+            ## check for equal indices
+            if idx(inst) != idx(inst2)
+                error("indices must coincide for hcat")
+            end
+            
+            instNew = $(myType)(hcat(inst.vals, inst2.vals), idx(inst))
+            return instNew
+        end
+    end)
 end
 
-function hcat(tm::Timedata, tm2::Timedata)
-    ## check for equal indices
-    if idx(tm) != idx(tm2)
-        error("indices must coincide for hcat")
-    end
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+    eval(macroexpand(:(@pres_hcat($t))))
+end
 
-    tmNew = Timedata(hcat(tm.vals, tm2.vals), idx(tm))
-    return tmNew
+##########
+## vcat ##
+##########
+
+import Base.vcat
+macro pres_vcat(myType)
+    esc(quote
+
+        function vcat(inst::$(myType), inst2::$(myType))
+            ## check for equal names
+            if names(inst) != names(inst2)
+                error("variable names must coincide for vcat")
+            end
+            
+            if idxtype(inst) != idxtype(inst2)
+                error("time index must be of same type for vcat")
+            end
+    
+            catVals = vcat(inst.vals, inst2.vals)
+            return $(myType)(catVals, [idx(inst), idx(inst2)])
+        end
+    end)
+end
+
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+    eval(macroexpand(:(@pres_vcat($t))))
 end
 
 ############
