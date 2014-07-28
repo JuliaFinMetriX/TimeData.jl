@@ -166,3 +166,31 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     eval(macroexpand(:(@pres_flipud($t))))
 end
 
+####################
+## complete_cases ##
+####################
+
+function complete_cases(td::AbstractTimedata)
+    ## find days without NA
+    return complete_cases(td.vals)
+end
+
+function complete_cases(tm::AbstractTimematr)
+    ## no NAs allowed
+    return bool(ones(size(tm, 1)))
+end
+
+##########
+## narm ##
+##########
+
+function narm(td::AbstractTimedata)
+    ## return days without NA
+    smallTd = td[complete_cases(td), :]
+    return smallTd
+end
+
+function narm(tm::AbstractTimematr)
+    ## no NAs allowed
+    return tm
+end
