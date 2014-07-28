@@ -22,25 +22,58 @@ macro pres_msSymmetric(f, myType)
             $(myType)($(f)(core(inst), core(inst2)),
                       names(inst), idx(inst))
 
-        $(f)(inst::$(myType),b::Union(String,Number)) =
+        $(f)(inst::$(myType),b::Number) =
             $(myType)($(f)(core(inst), b), names(inst), idx(inst)) 
         
-        $(f)(b::Union(String,Number),inst::$(myType)) =
+        $(f)(b::Number,inst::$(myType)) =
             $(myType)($(f)(b,core(inst)), names(inst), idx(inst))
     end)
 end
 
+
 importall Base
 for t = (:Timematr, :Timecop)
     for f in pres_msSymmetric_functions
-        ## print(macroexpand(:(@swap_type($f, $t))))
         eval(macroexpand(:(@pres_msSymmetric($f, $t))))        
-        ## @eval begin
-        ##     @swap_type $(f) $(t)
-        ## end
-
     end
 end
+
+macro pres_msSymmetric_Timenum(f)
+    esc(quote
+        function $(f)(inst::Timenum, inst2::Timenum)
+
+            dfResult = DataFrame()
+            for col in names(inst)
+                dfResult[col] = $(f)(inst.vals[col], inst2.vals[col])
+            end
+            return Timenum(dfResult, idx(inst))
+        end
+
+        function $(f)(inst::Timenum, val::Number)
+            
+            dfResult = DataFrame()
+            for col in names(inst)
+                dfResult[col] = $(f)(inst.vals[col], val)
+            end
+            return Timenum(dfResult, idx(inst))
+        end
+
+        function $(f)(val::Number, inst::Timenum)
+            
+            dfResult = DataFrame()
+            for col in names(inst)
+                dfResult[col] = $(f)(val, inst.vals[col])
+            end
+            return Timenum(dfResult, idx(inst))
+        end
+
+    end)
+end
+
+for f in pres_msSymmetric_functions
+    eval(macroexpand(:(@pres_msSymmetric_Timenum($f))))        
+end
+
 
 #################################################
 ## type preserving functions without arguments ##
@@ -68,9 +101,26 @@ end
 
 for t = (:Timematr, :Timecop)
     for f in pres_msUnitary_functions
-        ## @timedata_unary f t
         eval(macroexpand(:(@pres_msUnitary($f, $t))))                
     end
+end
+
+macro pres_msUnitary_Timenum(f)
+    esc(quote
+        function $(f)(inst::Timenum)
+
+            dfResult = DataFrame()
+            for col in names(inst)
+                dfResult[col] = $(f)(inst.vals[col])
+            end
+
+            Timenum(dfResult, idx(inst))
+        end
+    end)
+end
+
+for f in pres_msUnitary_functions
+    eval(macroexpand(:(@pres_msUnitary_Timenum($f))))
 end
 
 ######################################################
@@ -132,6 +182,33 @@ for t = (:Timematr, :Timecop)
         ## @varargs_type f t
         eval(macroexpand(:(@pres_msSingle_or_extra($f, $t))))
     end
+end
+
+macro pres_msSingle_or_extra_Timenum(f)
+    esc(quote
+        function $(f)(inst::Timenum)
+
+            dfResult = DataFrame()
+            for col in names(inst)
+                dfResult[col] = $(f)(inst.vals[col])
+            end
+            return Timenum(dfResult, idx(inst))
+        end
+
+        function $(f)(inst::Timenum, i::Integer)
+
+            dfResult = DataFrame()
+            for col in names(inst)
+                dfResult[col] = $(f)(inst.vals[col], i)
+            end
+            return Timenum(dfResult, idx(inst))
+        end
+
+    end)
+end
+
+for f in pres_msSingle_or_extra_functions
+    eval(macroexpand(:(@pres_msSingle_or_extra_Timenum($f))))
 end
 
 ######################################################
