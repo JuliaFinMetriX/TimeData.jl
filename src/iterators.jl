@@ -1,109 +1,105 @@
-######################
-## rowwise iterator ##
-######################
-
-import Base.start
-function start(tm::Timematr)
-    return 1
-end
-
-import Base.next
-function next(tm::Timematr, ii::Int)
-    (nrows, ncol) = size(tm)
-    ncolReal = ncol + 1
-
-    df = convert(DataFrame, tm)
-    return next(df, ii)
-    ## return (df[ii, :], ii+1)
-end
-
-import Base.done
-function done(tm::Timematr, ii::Int)
-    df = convert(DataFrame, tm)
-    return done(df, ii)
-end
-
-#########################
-## columnwise iterator ##
-#########################
-
-import Base.start
-function start(tm::Timematr)
-    return 1
-end
-
-import Base.next
-function next(tm::Timematr, ii::Int)
-    (nrows, ncol) = size(tm)
-    ncolReal = ncol + 1
-
-    df = convert(DataFrame, tm)
-    return (df[:, ii], ii+1)
-end
-
-import Base.done
-function done(tm::Timematr, ii::Int)
-    (nrows, ncol) = size(tm)
-    ncolReal = ncol + 1
-
-    isDone = false
-    if ii >= ncolReal
-        isDone = true
-    end
-    return isDone
-end
-
-
 ##########################
-## elementwise iterator ##
+## iteration by columns ##
 ##########################
 
-import Base.start
-function start(tm::Timematr)
-    return 1
+immutable TdColumnIterator
+    td::AbstractTimedata
 end
 
-import Base.next
-function next(tm::Timematr, ii::Int)
-    (nrows, ncol) = size(tm)
-    ncolReal = ncol + 1
+import DataFrames.eachcol
+eachcol(td::AbstractTimedata) = TdColumnIterator(td)
 
-    rowInd = mod(ii, nrows)
-    if rowInd == 0
-        rowInd = nrows
+Base.start(itr::TdColumnIterator) = 1
+Base.done(itr::TdColumnIterator, j::Int) = j > size(itr.td, 2)
+Base.next(itr::TdColumnIterator, j::Int) = (itr.td[j], j + 1)
+Base.size(itr::TdColumnIterator) = (size(itr.td, 2), )
+Base.length(itr::TdColumnIterator) = size(itr.td, 2)
+Base.getindex(itr::TdColumnIterator, j::Any) = itr.td[:, j]
+
+import Base.map
+
+## map function for column iterator always returns Timedata object of
+## same size! Indices remain unchanged!
+function map(f::Function, tdci::TdColumnIterator)
+    # note: `f` must return a consistent length
+    res = DataFrame()
+    for (n, v) in eachcol(tdci.td.vals)
+        res[n] = f(v)
     end
-    colInd = int((ii - rowInd)/nrows + 1)
-
-    if colInd == 1
-        output = (idx(tm)[rowInd], ii+1)
-    else
-        output = (tm.vals[rowInd, colInd-1], ii+1)
+    
+    td = Timedata(res, idx(tdci.td))
+    if isa(tdci.td, AbstractTimenum)
+        try
+            td = convert(Timenum, td)
+        catch
+        end
+    elseif isa(tdci.td, AbstractTimenum)
+        try
+            td = convert(Timematr, td)
+        catch
+        end
     end
-        
-    return output
+    return td
 end
 
-import Base.done
-function done(tm::Timematr, ii::Int)
-    (nrows, ncol) = size(tm)
-    ncolReal = ncol + 1
-
-    isDone = false
-    if ii >= nrows*ncolReal
-        isDone = true
+## map function for column iterator always returns Timedata object of
+## same size! Indices remain unchanged!
+function map(f::Function, tdci::TdColumnIterator, x)
+    # note: `f` must return a consistent length
+    nIter1 = length(tdci)
+    nIter2 = length(x)
+    if nIter1 != nIter2
+        error("length of iterators must be identical")
     end
-    return isDone
+
+    res = DataFrame()
+    nams = names(tdci.td)
+    state = start(x)
+    for ii=1:nIter1
+        val, state = next(x, state)
+        res[nams[ii]] = f(tdci.td.vals[:, ii], val)
+    end
+
+    display(res)
+    td = Timedata(res, idx(tdci.td))
+    if isa(tdci.td, AbstractTimenum)
+        try
+            td = convert(Timenum, td)
+        catch
+        end
+    elseif isa(tdci.td, AbstractTimenum)
+        try
+            td = convert(Timematr, td)
+        catch
+        end
+    end
+    return td
+end
+
+#######################
+## iteration by rows ##
+#######################
+
+immutable TdRowIterator
+    td::AbstractTimedata
+end
+import DataFrames.eachrow
+eachrow(td::AbstractTimedata) = TdRowIterator(td)
+
+Base.start(itr::TdRowIterator) = 1
+Base.done(itr::TdRowIterator, i::Int) = i > size(itr.td, 1)
+Base.next(itr::TdRowIterator, i::Int) = (itr.td[i, :], i + 1)
+Base.size(itr::TdRowIterator) = (size(itr.td, 1), )
+Base.length(itr::TdRowIterator) = size(itr.td, 1)
+Base.getindex(itr::TdRowIterator, i::Any) = itr.td[i, :]
+
+import Base.map
+function map(f::Function, tdri::TdRowIterator)
+    ret = deepcopy(tdri.td)
+    for ii=1:size(tdri.td, 1)
+        ret.vals[ii, :] = (f(tdri.td[ii, :])).vals
+    end
+    return ret
 end
 
 
-#############
-## testing ##
-#############
-
-tm = Timematr(rand(10, 5))
-
-state = start(tm);
-while !done(tm, state)
-    i, state = next(tm, state)
-    println(i)
-end
