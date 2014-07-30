@@ -29,7 +29,7 @@ end
 
 function get(td::AbstractTimenum)
     ## return all entries of Timenum object
-    return float64([get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)])
+    return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
 end
 
 function core(td::AbstractTimedata)
@@ -87,7 +87,29 @@ end
 
 import DataFrames.isna
 function isna(tn::AbstractTimedata)
-    return Timedata(isna(tn.vals), idx(tn))
+    return Timedata([isna(tn.vals)], idx(tn))
+end
+
+###########
+## setNA ##
+###########
+
+function setNA!(td::AbstractTimedata, rowIdx::Int, colIdx::Int)
+    ## set entry to NA
+    if !isa(td.vals.columns[colIdx], DataArray)
+        td.vals.columns[colIdx] = DataArray(td.vals.columns[colIdx])
+    end        
+    td.vals[rowIdx, colIdx] = NA
+    return td
+end
+
+function setNA!(td::AbstractTimematr, rowIdx::Int, colIdx::Int)
+    ## set entry to NA
+    error("Setting entries to NA is not allowed for AbstractTimematr types")
+    ## td = convert(Timenum, td)
+    ## td.vals.columns[colIdx] = DataArray(td.vals.columns[colIdx])
+    ## td.vals[rowIdx, colIdx] = NA
+    ## return td
 end
 
 ##########
@@ -140,6 +162,19 @@ end
 for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     eval(macroexpand(:(@pres_vcat($t))))
 end
+
+function vcat(tds::AbstractTimedata...)
+    ## all components must have equal names
+    colnames = names(tds[1])
+    nTds = length(tds)
+
+    res = deepcopy(tds[1])
+    for ii=2:nTds
+        res = vcat(res, tds[ii])
+    end
+    res
+end
+
 
 ############
 ## flipud ##
@@ -194,4 +229,54 @@ end
 function narm(tm::AbstractTimematr)
     ## no NAs allowed
     return tm
+end
+
+########################
+## asTd / asTm / asTn ##
+########################
+
+function isaRowVector(x::Array)
+    isa(x, Matrix) & (size(x, 1) == 1 )
+end
+
+function asArrayOfEqualDimensions(arr::Array, td::AbstractTimedata)
+    if !isa(arr, Vector) & !isaRowVector(arr)
+        error("array must be either row or column vector for
+    conversion")
+    end
+
+    (nObs, nVars) = size(td)
+    nElem = length(arr)
+    
+    if isaRowVector(arr)
+        # interpretation as row vector
+        if nElem != nVars
+            error("wrong dimensions: number of columns not equal")
+        end
+        resVals = repmat(arr, nObs, 1)
+    else # column vector
+        if nElem == nObs
+            resVals = repmat(arr, 1, nVars)
+        elseif nElem == nVars
+            resVals = repmat(arr', nObs, 1)
+        else
+            error("wrong dimensions: array can not be converted")    
+        end
+    end
+    resVals
+end
+
+function asTd(arr::Array, td::AbstractTimedata)
+    resVals = asArrayOfEqualDimensions(arr, td)
+    td = Timedata(resVals, names(td), idx(td))
+end
+
+function asTn(arr::Array, td::AbstractTimedata)
+    resVals = asArrayOfEqualDimensions(arr, td)
+    td = Timenum(resVals, names(td), idx(td))
+end
+
+function asTm(arr::Array, td::AbstractTimedata)
+    resVals = asArrayOfEqualDimensions(arr, td)
+    td = Timenum(resVals, names(td), idx(td))
 end
