@@ -28,6 +28,8 @@ core,
 cov,
 cumprod,
 cumsum,
+eachcol,
+eachrow,
 geomMean,
 get,
 hcat,
@@ -50,6 +52,8 @@ rowmeans,
 rowprods,
 rowstds,
 rowsums,
+setDfRow!,
+setNA!,
 std,
 str,
 sum,
@@ -58,6 +62,7 @@ Timedata,
 Timematr,
 Timenum,
 vcat,
+writedlm,
 writeTimedata
 
 include("constraints.jl")
@@ -76,5 +81,7 @@ include("io.jl")
 include("join.jl")
 ## include("plotting.jl")
 include("dataframe_extensions.jl")
+include("iterators.jl")
+include("convert.jl")
 
 end
