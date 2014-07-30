@@ -57,3 +57,14 @@ function writeTimedata(filename::String, td::AbstractTimedata)
     writetable(filename, df)
 end
 
+######################
+## org-babel output ##
+######################
+
+function Base.writedlm(io::IO, td::AbstractTimedata, dlm; opts...)
+    nams = [:idx, names(td)]
+    vals = [idx(td) arrAny = get(td)]
+    arrAny = [nams', vals]
+    writedlm(io, arrAny, dlm; opts...)
+end
+

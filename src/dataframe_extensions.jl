@@ -79,9 +79,16 @@ end
 ##################################
 
 importall Base
-for op = (:+, :.+, :-, :.-, :.*, :./)
+for op = (:.+, :.-, :.*, :./, :.^)
   eval(quote
       function $op(df1::DataFrame, df2::DataFrame)
+          try
+              (array(df1), array(df2))
+              catch
+              error("mathematical operators only work on DataFrames
+with numeric values only")
+          end
+              
           res = $op(array(df1), array(df2))
           ## if size(res, 1) == 1
               ## df = composeDataFrame(res', names(df1))
@@ -91,3 +98,31 @@ for op = (:+, :.+, :-, :.-, :.*, :./)
       end
   end)
 end
+
+##############
+## setDfRow ##
+##############
+
+function setDfRow!(df::DataFrame, arr::Array, rowInd::Int)
+    nElem = length(arr)
+    if nElem != size(df, 2)
+        error("wrong number of columns during assignment")
+    end
+
+    for ii=1:nElem
+        df[1, ii] = arr[ii]
+    end
+    return df
+end
+
+######################
+## org-babel output ##
+######################
+
+function Base.writedlm(io::IO, df::DataFrame, dlm; opts...)
+    nams = names(df)
+    vals = Any[df[ii, jj] for ii=1:size(df, 1), jj=1:size(df, 2)]
+    arrAny = [nams', vals]
+    writedlm(io, arrAny, dlm; opts...)
+end
+
