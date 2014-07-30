@@ -20,21 +20,6 @@ function Timematr{T}(vals::DataFrame, idx::Array{T, 1})
     return Timematr{T}(vals, idx)
 end
 
-    
-#################
-## Conversions ##
-#################
-
-## ## conversion upwards: always works
-## function convert(::Type{Timedata}, tm::Timematr)
-##     Timedata(tm.vals, tm.idx)
-## end
-
-## ## conversion upwards: always works
-## function convert(::Type{Timenum}, tm::Timematr)
-##     Timenum(tm.vals, tm.idx)
-## end
-
 #############################
 ## get numeric values only ##
 #############################

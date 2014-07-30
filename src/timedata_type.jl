@@ -19,21 +19,6 @@ function Timedata{T}(vals::DataFrame, idx::Array{T, 1})
     return Timedata{T}(vals, idx)
 end
 
-
-#################
-## Conversions ##
-#################
-
-## conversion downwards: fails for non-numeric values
-## function convert(::Type{Timenum}, td::Timedata)
-    ## Timenum(td.vals, td.idx)
-## end
-
-## conversion downwards: fails for NAs
-## function convert(::Type{Timematr}, td::Timedata)
-    ## Timematr(td.vals, td.idx)
-## end
-
 #######################
 ## find boolean true ##
 #######################
