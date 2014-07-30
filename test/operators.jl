@@ -45,7 +45,7 @@ macro test_basic_operators(t)
         
         td1 = exp(td)
         td2 = log(td1)
-        @test_approx_eq get(td) get(td2)
+        @test_approx_eq convert(Array{Float64, 1}, get(td)[:]) convert(Array{Float64, 1}, get(td2)[:])
         
         ## rounding functions
         round(td)
