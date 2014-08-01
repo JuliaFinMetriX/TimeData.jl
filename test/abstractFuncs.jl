@@ -16,6 +16,11 @@ nams = [:A, :B, :C, :D]
 
 allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
 
+###########################
+## names, idx, get, core ##
+###########################
+
+
 ## test information retrieval functions
 for t in allTypes
     eval(quote
@@ -24,8 +29,54 @@ for t in allTypes
         @test isequal(TimeData.idx(td), DataArray(dats))
         @test get(td, 3, 4) == 0.5
         @test get(td)[3, 4] == 0.5
+        @test core(td)[3, 4] == 0.5
+        @test size(td) == (30, 4)
+        @test ndims(td) == 2
+        @test td[:, 1:2] == hcat(td[1], td[2])
+#        @test td == hcat(td[1], td[2], td[3], td[4])
     end)
 end
+
+##########
+## isna ##
+##########
+
+## set up Timenum with NAs
+df = DataFrame()
+df[:a] = @data([4, 5, 6, NA, 8])
+df[:b] = @data([3, 8, NA, NA, 2])
+dats = [date(2014,1,1):date(2014,1,5)]
+tn = Timenum(df, dats)
+
+## test outcome
+naVals = [false false; false false; false true; true true; false false]
+isNaTd = Timedata(naVals, names(tn), idx(tn))
+@test isna(tn) == isNaTd
+
+############
+## setNA! ##
+############
+
+setNA!(tn, 1, 2)
+get(tn, 1, 2) == NA
+
+tm = Timematr(rand(2, 2))
+@test_throws ErrorException setNA!(tm, 1, 2)
+
+################
+## hcat tests ##
+################
+
+tm = Timematr(rand(2, 3))
+hcat(tm[:, 1], tm[:, 2], tm[:, 3])
+
+td = Timedata(rand(2, 3))
+hcat(td[:, 1], td[:, 2])
+hcat(td[:, 1], td[:, 2], td[:, 1])
+hcat(tm[:, 1], tm[:, 2], tm[:, 1])
+@test_throws ErrorException hcat(tm[:, 1], td[:, 2])
+@test_throws ErrorException hcat(tm[:, 1], tm[:, 2], td[:, 2])
+
 
 ################
 ## vcat tests ##

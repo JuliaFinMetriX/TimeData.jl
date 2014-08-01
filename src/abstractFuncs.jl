@@ -11,34 +11,28 @@ function names(tn::AbstractTimedata)
     return names(tn.vals)
 end
 
+function core(td::AbstractTimedata)
+    ## return all entries of Timedata object
+    return get(td)
+end
+
+function idxtype(td::AbstractTimedata)
+    return typeof(idx(td))
+end
+
+#########
+## get ##
+#########
+
 import Base.get
 function get(td::AbstractTimedata, idx1::Int, idx2::Int)
     ## return entry of Timedata object
     return td.vals[idx1, idx2]
 end
 
-function get(td::AbstractTimenum, idx1::Int, idx2::Int)
-    ## return entry of Timenum object
-    return td.vals[idx1, idx2]
-end
-
 function get(td::AbstractTimedata)
     ## return all entries of Timedata object
     return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
-end
-
-function get(td::AbstractTimenum)
-    ## return all entries of Timenum object
-    return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
-end
-
-function core(td::AbstractTimedata)
-    ## return all entries of Timedata object
-    return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
-end
-
-function idxtype(td::AbstractTimedata)
-    return typeof(idx(td))
 end
 
 ###################
@@ -86,8 +80,11 @@ end
 ##########
 
 import DataFrames.isna
-function isna(tn::AbstractTimedata)
-    return Timedata([isna(tn.vals)], idx(tn))
+function isna(td::AbstractTimedata)
+    ## elementwise test for NA
+    naArr = [isna(get(td, ii, jj)) for ii=1:size(td, 1),
+             jj=1:size(td, 2)] 
+    return Timedata(naArr, names(td), idx(td))
 end
 
 ###########
@@ -95,7 +92,8 @@ end
 ###########
 
 function setNA!(td::AbstractTimedata, rowIdx::Int, colIdx::Int)
-    ## set entry to NA
+    ## set entry to NA - could require changing eltype of column to
+    ## DataArray 
     if !isa(td.vals.columns[colIdx], DataArray)
         td.vals.columns[colIdx] = DataArray(td.vals.columns[colIdx])
     end        
@@ -104,18 +102,16 @@ function setNA!(td::AbstractTimedata, rowIdx::Int, colIdx::Int)
 end
 
 function setNA!(td::AbstractTimematr, rowIdx::Int, colIdx::Int)
-    ## set entry to NA
+    ## set entry to NA not allowed for Timematr
     error("Setting entries to NA is not allowed for AbstractTimematr types")
-    ## td = convert(Timenum, td)
-    ## td.vals.columns[colIdx] = DataArray(td.vals.columns[colIdx])
-    ## td.vals[rowIdx, colIdx] = NA
-    ## return td
 end
 
 ##########
 ## hcat ##
 ##########
 
+## hcat requires completely equal indices and equal types
+## hcat preserves type
 import Base.hcat
 macro pres_hcat(myType)
     esc(quote
@@ -133,6 +129,34 @@ end
 
 for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     eval(macroexpand(:(@pres_hcat($t))))
+end
+
+macro pres_hcat_varargs(myType)
+    esc(quote
+        function hcat(tds::$(myType)...)
+            nArgs = length(tds)
+
+            res = deepcopy(tds[1])
+            for ii=2:nArgs
+                res = hcat(res, tds[ii])
+            end
+            res
+        end
+    end)
+end
+
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+    eval(macroexpand(:(@pres_hcat_varargs($t))))
+end
+
+function hcat(inst1::AbstractTimedata, inst2::AbstractTimedata)
+    ## not defined for different types
+    error("objects must be of equal type for hcat")
+end
+
+function hcat(inst::AbstractTimedata...)
+    ## not defined for different types
+    error("objects must be of equal type for hcat")
 end
 
 ##########
@@ -212,7 +236,7 @@ function complete_cases(td::AbstractTimedata)
 end
 
 function complete_cases(tm::AbstractTimematr)
-    ## no NAs allowed
+    ## no NAs allowed anyways
     return bool(ones(size(tm, 1)))
 end
 
