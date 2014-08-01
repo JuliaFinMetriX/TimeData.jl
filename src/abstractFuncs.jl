@@ -59,11 +59,10 @@ end
 
 import Base.isequal
 function isequal(tn::AbstractTimedata, tn2::AbstractTimedata)
-    typeEqu = isequal(typeof(tn), typeof(tn2))
-    valsEqu = isequal(tn.vals, tn2.vals)
-    idxEqu = isequal(tn.idx, tn2.idx)
-    equ = (valsEqu & idxEqu & typeEqu)
-    return equ
+    isequal(typeof(tn), typeof(tn2)) || return false
+    isequal(tn.vals, tn2.vals) || return false
+    isequal(tn.idx, tn2.idx) || return false
+    return true
 end
 
 import Base.==
@@ -187,16 +186,34 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
     eval(macroexpand(:(@pres_vcat($t))))
 end
 
-function vcat(tds::AbstractTimedata...)
-    ## all components must have equal names
-    colnames = names(tds[1])
-    nTds = length(tds)
+macro pres_vcat_varargs(myType)
+    esc(quote
+        function vcat(tds::$(myType)...)
+            ## all components must have equal names
+            colnames = names(tds[1])
+            nTds = length(tds)
 
-    res = deepcopy(tds[1])
-    for ii=2:nTds
-        res = vcat(res, tds[ii])
-    end
-    res
+            res = deepcopy(tds[1])
+            for ii=2:nTds
+                res = vcat(res, tds[ii])
+            end
+            res
+        end
+    end)
+end
+
+for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+    eval(macroexpand(:(@pres_vcat_varargs($t))))
+end
+
+function vcat(inst1::AbstractTimedata, inst2::AbstractTimedata)
+    ## not defined for different types
+    error("objects must be of equal type for vcat")
+end
+
+function vcat(inst::AbstractTimedata...)
+    ## not defined for different types
+    error("objects must be of equal type for vcat")
 end
 
 
@@ -211,12 +228,12 @@ macro pres_flipud(myType)
         function flipud(inst::$(myType))
             ## flip data upside down
 
+            flippedVals = DataFrame()
             for colName in names(inst.vals)
-                inst.vals[colName] = flipud(inst.vals[colName])
+                flippedVals[colName] = flipud(inst.vals[colName])
             end
             dats = flipud(idx(inst))
-        
-            flipped = $(myType)(inst.vals, dats)
+            return $(myType)(flippedVals, dats)
         end
     end)
 end
@@ -252,7 +269,7 @@ end
 
 function narm(tm::AbstractTimematr)
     ## no NAs allowed
-    return tm
+    return deepcopy(tm)
 end
 
 ########################
@@ -262,6 +279,11 @@ end
 function isaRowVector(x::Array)
     isa(x, Matrix) & (size(x, 1) == 1 )
 end
+
+function isaRowVector(x::Any)
+    error("isaRowVector only is defined for Arrays")
+end
+
 
 function asArrayOfEqualDimensions(arr::Array, td::AbstractTimedata)
     if !isa(arr, Vector) & !isaRowVector(arr)
@@ -290,17 +312,24 @@ function asArrayOfEqualDimensions(arr::Array, td::AbstractTimedata)
     resVals
 end
 
-function asTd(arr::Array, td::AbstractTimedata)
+function asArrayOfEqualDimensions(val::Any, td::AbstractTimedata)
+    (nObs, nVars) = size(td)
+    
+    resVals = repmat([val], nObs, nVars)
+    return resVals
+end
+
+function asTd(arr::Array, td::Timedata)
     resVals = asArrayOfEqualDimensions(arr, td)
     td = Timedata(resVals, names(td), idx(td))
 end
 
-function asTn(arr::Array, td::AbstractTimedata)
+function asTn(arr::Array, td::Timenum)
     resVals = asArrayOfEqualDimensions(arr, td)
     td = Timenum(resVals, names(td), idx(td))
 end
 
-function asTm(arr::Array, td::AbstractTimedata)
+function asTm(arr::Array, td::Timematr)
     resVals = asArrayOfEqualDimensions(arr, td)
     td = Timenum(resVals, names(td), idx(td))
 end
