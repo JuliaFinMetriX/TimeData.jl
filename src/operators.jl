@@ -1,84 +1,114 @@
+## This file defines basic mathematical functions and operators for
+## Timenum and Timemtr types. These operators and functions make sense
+## only for objects that are restricted to numeric values. For type
+## Timedata, they are not defined, similarly to DataFrames.
+##
+## Operators usually try to build on the same operator for DataArrays.
+## Only where it makes sense, Timematr operators will be build on
+## operators that are defined on numeric Arrays.
+
 #######################################################
 ## type preserving symmetric operators and functions ##
 #######################################################
 
+## mathematical operators are defined elementwise
+## 
+## if two Timematr / Timenum objects are involved, indices and column
+## names must coincide.
+##
+## elementwise operators involving two different TimeData types are
+## not allowed.
+## 
 ## function headers
 ## f(inst::NewType, inst2::NewType)
 ## f(inst::NewType, b::Number)
 ## f(b::Number, inst::NewType)
 
-## - mathematical operators, defined for Timenum and Timematr only
-## - mathematical functions
 
-const element_wise_operators = [:(.+), :(.-), :(.*), :(./), :(.^)]
-const element_wise_operators_ext = [:(div), :(mod), :(fld), :(rem)]
-const matrix_mult = [:(*), :(/)] # not implemented for Timenum yet
+## type preserving: applied to Timematr, it will again return Timematr
+## object 
 
-
-pres_msSymmetric_functions = [element_wise_operators,
-                              matrix_mult,
-                              element_wise_operators_ext]
-
-macro pres_msSymmetric(f, myType)
+## macro is parametrized with respect to type, because this way
+## Timematr implementations involving core() can easily be re-defined
+## and related to DataArray operators as well
+macro pres_symmetric_timenum(f, myType)
     esc(quote
-        $(f)(inst::$(myType), inst2::$(myType)) =
-            $(myType)($(f)(core(inst), core(inst2)),
-                      names(inst), idx(inst))
-
-        $(f)(inst::$(myType),b::Number) =
-            $(myType)($(f)(core(inst), b), names(inst), idx(inst)) 
-        
-        $(f)(b::Number,inst::$(myType)) =
-            $(myType)($(f)(b,core(inst)), names(inst), idx(inst))
-    end)
-end
-
-
-importall Base
-for t = (:Timematr, :AbstractTimematr)
-    for f in pres_msSymmetric_functions
-        eval(macroexpand(:(@pres_msSymmetric($f, $t))))        
-    end
-end
-
-macro pres_msSymmetric_Timenum(f)
-    esc(quote
-        function $(f)(inst::Timenum, inst2::Timenum)
-
+        function $(f)(inst::$(myType), inst2::$(myType))
+            if !issimilar(inst, inst2)
+                error("TimeData objects not similar")
+            end
+            
             dfResult = DataFrame()
             for col in names(inst)
                 dfResult[col] = $(f)(inst.vals[col], inst2.vals[col])
             end
-            return Timenum(dfResult, idx(inst))
+            return $(myType)(dfResult, idx(inst))
         end
 
-        function $(f)(inst::Timenum, val::Number)
+        function $(f)(inst::$(myType), val::Number)
             
             dfResult = DataFrame()
             for col in names(inst)
                 dfResult[col] = $(f)(inst.vals[col], val)
             end
-            return Timenum(dfResult, idx(inst))
+            return $(myType)(dfResult, idx(inst))
         end
 
-        function $(f)(val::Number, inst::Timenum)
+        function $(f)(val::Number, inst::$(myType))
             
             dfResult = DataFrame()
             for col in names(inst)
                 dfResult[col] = $(f)(val, inst.vals[col])
             end
-            return Timenum(dfResult, idx(inst))
+            return $(myType)(dfResult, idx(inst))
         end
 
     end)
 end
 
-## no matrix multiplication implemented yet for Timenum
-pres_msSymmetric_functions = [element_wise_operators,
-                              element_wise_operators_ext]
+macro pres_symmetric_timematr(f)
+    ## can be related to Array operators through core function
+    esc(quote
+        ## tm1 .+ tm2
+        function $(f)(inst::Timematr, inst2::Timematr)
+            if !issimilar(inst, inst2)
+                error("Timematr object not similar")
+            end
+            return Timematr($(f)(core(inst), core(inst2)),
+                            names(inst), idx(inst))
+        end
 
-for f in pres_msSymmetric_functions
-    eval(macroexpand(:(@pres_msSymmetric_Timenum($f))))        
+        ## tm .+ 3
+        function $(f)(inst::Timematr,b::Number)
+            return Timematr($(f)(core(inst), b), names(inst),
+                            idx(inst))
+        end
+
+        ## 3 .+ tm
+        function $(f)(b::Number,inst::Timematr)
+            return Timematr($(f)(b,core(inst)), names(inst),
+                            idx(inst))
+        end
+    end)
+end
+
+importall Base
+t = :Timenum
+for f in [:(.+), :(.-), :(.*), :(./), :(.^)]
+    eval(macroexpand(:(@pres_symmetric_timematr($f))))
+    eval(macroexpand(:(@pres_symmetric_timenum($f, $t))))
+end
+
+## other function with two numbers as input
+for f in [:(div), :(mod), :(fld), :(rem)]
+    eval(macroexpand(:(@pres_symmetric_timematr($f))))
+    eval(macroexpand(:(@pres_symmetric_timenum($f, $t))))
+end
+
+## only implemented for Timematr
+const matrix_mult = [:(*), :(/)]
+for f in matrix_mult
+    eval(macroexpand(:(@pres_symmetric_timematr($f))))
 end
 
 
@@ -88,46 +118,43 @@ end
 
 ## f(inst::NewType)
 const unary_operators = [:(+), :(-)]    # [:(*), :(/)]
-
 const mathematical_functions = [:abs, :sign,
-                                :acos, :acosh, :asin, :asinh,
-                                :atan, :atanh, :sin, :sinh, :cos, 
-                                :cosh, :tan, :tanh, :exp, :exp2,
-                                :expm1, :log, :log10, :log1p,
-                                :log2, :exponent, :sqrt, :gamma,
-                                :lgamma, :digamma, :erf, :erfc]
+                                ## :acos, :acosh, :asin, :asinh,
+                                ## :atan, :atanh, :sin, :sinh, :cos, 
+                                ## :cosh, :tan, :tanh,
+                                ## :exp2, :expm1, :log10, :log1p,
+                                ## :log2, :exponent,
+                                ## :lgamma, :digamma, :erf, :erfc,
+                                :exp, :log, :sqrt, :gamma
+                                ]
 
 pres_msUnitary_functions = [unary_operators, mathematical_functions]
 
-macro pres_msUnitary(f, myType)
+macro pres_msUnitary_timenum(f, myType)
     esc(quote
-        $(f)(inst::$(myType)) =
-            $(myType)($(f)(core(inst)), names(inst), idx(inst))
-    end)
-end
-
-for t = (:Timematr)
-    for f in pres_msUnitary_functions
-        eval(macroexpand(:(@pres_msUnitary($f, $t))))                
-    end
-end
-
-macro pres_msUnitary_Timenum(f)
-    esc(quote
-        function $(f)(inst::Timenum)
+        function $(f)(inst::$(myType))
 
             dfResult = DataFrame()
             for col in names(inst)
                 dfResult[col] = $(f)(inst.vals[col])
             end
 
-            Timenum(dfResult, idx(inst))
+            $(myType)(dfResult, idx(inst))
         end
     end)
 end
 
+macro pres_msUnitary_timematr(f)
+    esc(quote
+        $(f)(inst::Timematr) =
+            Timematr($(f)(core(inst)), names(inst), idx(inst))
+    end)
+end
+
+t = :Timenum
 for f in pres_msUnitary_functions
-    eval(macroexpand(:(@pres_msUnitary_Timenum($f))))
+    eval(macroexpand(:(@pres_msUnitary_timematr($f))))
+    eval(macroexpand(:(@pres_msUnitary_timenum($f, $t))))
 end
 
 ######################################################
@@ -138,35 +165,32 @@ end
 ## f(inst::NewType, b::Number)
 ## f(b::Number, inst::NewType)
 
-const element_wise_comparisons = [:(.==), :(.!=), :(.>), :(.>=),
-                                     :(.<), :(.<=)]
-
-nonpres_msSymmetric_functions = [element_wise_comparisons]
-
-macro nonpres_msSymmetric(f)
+## for timedata and timenum objects apply function to DataArrays
+macro nonpres_msSymmetric_timedata(f)
     esc(quote
         function $(f)(inst::AbstractTimedata, inst2::AbstractTimedata)
-            if idx(inst) != idx(inst2)
-                error("indices must be equal for logical comparison")
+            if !issimilar(inst, inst2)
+                error("TimeData objects not similar")
             end
+
             df2 = DataFrame()
             for nam in names(inst)
-                df2[:nam] = $(f)(inst.vals[:nam], inst2.vals[:nam])
+                df2[nam] = $(f)(inst.vals[nam], inst2.vals[nam])
             end
             return Timedata(df2, idx(inst))
         end
 
-        function $(f)(inst::AbstractTimedata,b::Union(String,Number,NAtype))
+        function $(f)(inst::AbstractTimedata,b::Union(String,Number))
             df2 = DataFrame()
-            for col in eachcol(df)
+            for col in eachcol(inst.vals)
                 df2[col[1]] = $(f)(col[2], b)
             end
             return Timedata(df2, idx(inst))
         end
 
-        function $(f)(b::Union(String,Number,NAtype),inst::AbstractTimedata)
+        function $(f)(b::Union(String,Number),inst::AbstractTimedata)
             df2 = DataFrame()
-            for col in eachcol(df)
+            for col in eachcol(inst.vals)
                 df2[col[1]] = $(f)(col[2], b)
             end
             return Timedata(df2, idx(inst))
@@ -174,25 +198,34 @@ macro nonpres_msSymmetric(f)
     end)
 end
 
+## for timematr objects apply function to Array
+## for comparison, only Numbers need to be considered
 macro nonpres_msSymmetric_timematr(f)
     esc(quote
-        $(f)(inst::Timematr, inst2::Timematr) =
-            Timedata(convert(Array{Bool, 2}, $(f)(core(inst), core(inst2))),
-                     names(inst), idx(inst)) 
+        function $(f)(inst::Timematr, inst2::Timematr)
+            if !issimilar(inst, inst2)
+                error("Timematr objects not similar")
+            end
 
-        $(f)(inst::Timematr, b::Union(String,Number)) =
-            Timedata(convert(Array{Bool, 2}, $(f)(core(inst),b)),
-                     names(inst), idx(inst)) 
+            return Timedata(convert(Array{Bool, 2}, $(f)(core(inst), core(inst2))),
+                            names(inst), idx(inst))
+        end
+
+        function $(f)(inst::Timematr, b::Number)
+            return Timedata(convert(Array{Bool, 2}, $(f)(core(inst),b)),
+                            names(inst), idx(inst))
+        end
         
-        $(f)(b::Union(String,Number),inst::AbstractTimedata) =
-            Timedata(convert(Array{Bool, 2}, $(f)(b,core(inst))),
-                     names(inst), idx(inst))
+        function $(f)(b::Union(String,Number),inst::Timematr)
+            return Timedata(convert(Array{Bool, 2}, $(f)(b,core(inst))),
+                            names(inst), idx(inst))
+        end
     end)
 end
 
-for f in nonpres_msSymmetric_functions
-    eval(macroexpand(:(@nonpres_msSymmetric($f))))
+for f in [:(.==), :(.!=), :(.>), :(.>=), :(.<), :(.<=)]
     eval(macroexpand(:(@nonpres_msSymmetric_timematr($f))))
+    eval(macroexpand(:(@nonpres_msSymmetric_timedata($f))))
 end
 
 #########################################################
@@ -202,67 +235,62 @@ end
 ## f(td::NewType)
 ## f(td::NewType, i::Integer)
 
-const rounding_operators = [:round, :ceil, :floor, :trunc]
-
-pres_msSingle_or_extra_functions = rounding_operators
-
-macro pres_msSingle_or_extra(f, myType)
+macro pres_msSingle_or_extra_timematr(f)
     esc(quote
-        $(f)(inst::$(myType)) =
-            $(myType)($(f)(core(inst)), names(inst), idx(inst))
-        $(f)(inst::$(myType), i::Integer) =
-            $(myType)($(f)(core(inst), i), names(inst), idx(inst))
+        $(f)(inst::Timematr) =
+            Timematr($(f)(core(inst)), names(inst), idx(inst))
+        $(f)(inst::Timematr, i::Integer) =
+            Timematr($(f)(core(inst), i), names(inst), idx(inst))
     end)
 end
 
-for t = (:Timematr)
-    for f in pres_msSingle_or_extra_functions
-        ## @varargs_type f t
-        eval(macroexpand(:(@pres_msSingle_or_extra($f, $t))))
-    end
-end
-
-macro pres_msSingle_or_extra_Timenum(f)
+macro pres_msSingle_or_extra_timenum(f, myType)
     esc(quote
-        function $(f)(inst::Timenum)
-
+        function $(f)(inst::$(myType))
             dfResult = DataFrame()
             for col in names(inst)
                 dfResult[col] = $(f)(inst.vals[col])
             end
-            return Timenum(dfResult, idx(inst))
+            return $(myType)(dfResult, idx(inst))
         end
 
         function $(f)(inst::Timenum, i::Integer)
-
             dfResult = DataFrame()
             for col in names(inst)
                 dfResult[col] = $(f)(inst.vals[col], i)
             end
-            return Timenum(dfResult, idx(inst))
+            return $(myType)(dfResult, idx(inst))
         end
-
     end)
 end
 
-for f in pres_msSingle_or_extra_functions
-    eval(macroexpand(:(@pres_msSingle_or_extra_Timenum($f))))
+t = :Timenum
+for f in [:round, :ceil, :floor, :trunc]
+    eval(macroexpand(:(@pres_msSingle_or_extra_timematr($f))))
+    eval(macroexpand(:(@pres_msSingle_or_extra_timenum($f, $t))))
 end
+
 
 ######################################################
 ## non-preserving comparison operators for timedata ##
 ######################################################
 
-const element_wise_logicals = [:(&), :(|), :($)]
-
 macro time_data_comparison(f)
     esc(quote
-        $(f)(td1::Timedata, td2::Timedata) =
-            Timedata($(f)(array(td1.vals), array(td2.vals)),
-                     names(td1), idx(td2))
+        function $(f)(td1::Timedata, td2::Timedata)
+            if !issimilar(td1, td2)
+                error("Timedata objects not similar")
+            end
+
+            dfResult = DataFrame()
+            for col in names(td1)
+                dfResult[col] = $(f)(td1.vals[col], td2.vals[col])
+            end
+            return Timedata(dfResult, idx(td1))
+        end
     end)
 end
 
-for f in element_wise_logicals
+for f in [:(&), :(|), :($)]
     eval(macroexpand(:(@time_data_comparison($f))))
 end

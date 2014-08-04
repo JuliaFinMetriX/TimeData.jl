@@ -9,8 +9,11 @@ using TimeData
 println("\n Running operator tests\n")
 
 ## init test values
-vals = rand(30, 4)
-dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
+vals = [1 1 1 1;
+        2 2 2 2;
+        3 3 3 3;
+        4 4 4 4]
+dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4]
 nams = [:A, :B, :C, :D]
 valsDf = composeDataFrame(vals, nams)
 
@@ -18,24 +21,46 @@ valsDf = composeDataFrame(vals, nams)
 ## operators ##
 ###############
 
-macro test_basic_operators(t)
+## almost all tests for Timematr should also work for Timenum without
+## missing observations
+
+## separate testing
+## - matrix-mult
+## - comparisons for Timedata objects
+macro test_basic_operators(myType)
     esc(quote
         
-        td = $(t)(vals, nams, dats)
+        td = $(myType)(vals, nams, dats)
         
         ## mathematical operators
-        -td
-        +td
-        @test (td .+ td) == (2.*td)
-        @test td == 3.*(td./3)
+        @test isequal(td .+ td, 2.*td)
+        @test isequal(td, 3.*(td./3))
+        @test isequal(get((3./td).*td, 1, 1), 3)
+
+        ## arithmetics with scalar values
+        @test isequal(td .+ 1,  1 .+ td)
         
-        sign(td)
-        sign(-td)
-        abs(td)
-        exp(td)
-        log(td)
-        
-        td .> 0.5
+        @test isequal((td .- 1.5).*(-1), 1.5 .- td)
+        @test isequal(td .* 3, 3 .* td)
+
+        ## unary operators / mathematical functions
+        pres_msUnitary_functions = [:abs, :sign,
+                                    :exp, :log, :sqrt, :gamma,
+                                    :(+), :(-)
+                                    ]
+        for f in pres_msUnitary_functions
+            eval(:($(f)(td)))
+        end
+
+        ## comparisons
+        td .> td
+        td .< td
+        td .<= td
+        td .>= td
+        td .== td
+        td .!= td
+
+        td .< 0.5
         td .== 0.3
         td .!= 0.3
         
@@ -48,21 +73,11 @@ macro test_basic_operators(t)
         @test_approx_eq convert(Array{Float64, 1}, get(td)[:]) convert(Array{Float64, 1}, get(td2)[:])
         
         ## rounding functions
-        round(td)
-        round(td, 2)
-        ceil(td)
-        ceil(td, 2)
-        floor(td)
-        trunc(td)
-        
-        ## arithmetics with scalar values
-        @test (td .+ 1 == 1 .+ td)
-        
-        ## careful: -0.0 != 0.0
-        @test ((-(td .- 1.5)) == (1.5 .- td))
-        
-        @test (td .* 3 == 3 .* td)
-        
+        roundFunc = [:round, :ceil, :floor, :trunc]
+        for f in roundFunc
+            eval(:($(f)(td)))
+            eval(:($(f)(td, 2)))
+        end
     end)
 end
 
