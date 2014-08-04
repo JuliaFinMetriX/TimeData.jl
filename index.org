@@ -271,8 +271,6 @@ following types are introduced:
 - ~Timenum~: observations may consist of numeric values or missing
                values only
 - ~Timematr~: observations must be numeric values only
-- ~Timecop~: observations must be numeric values between 0 and 1
-               only
 
 Given that these constraints are fulfilled, one is able to define and
 use more specific functions matching the data characteristics more
