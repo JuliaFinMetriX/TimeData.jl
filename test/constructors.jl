@@ -19,7 +19,7 @@ nams = [:A, :B, :C, :D]
 valsDf = convert(DataFrame, vals)
 rename!(valsDf, names(valsDf), nams)
 
-allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
+allTypes = (:Timedata, :Timenum, :Timematr)
 
 ########################
 ## inner constructors ##

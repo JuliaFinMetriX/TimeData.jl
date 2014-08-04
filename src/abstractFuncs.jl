@@ -126,7 +126,7 @@ macro pres_hcat(myType)
     end)
 end
 
-for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+for t = (:Timedata, :Timenum, :Timematr)
     eval(macroexpand(:(@pres_hcat($t))))
 end
 
@@ -144,7 +144,7 @@ macro pres_hcat_varargs(myType)
     end)
 end
 
-for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+for t = (:Timedata, :Timenum, :Timematr)
     eval(macroexpand(:(@pres_hcat_varargs($t))))
 end
 
@@ -182,7 +182,7 @@ macro pres_vcat(myType)
     end)
 end
 
-for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+for t = (:Timedata, :Timenum, :Timematr)
     eval(macroexpand(:(@pres_vcat($t))))
 end
 
@@ -202,7 +202,7 @@ macro pres_vcat_varargs(myType)
     end)
 end
 
-for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+for t = (:Timedata, :Timenum, :Timematr)
     eval(macroexpand(:(@pres_vcat_varargs($t))))
 end
 
@@ -238,7 +238,7 @@ macro pres_flipud(myType)
     end)
 end
 
-for t = (:Timedata, :Timenum, :Timematr, :Timecop)
+for t = (:Timedata, :Timenum, :Timematr)
     eval(macroexpand(:(@pres_flipud($t))))
 end
 

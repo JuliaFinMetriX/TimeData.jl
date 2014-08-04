@@ -59,7 +59,6 @@ setNA!,
 std,
 str,
 sum,
-Timecop,
 Timedata,
 Timematr,
 Timenum,
@@ -69,7 +68,6 @@ writeTimedata
 
 include("constraints.jl")
 include("abstractTypes.jl")
-include("timecop.jl")
 include("timedata_type.jl")
 include("timenum.jl")
 include("timematr.jl")

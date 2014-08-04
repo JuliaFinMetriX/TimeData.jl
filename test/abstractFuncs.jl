@@ -14,7 +14,7 @@ vals[3, 4] = 0.5
 dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
 nams = [:A, :B, :C, :D]
 
-allTypes = (:Timedata, :Timenum, :Timematr, :Timecop)
+allTypes = (:Timedata, :Timenum, :Timematr)
 
 ###########################
 ## names, idx, get, core ##
