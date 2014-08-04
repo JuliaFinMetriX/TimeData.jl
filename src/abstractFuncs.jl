@@ -57,21 +57,36 @@ end
 ## isequal function ##
 ######################
 
+## isequal(NA, NA) -> true
 import Base.isequal
 function isequal(tn::AbstractTimedata, tn2::AbstractTimedata)
+    ## return single true or false
     isequal(typeof(tn), typeof(tn2)) || return false
     isequal(tn.vals, tn2.vals) || return false
     isequal(tn.idx, tn2.idx) || return false
     return true
 end
 
+## NA == NA -> NA
 import Base.==
 function ==(tn::AbstractTimedata, tn2::AbstractTimedata)
-    typeEqu = ==(typeof(tn), typeof(tn2))
-    valsEqu = ==(tn.vals, tn2.vals)
-    idxEqu = ==(tn.idx, tn2.idx)
-    equ = (valsEqu & idxEqu & typeEqu)
-    return equ
+    ## return single true or false
+    isequal(typeof(tn), typeof(tn2)) || return false
+    isequal(tn.idx, tn2.idx) || return false
+    return ==(tn.vals, tn2.vals)
+end
+
+function isequalElemwise(tn::TimeData.AbstractTimedata, tn2::TimeData.AbstractTimedata)
+    ## return matrix with true / false elements
+    if !TimeData.issimilar(tn, tn2)
+        error("Timedata object must be similar for elementwise
+isequal") 
+    end
+    (nObs, nVars) = size(tn)
+    vals = Bool[isequal(tn.vals[ii, jj], tn2.vals[ii, jj]) for
+        ii=1:nObs, 
+        jj=1:nVars] 
+    return Timedata(vals, names(tn), idx(tn))
 end
 
 ##########
@@ -332,4 +347,14 @@ end
 function asTm(arr::Array, td::Timematr)
     resVals = asArrayOfEqualDimensions(arr, td)
     td = Timenum(resVals, names(td), idx(td))
+end
+
+#####################
+## equal structure ##
+#####################
+
+function issimilar(td1::AbstractTimedata, td2::AbstractTimedata)
+    isequal(typeof(td1), typeof(td2)) || return false
+    isequal(names(td1), names(td2)) || return false
+    isequal(td1.idx, td2.idx) || return false
 end

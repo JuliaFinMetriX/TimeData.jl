@@ -127,10 +127,49 @@ end
 df = DataFrame()
 df[:a] = @data([3, NA])
 df[:b] = @data([4, NA])
-td = Timedata(df)
 
-@test isequal(td, td)
-@test isequal((td == td), NA)
+df2 = DataFrame()
+df2[:a] = @data([3, 4])
+df2[:b] = @data([4, NA])
+
+df3 = DataFrame()
+df3[:a] = @data([10, 4])
+df3[:b] = @data([4, NA])
+
+tn = Timenum(df)
+tn2 = Timenum(df2)
+tn3 = Timenum(df3)
+td = Timedata(df)
+tn4 = Timenum(df, [date(2010, 1, 1):date(2010, 1, 2)])
+
+## testing isequal
+@test isequal(tn, tn)
+@test !isequal(tn, tn2)
+@test !isequal(tn, tn3)
+
+## testing == 
+@test isna(tn == tn)
+@test isna(tn == tn2)
+@test !(tn == tn3)
+
+## differences in names, indices or types
+@test !isequal(tn, td)
+@test !(tn == td)
+@test !isequal(tn, tn4)
+@test !(tn == tn4)
+
+## elementwise equal objects
+@test isequalElemwise(tn, tn) == Timedata([true true; true true],
+                                          names(td), idx(td))
+
+## elementwise with unequal entries
+
+## differences in names, indices or types throw errors
+@test_throws ErrorException !isequalElemwise(tn, td)
+@test_throws ErrorException !isequalElemwise(tn, tn4)
+
+@test isequalElemwise(tn, tn2) == Timedata([true true; false true],
+                                           names(td), idx(td))
 
 ##################
 ## flipud tests ##
@@ -217,5 +256,34 @@ df = DataFrame(x1 = [1, 2], x2 = [1, 2])
 df = DataFrame(x1 = [1, 1], x2 = [2, 2])
 @test TimeData.asTd([1 2], td) == TimeData.Timedata(df)
 
+###############
+## issimilar ##
+###############
+
+df = DataFrame()
+df[:a] = @data([4, 5, 6, NA, 8])
+df[:b] = @data([3, 8, NA, NA, 2])
+dats = [date(2014,1,1):date(2014,1,5)]
+tn = TimeData.Timenum(df, dats)
+
+## similar
+@test TimeData.issimilar(tn, tn)
+
+## different indices
+tn2 = TimeData.Timenum(df)
+@test !TimeData.issimilar(tn, tn2)
+
+## different names
+df = DataFrame()
+df[:a] = @data([4, 5, 6, NA, 8])
+df[:b] = @data([3, 8, NA, NA, 2])
+dats = [date(2014,1,1):date(2014,1,5)]
+tn2 = TimeData.Timenum(df, dats)
+names!(tn2.vals, [:c, :d])
+@test !TimeData.issimilar(tn, tn2)
+
+## different types
+tm = TimeData.Timedata(df, dats)
+@test !TimeData.issimilar(tn, tm)
 
 end
