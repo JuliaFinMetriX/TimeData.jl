@@ -5,6 +5,7 @@ using DataFrames
 using DataArrays
 
 tests = ["abstractFuncs.jl",
+         "preservingFuncs.jl",
          "constraints.jl",
          "constructors.jl",
          "convert.jl",
