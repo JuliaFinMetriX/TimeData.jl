@@ -24,12 +24,7 @@ names must match"
     end
     
     df = convert(DataFrame, vals)
-    try
-        rename!(df, names(df), nams)
-    catch
-        # renaming didn't work - leave as is
-    end
-
+    names!(df, nams)
     return df
 end
 
