@@ -37,14 +37,32 @@ end
 ## round dataframe values ##
 ############################
 
+function tryRound(x)
+    try 
+        round(x, 2)
+    catch
+        x
+    end
+end
+
+function tryRound(x, nDgts::Int)
+    try 
+        round(x, nDgts)
+    catch
+        x
+    end
+end
+
 import Base.round
 function round(df::DataFrame, nDgts::Int)
-    vals = round(array(df), nDgts)
+    vals = Any[tryRound(df[ii, jj], nDgts) for ii=1:size(df, 1),
+        jj=1:size(df, 2)] 
     return composeDataFrame(vals, names(df))
 end
 
 function round(df::DataFrame)
-    vals = round(array(df), 2)
+    vals = Any[tryRound(df[ii, jj]) for ii=1:size(df, 1),
+        jj=1:size(df, 2)] 
     return composeDataFrame(vals, names(df))
 end
 
@@ -52,16 +70,7 @@ end
 macro roundDf(expr::Expr)
     quote 
         res = $(esc(expr))
-    
-        function tryRound(x)
-            try 
-                round(x, 2)
-            catch
-                x
-            end
-        end
-
-        resRnd = [tryRound(res[ii, jj]) for ii=1:size(res, 1), jj=1:size(res, 2)] |>
+        resRnd = Any[tryRound(res[ii, jj]) for ii=1:size(res, 1), jj=1:size(res, 2)] |>
                  x -> composeDataFrame(x, names(res))
     
         display(resRnd)
@@ -73,26 +82,26 @@ end
 ## basic mathematical operators ##
 ##################################
 
-importall Base
-for op = (:.+, :.-, :.*, :./, :.^)
-  eval(quote
-      function $op(df1::DataFrame, df2::DataFrame)
-          try
-              (array(df1), array(df2))
-              catch
-              error("mathematical operators only work on DataFrames
-with numeric values only")
-          end
+## importall Base
+## for op = (:.+, :.-, :.*, :./, :.^)
+##   eval(quote
+##       function $op(df1::DataFrame, df2::DataFrame)
+##           try
+##               (array(df1), array(df2))
+##               catch
+##               error("mathematical operators only work on DataFrames
+## with numeric values only")
+##           end
               
-          res = $op(array(df1), array(df2))
-          ## if size(res, 1) == 1
-              ## df = composeDataFrame(res', names(df1))
-          ## else
-          df = composeDataFrame(res, names(df1))
-          ## end
-      end
-  end)
-end
+##           res = $op(array(df1), array(df2))
+##           ## if size(res, 1) == 1
+##               ## df = composeDataFrame(res', names(df1))
+##           ## else
+##           df = composeDataFrame(res, names(df1))
+##           ## end
+##       end
+##   end)
+## end
 
 ##############
 ## setDfRow ##
@@ -105,7 +114,7 @@ function setDfRow!(df::DataFrame, arr::Array, rowInd::Int)
     end
 
     for ii=1:nElem
-        df[1, ii] = arr[ii]
+        df[rowInd, ii] = arr[ii]
     end
     return df
 end

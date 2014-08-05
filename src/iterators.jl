@@ -28,14 +28,14 @@ function map(f::Function, tdci::TdColumnIterator)
     end
     
     td = Timedata(res, idx(tdci.td))
-    if isa(tdci.td, AbstractTimenum)
+    if isa(tdci.td, AbstractTimematr)
         try
-            td = convert(Timenum, td)
+            td = convert(Timematr, td)
         catch
         end
     elseif isa(tdci.td, AbstractTimenum)
         try
-            td = convert(Timematr, td)
+            td = convert(Timenum, td)
         catch
         end
     end
