@@ -34,8 +34,8 @@
 macro pres_symmetric_timenum(f, myType)
     esc(quote
         function $(f)(inst::$(myType), inst2::$(myType))
-            if !issimilar(inst, inst2)
-                error("TimeData objects not similar")
+            if !hasSimilarColumns(inst, inst2)
+                error("Timematr variables not similar")
             end
             
             dfResult = DataFrame()
@@ -71,8 +71,8 @@ macro pres_symmetric_timematr(f)
     esc(quote
         ## tm1 .+ tm2
         function $(f)(inst::Timematr, inst2::Timematr)
-            if !issimilar(inst, inst2)
-                error("Timematr object not similar")
+            if !hasSimilarColumns(inst, inst2)
+                error("Timematr variables not similar")
             end
             return Timematr($(f)(core(inst), core(inst2)),
                             names(inst), idx(inst))

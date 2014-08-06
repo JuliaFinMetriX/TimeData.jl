@@ -117,8 +117,9 @@ end
 
 function convert(::Type{AbstractTimedata}, ta::TimeArray)
 
-    ## namesAsSymbols = Symbol[convert(Symbol, ii) for ii in ta.colnames]
-    df = composeDataFrame(ta.values, ta.colnames)
+    namesAsSymbols = [DataFrames.identifier(nam) for nam in ta.colnames]
+    
+    df = composeDataFrame(ta.values, namesAsSymbols)
     idx = ta.timestamp
 
     try

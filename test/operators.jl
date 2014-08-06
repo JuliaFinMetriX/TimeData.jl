@@ -15,7 +15,7 @@ vals = [1 1 1 1;
         4 4 4 4]
 dats = Date[Date(2013, 7, ii) for ii=1:4]
 nams = [:A, :B, :C, :D]
-valsDf = composeDataFrame(vals, nams)
+valsDf = TimeData.composeDataFrame(vals, nams)
 
 ###############
 ## operators ##
@@ -33,6 +33,8 @@ macro test_basic_operators(myType)
         td = $(myType)(vals, nams, dats)
         
         ## mathematical operators
+        td[2:end, :] .- td[1:(end-1), :]
+        
         @test isequal(td .+ td, 2.*td)
         @test isequal(td, 3.*(td./3))
         @test isequal(get((3./td).*td, 1, 1), 3)

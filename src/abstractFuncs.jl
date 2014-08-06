@@ -129,3 +129,10 @@ function issimilar(td1::AbstractTimedata, td2::AbstractTimedata)
     isequal(names(td1), names(td2)) || return false
     isequal(td1.idx, td2.idx) || return false
 end
+
+function hasSimilarColumns(td1::AbstractTimedata, td2::AbstractTimedata)
+    isequal(super(typeof(td1)), super(typeof(td2))) || return false
+    isequal(names(td1), names(td2)) || return false
+end
+    
+    

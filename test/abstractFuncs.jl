@@ -135,10 +135,12 @@ tn = TimeData.Timenum(df, dats)
 
 ## similar
 @test TimeData.issimilar(tn, tn)
+@test TimeData.hasSimilarColumns(tn, tn)
 
 ## different indices
 tn2 = TimeData.Timenum(df)
 @test !TimeData.issimilar(tn, tn2)
+@test TimeData.hasSimilarColumns(tn, tn2)
 
 ## different names
 df = DataFrame()
@@ -148,9 +150,11 @@ dats = [Date(2014,1,1):Date(2014,1,5)]
 tn2 = TimeData.Timenum(df, dats)
 names!(tn2.vals, [:c, :d])
 @test !TimeData.issimilar(tn, tn2)
+@test !TimeData.hasSimilarColumns(tn, tn2)
 
 ## different types
 tm = TimeData.Timedata(df, dats)
 @test !TimeData.issimilar(tn, tm)
+@test !TimeData.hasSimilarColumns(tn, tm)
 
 end
