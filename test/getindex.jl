@@ -3,7 +3,7 @@ module TestGetIndex
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 
 println("\n Running getindex tests:")
@@ -22,7 +22,7 @@ df2 = DataFrame(a = rand(8), b = rand(8))
 
 ## init test values
 vals = rand(30, 4)
-dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
+dats = Date[Date(2013, 7, ii) for ii=1:30]
 nams = [:A, :B, :C, :D]
 
 for t = (:Timedata, :Timenum, :Timematr)
@@ -79,26 +79,26 @@ for t = (:Timedata, :Timenum, :Timematr)
         ## tmp = tn[ex, :]
         ## @test isa(tmp, $(t))
         
-        ## indexing single row by date
-        tmp = tn[date(2013, 07, 04)]
+        ## indexing single row by Date
+        tmp = tn[Date(2013, 07, 04)]
         @test isa(tmp, $(t))
         
         ## indexing rows by idx
-        idxToFind = Date{ISOCalendar}[date(2013, 07, ii) for ii=12:18]
+        idxToFind = Date[Date(2013, 07, ii) for ii=12:18]
         tmp = tn[idxToFind]
         @test isa(tmp, $(t))
         
         ## indexing rows by idx, columns
         @test isa(tn[idxToFind, 2:3], $(t))
         @test isa(tn[idxToFind, :A], $(t))
-        @test isa(tn[date(2013,01,03):date(2013,07,12)], $(t))
-        @test isa(tn[date(2013,01,03):date(2013,07,12), :D], $(t))
-        @test isa(tn[date(2013,01,03):date(2013,07,12), 2:3], $(t))
-        @test isa(tn[date(2013,01,03):date(2013,07,12),
+        @test isa(tn[Date(2013,01,03):Date(2013,07,12)], $(t))
+        @test isa(tn[Date(2013,01,03):Date(2013,07,12), :D], $(t))
+        @test isa(tn[Date(2013,01,03):Date(2013,07,12), 2:3], $(t))
+        @test isa(tn[Date(2013,01,03):Date(2013,07,12),
                      [true, false, false, true]], $(t))
         
         ## test empty instance
-        @test isa(tn[date(2013,01,03):date(2013,07,12),
+        @test isa(tn[Date(2013,01,03):Date(2013,07,12),
                      [false, false, false, false]], $(t))
     end)
 end

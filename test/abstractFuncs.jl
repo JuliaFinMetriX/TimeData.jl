@@ -3,7 +3,7 @@ module TestAbstractFuncs
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 
 println("\n Running abstract function tests\n")
@@ -11,7 +11,7 @@ println("\n Running abstract function tests\n")
 ## create instance
 vals = rand(30, 4)
 vals[3, 4] = 0.5
-dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
+dats = Date[Date(2013, 7, ii) for ii=1:30]
 nams = [:A, :B, :C, :D]
 
 allTypes = (:Timedata, :Timenum, :Timematr)
@@ -45,7 +45,7 @@ end
 df = DataFrame()
 df[:a] = @data([4, 5, 6, NA, 8])
 df[:b] = @data([3, 8, NA, NA, 2])
-dats = [date(2014,1,1):date(2014,1,5)]
+dats = [Date(2014,1,1):Date(2014,1,5)]
 tn = Timenum(df, dats)
 
 ## test outcome
@@ -75,7 +75,7 @@ tn = Timenum(df)
 tn2 = Timenum(df2)
 tn3 = Timenum(df3)
 td = Timedata(df)
-tn4 = Timenum(df, [date(2010, 1, 1):date(2010, 1, 2)])
+tn4 = Timenum(df, [Date(2010, 1, 1):Date(2010, 1, 2)])
 
 ## testing isequal
 @test isequal(tn, tn)
@@ -130,7 +130,7 @@ tm = Timematr(rand(2, 3))
 df = DataFrame()
 df[:a] = @data([4, 5, 6, NA, 8])
 df[:b] = @data([3, 8, NA, NA, 2])
-dats = [date(2014,1,1):date(2014,1,5)]
+dats = [Date(2014,1,1):Date(2014,1,5)]
 tn = TimeData.Timenum(df, dats)
 
 ## similar
@@ -144,7 +144,7 @@ tn2 = TimeData.Timenum(df)
 df = DataFrame()
 df[:a] = @data([4, 5, 6, NA, 8])
 df[:b] = @data([3, 8, NA, NA, 2])
-dats = [date(2014,1,1):date(2014,1,5)]
+dats = [Date(2014,1,1):Date(2014,1,5)]
 tn2 = TimeData.Timenum(df, dats)
 names!(tn2.vals, [:c, :d])
 @test !TimeData.issimilar(tn, tn2)

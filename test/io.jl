@@ -3,7 +3,7 @@ module TestIoFuncs
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 
 println("\n Running IO function tests\n")

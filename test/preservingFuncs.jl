@@ -3,7 +3,7 @@ module TestPreservingFuncs
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 
 println("\n Running type preserving function tests\n")
@@ -18,7 +18,7 @@ allTypes = (:Timedata, :Timenum, :Timematr)
 df = DataFrame()
 df[:a] = @data([4, 5, 6, NA, 8])
 df[:b] = @data([3, 8, NA, NA, 2])
-dats = [date(2014,1,1):date(2014,1,5)]
+dats = [Date(2014,1,1):Date(2014,1,5)]
 tn = Timenum(df, dats)
 
 setNA!(tn, 1, 2)
@@ -56,7 +56,7 @@ for t in allTypes
         ## unequal indices
         td = $(t)(rand(10,2), [:a, :b])
         td2 = $(t)(rand(10,2), [:a, :b],
-                   [date(2010,1,1):date(2010,1,10)]) 
+                   [Date(2010,1,1):Date(2010,1,10)]) 
         @test_throws ErrorException vcat(td, td2)
         
         ## vcat
@@ -64,8 +64,8 @@ for t in allTypes
         df[:a] = @data([0.4, 0.3])
         df[:b] = @data([0.3, 0.8])
         
-        dats1 = [date(2014,1,1):date(2014,1,2)]
-        dats2 = [date(2014,1,3):date(2014,1,4)]
+        dats1 = [Date(2014,1,1):Date(2014,1,2)]
+        dats2 = [Date(2014,1,3):Date(2014,1,4)]
         td = $(t)(df, dats1)
         td2 = $(t)(df, dats2)
         td3 = $(t)(vcat(df, df), [dats1, dats2])

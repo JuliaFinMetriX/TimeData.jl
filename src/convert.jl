@@ -77,7 +77,7 @@ function convert(::Type{AbstractTimedata}, df::DataFrame)
     end
 
     # parse first column that passes the Datetime regex test
-    idx = Date{ISOCalendar}[date(d) for d in df[col_that_pass[1]]] # without
+    idx = Date[Date(d) for d in df[col_that_pass[1]]] # without
                                         # Date it would fail chkIdx
                                         # in constructor
     

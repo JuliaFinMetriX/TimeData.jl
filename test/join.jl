@@ -3,7 +3,7 @@ module TestJoin
 using Base.Test
 using TimeData
 using DataArrays
-using Datetime
+using Dates
 using DataFrames
 
 println("\n Running join tests\n")
@@ -22,8 +22,8 @@ ids = TimeData.getIndices(equalIds, idx1, idx2)
 @test ids == sort(unique([idx1, idx2]))
 
 ## with date indices
-dats1 = [date(2000,1, ii) for ii=idx1]
-dats2 = [date(2000,1, ii) for ii=idx2]
+dats1 = [Date(2000,1, ii) for ii=idx1]
+dats2 = [Date(2000,1, ii) for ii=idx2]
 equalIds = TimeData.findAllOccurringDates(idx1, idx2)
 ids = TimeData.getIndices(equalIds, dats1, dats2)
 @test ids == sort(unique([dats1, dats2]))

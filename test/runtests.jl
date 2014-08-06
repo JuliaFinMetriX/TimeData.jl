@@ -1,6 +1,6 @@
 module runtests
 
-using Datetime
+using Dates
 using DataFrames
 using DataArrays
 

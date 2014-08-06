@@ -3,7 +3,7 @@ module TestConversions
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 ## using TimeData
 
@@ -12,7 +12,7 @@ println("\n Running conversion tests\n")
 df = DataFrame()
 df[:a] = @data([4, NA])
 df[:b] = @data([3, 8])
-dats1 = [date(2014,1,1):date(2014,1,2)]
+dats1 = [Date(2014,1,1):Date(2014,1,2)]
 tn = TimeData.Timenum(df, dats1)
 
 ## convert Timenum
@@ -37,7 +37,7 @@ tm = TimeData.Timedata(vals, dats1)
 df = DataFrame()
 df[:a] = @data([4, NA])
 df[:b] = @data([3, 8])
-dats1 = [date(2014,1,1):date(2014,1,2)]
+dats1 = [Date(2014,1,1):Date(2014,1,2)]
 tn = TimeData.Timedata(df, dats1)
 
 TimeData.convert(TimeData.Timenum, tn)
@@ -47,7 +47,7 @@ TimeData.convert(TimeData.Timenum, tn)
 df = DataFrame()
 df[:a] = @data(["hello", NA])
 df[:b] = @data([3, 8])
-dats1 = [date(2014,1,1):date(2014,1,2)]
+dats1 = [Date(2014,1,1):Date(2014,1,2)]
 tn = TimeData.Timedata(df, dats1)
 
 @test_throws ArgumentError TimeData.convert(TimeData.Timenum, tn)

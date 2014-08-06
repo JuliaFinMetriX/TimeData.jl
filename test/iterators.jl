@@ -3,7 +3,7 @@ module TestIterators
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 ## using TimeData
 
@@ -12,7 +12,7 @@ println("\n Running iterator tests\n")
 df = DataFrame()
 df[:a] = @data([4, 5])
 df[:b] = @data([3, 8])
-dats = [date(2014,1,1):date(2014,1,2)]
+dats = [Date(2014,1,1):Date(2014,1,2)]
 
 tn = TimeData.Timenum(df, dats)
 tm = TimeData.Timematr(df, dats)
@@ -37,7 +37,7 @@ td = TimeData.Timedata(df, dats)
 df2 = DataFrame()
 df2[:a] = @data([8, 10])
 df2[:b] = @data([6, 16])
-dats = [date(2014,1,1):date(2014,1,2)]
+dats = [Date(2014,1,1):Date(2014,1,2)]
 
 tn2 = TimeData.Timenum(df2, dats)
 tm2 = TimeData.Timematr(df2, dats)

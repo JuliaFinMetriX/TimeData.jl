@@ -3,7 +3,7 @@ module TestConstraints
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 ## using TimeData
 
@@ -13,12 +13,12 @@ println("\n Running constraints tests\n")
 ## chkIdx ##
 ############
 
-## test dates
-validIdx = Date{ISOCalendar}[date(2010,02,ii) for ii=1:10]
+## test Dates
+validIdx = Date[Date(2010,02,ii) for ii=1:10]
 TimeData.chkIdx(validIdx)
 
 ## test times
-validIdx = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
+validIdx = DateTime[DateTime(2010,02,ii,00,00,00)
                                  for ii=1:10]
 TimeData.chkIdx(validIdx)
 
@@ -30,9 +30,6 @@ TimeData.chkIdx(validIdx)
 invalidIdx = [1. 2 3]
 @test_throws TypeError TimeData.chkIdx(invalidIdx)
 
-## array of element type Any
-invalidIdx = [datetime(2010,02,ii,00,00,00) for ii=1:10]
-@test_throws TypeError TimeData.chkIdx(invalidIdx)
 
 ## idx must be array!
 invalidIdx = today()

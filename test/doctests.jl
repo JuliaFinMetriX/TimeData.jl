@@ -8,12 +8,12 @@ using DataFrames
 println("\n Running documentation tests\n")
 
 using TimeData
-using Datetime
+using Dates
 
 fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
 tm = TimeData.readTimedata(fileName)[1:10, 1:4]
 
-tm[date(2012, 1, 4):date(2012, 1, 10), 1:2]
+tm[Date(2012, 1, 4):Date(2012, 1, 10), 1:2]
 
 tm[3:8, 2:3]
 
@@ -26,7 +26,7 @@ mean(tm, 1)
 TimeData.rowmeans(tm)
 
 vals = rand(4, 3);
-dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4];
+dats = Date[Date(2013, 7, ii) for ii=1:4];
 nams = [:A, :B, :C];
 valsDf = composeDataFrame(vals, nams);
 
@@ -65,12 +65,12 @@ tmp = tm[logicCol]
 tmp = tm[logicRow, logicCol]
 tmp = tm[logicRow, :]
 
-## indexing with dates
-datesToFind = Date{ISOCalendar}[date(2013, 7, ii) for ii=2:3]
-tmp = tm[datesToFind]
-tm[date(2013,7,1):date(2013,7,3)]
-tm[date(2013,7,2):date(2013,7,3), :B]
-tm[date(2013,7,3):date(2013,7,12), [true, false, false]]
+## indexing with Dates
+DatesToFind = Date[Date(2013, 7, ii) for ii=2:3]
+tmp = tm[DatesToFind]
+tm[Date(2013,7,1):Date(2013,7,3)]
+tm[Date(2013,7,2):Date(2013,7,3), :B]
+tm[Date(2013,7,3):Date(2013,7,12), [true, false, false]]
 
 filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
 tm = readTimedata(filePath)

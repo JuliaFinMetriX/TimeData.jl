@@ -12,7 +12,7 @@ script:
   - julia -e 'versioninfo()'
   - julia -e 'Pkg.add("DataArrays")'
   - julia -e 'Pkg.add("DataFrames")'
-  - julia -e 'Pkg.add("Datetime")'
+  - julia -e 'Pkg.add("Dates")'
   - julia -e 'Pkg.update()'
   - julia -e 'Pkg.init(); Pkg.add("TimeData"); Pkg.checkout("TimeData")'
   - julia -e 'using TimeData; @assert isdefined(:TimeData); @assert typeof(TimeData) === Module'

@@ -3,15 +3,15 @@ module TestConstructors
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 
 println("\n Running constructor tests\n")
 
 ## init test values
 vals = rand(30, 4)
-dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:30]
-tims = DateTime{ISOCalendar,UTC}[datetime(2010,02,ii,00,00,00)
+dats = Date[Date(2013, 7, ii) for ii=1:30]
+tims = DateTime[DateTime(2010,02,ii,00,00,00)
                                  for ii=1:30]
 idxs = [1:30]
 ## nams = ["A", "B", "C", "D"]
@@ -88,7 +88,7 @@ for t in allTypes
 end
 
 ## idx and vals sizes not matching
-idxVals = [date(2013, 7, ii) for ii=1:30]
+idxVals = [Date(2013, 7, ii) for ii=1:30]
 valsArr = rand(20, 4)
 for t in allTypes
     eval(quote

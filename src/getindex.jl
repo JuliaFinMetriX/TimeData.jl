@@ -140,21 +140,21 @@ for t = (:Timedata, :Timenum, :Timematr)
             return td[row_ind, :]
         end
         
-        function getindex(td::$(t), idxs::Array{Date{ISOCalendar},1})
+        function getindex(td::$(t), idxs::Array{Date,1})
             row_inds = findin(TimeData.idx(td), idxs)
             return td[row_inds, :]
         end
         
-        function getindex(td::$(t), idxs::Array{Date{ISOCalendar},1}, x::Any)
+        function getindex(td::$(t), idxs::Array{Date,1}, x::Any)
             row_inds = findin(TimeData.idx(td), idxs)
             return td[row_inds, x]
         end
         
-        function getindex(td::$(t), idx::DateRange{ISOCalendar})
+        function getindex(td::$(t), idx::StepRange{Date,Day})
             return getindex(td, [idx])
         end
         
-        function getindex(td::$(t), idx::DateRange{ISOCalendar},
+        function getindex(td::$(t), idx::StepRange{Date,Day},
                                    x::Any)
             return getindex(td, [idx], x)
         end

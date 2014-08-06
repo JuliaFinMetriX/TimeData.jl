@@ -3,7 +3,7 @@ module TestDfExtensions
 using Base.Test
 using DataArrays
 using DataFrames
-using Datetime
+using Dates
 using TimeData
 ## using TimeData
 
@@ -28,7 +28,7 @@ df2 = TimeData.composeDataFrame(vals, [:a, :b])
 df = DataFrame()
 df[:a] = @data([4, 5])
 df[:b] = @data([3, 8])
-dats = [date(2014,1,1):date(2014,1,2)]
+dats = [Date(2014,1,1):Date(2014,1,2)]
 tn = TimeData.Timenum(df, dats)
 
 df2 = DataFrame()
