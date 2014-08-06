@@ -13,6 +13,7 @@ tests = ["abstractFuncs.jl",
          "doctests.jl",
          "getindex.jl",
          "iterators.jl",
+         "io.jl",
          "timematr.jl",
          "timenum.jl",
          "operators.jl"]
