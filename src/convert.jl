@@ -109,3 +109,29 @@ function convert(::Type{AbstractTimedata}, df::DataFrame)
     
     return td
 end
+
+
+################
+## TimeArrays ##
+################
+
+function convert(::Type{AbstractTimedata}, ta::TimeArray)
+
+    ## namesAsSymbols = Symbol[convert(Symbol, ii) for ii in ta.colnames]
+    df = composeDataFrame(ta.values, ta.colnames)
+    idx = ta.timestamp
+
+    try
+        td = Timematr(df, idx)
+        return td        
+    catch
+        try
+            td = Timenum(df, idx)
+            return td
+        catch
+            td = Timedata(df, idx)
+            return td
+        end
+    end
+    td
+end

@@ -8,6 +8,7 @@ module TimeData
 using DataArrays
 using DataFrames
 using Dates
+using TimeSeries
 ## using Winston
 ## using Gadfly
 
