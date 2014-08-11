@@ -10,23 +10,6 @@ println("\n Running type preserving function tests\n")
 
 allTypes = (:Timedata, :Timenum, :Timematr)
 
-############
-## setNA! ##
-############
-
-## set up Timenum with NAs
-df = DataFrame()
-df[:a] = @data([4, 5, 6, NA, 8])
-df[:b] = @data([3, 8, NA, NA, 2])
-dats = [Date(2014,1,1):Date(2014,1,5)]
-tn = Timenum(df, dats)
-
-setNA!(tn, 1, 2)
-get(tn, 1, 2) == NA
-
-tm = Timematr(rand(2, 2))
-@test_throws ErrorException setNA!(tm, 1, 2)
-
 ################
 ## hcat tests ##
 ################

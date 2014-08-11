@@ -1,25 +1,6 @@
 ## functions that work for all types but return output depending on
 ## the input type: Timematr for Timematr, Timenum for Timenum, ...
 
-###########
-## setNA ##
-###########
-
-function setNA!(td::AbstractTimedata, rowIdx::Int, colIdx::Int)
-    ## set entry to NA - could require changing eltype of column to
-    ## DataArray 
-    if !isa(td.vals.columns[colIdx], DataArray)
-        td.vals.columns[colIdx] = DataArray(td.vals.columns[colIdx])
-    end        
-    td.vals[rowIdx, colIdx] = NA
-    return td
-end
-
-function setNA!(td::AbstractTimematr, rowIdx::Int, colIdx::Int)
-    ## set entry to NA not allowed for Timematr
-    error("Setting entries to NA is not allowed for AbstractTimematr types")
-end
-
 ##########
 ## hcat ##
 ##########
