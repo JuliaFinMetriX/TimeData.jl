@@ -44,6 +44,8 @@ end
 
 ## map function for column iterator always returns Timedata object of
 ## same size! Indices remain unchanged!
+
+## map for two collections:
 function map(f::Function, tdci::TdColumnIterator, x)
     # note: `f` must return a consistent length
     nIter1 = length(tdci)
