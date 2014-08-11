@@ -99,9 +99,11 @@ end
 import DataFrames.isna
 function isna(td::AbstractTimedata)
     ## elementwise test for NA
-    naArr = [isna(get(td, ii, jj)) for ii=1:size(td, 1),
-             jj=1:size(td, 2)] 
-    return Timedata(naArr, names(td), idx(td))
+    df = DataFrame()
+    for (nam, col) in eachcol(td.vals)
+        df[nam] = [isna(col)...]
+    end
+    return Timedata(df, idx(td))
 end
 
 
