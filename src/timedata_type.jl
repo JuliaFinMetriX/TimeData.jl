@@ -24,6 +24,70 @@ end
 #######################
 
 import Base.find
-function find(td::Timedata)
-    return find(array(td.vals))
+function find(td::TimeData.Timedata)
+    ## apply find to column DataArrays
+    allRowInds = Int[]
+    allColInds = Int[]
+    for (name, col) in eachcol(td.vals)
+        rowInds = find(col)
+        colInd = td.vals.colindex[name]
+        colInds = repmat([colInd], length(rowInds))
+        append!(allRowInds, [rowInds])
+        append!(allColInds, [colInds])
+    end
+    return sub2ind(size(td), allRowInds, allColInds)
+end
+
+function find2sub(td::TimeData.Timedata)
+    ## apply find to column DataArrays and return tuple of subscripts 
+    allRowInds = Int[]
+    allColInds = Int[]
+    for (name, col) in eachcol(td.vals)
+        rowInds = find(col)
+        colInd = td.vals.colindex[name]
+        colInds = repmat([colInd], length(rowInds))
+        append!(allRowInds, [rowInds])
+        append!(allColInds, [colInds])
+    end
+    return (allRowInds, allColInds)
+end
+
+function find(f::Function, td::TimeData.AbstractTimedata)
+    ## apply function elementwise to td
+    ## apply find to column DataArrays
+
+    (nObs, nVars) = size(td)
+
+    allRowInds = Int[]
+    allColInds = Int[]
+    
+    for ii=1:nObs
+        for jj=1:nVars
+            if isequal(f(get(td, ii, jj)), true)
+                push!(allRowInds, ii)
+                push!(allColInds, jj)
+            end
+        end
+    end
+    return sub2ind(size(td), allRowInds, allColInds)
+end
+
+function find2sub(f::Function, td::TimeData.AbstractTimedata)
+    ## apply function elementwise to td
+    ## apply find to column DataArrays
+
+    (nObs, nVars) = size(td)
+
+    allRowInds = Int[]
+    allColInds = Int[]
+    
+    for ii=1:nObs
+        for jj=1:nVars
+            if isequal(f(get(td, ii, jj)), true)
+                push!(allRowInds, ii)
+                push!(allColInds, jj)
+            end
+        end
+    end
+    return (allRowInds, allColInds)
 end
