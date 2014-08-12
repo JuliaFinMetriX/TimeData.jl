@@ -18,6 +18,7 @@ tests = ["abstractFuncs.jl",
          "io.jl",
          "timematr.jl",
          "timenum.jl",
+         "timedata.jl",
          "operators.jl"]
 
 

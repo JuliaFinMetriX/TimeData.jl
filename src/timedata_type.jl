@@ -26,15 +26,7 @@ end
 import Base.find
 function find(td::TimeData.Timedata)
     ## apply find to column DataArrays
-    allRowInds = Int[]
-    allColInds = Int[]
-    for (name, col) in eachcol(td.vals)
-        rowInds = find(col)
-        colInd = td.vals.colindex[name]
-        colInds = repmat([colInd], length(rowInds))
-        append!(allRowInds, [rowInds])
-        append!(allColInds, [colInds])
-    end
+    (allRowInds, allColInds) = find2sub(td)
     return sub2ind(size(td), allRowInds, allColInds)
 end
 
@@ -56,19 +48,7 @@ function find(f::Function, td::TimeData.AbstractTimedata)
     ## apply function elementwise to td
     ## apply find to column DataArrays
 
-    (nObs, nVars) = size(td)
-
-    allRowInds = Int[]
-    allColInds = Int[]
-    
-    for ii=1:nObs
-        for jj=1:nVars
-            if isequal(f(get(td, ii, jj)), true)
-                push!(allRowInds, ii)
-                push!(allColInds, jj)
-            end
-        end
-    end
+    (allRowInds, allColInds) = find2sub(f, td)
     return sub2ind(size(td), allRowInds, allColInds)
 end
 
@@ -83,7 +63,11 @@ function find2sub(f::Function, td::TimeData.AbstractTimedata)
     
     for ii=1:nObs
         for jj=1:nVars
-            if isequal(f(get(td, ii, jj)), true)
+            fval = f(get(td, ii, jj))
+            if !isa(fval, Bool) & !isna(fval)
+                error("function must return boolean value or NA")
+            end
+            if isequal(fval, true)
                 push!(allRowInds, ii)
                 push!(allColInds, jj)
             end
