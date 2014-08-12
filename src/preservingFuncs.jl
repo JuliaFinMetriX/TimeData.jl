@@ -212,6 +212,6 @@ end
 
 function asTm(arr::Array, td::Timematr)
     resVals = asArrayOfEqualDimensions(arr, td)
-    td = Timenum(resVals, names(td), idx(td))
+    td = Timematr(resVals, names(td), idx(td))
 end
 
