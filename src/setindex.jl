@@ -49,6 +49,36 @@ end
 ## impute! ##
 #############
 
-## - impute with fixed value: 0
-## - impute with last observation
-## - impute with next observation
+function impute!(td::TimeData.AbstractTimedata, with="last")
+    ## impute NAs with last or next observation or zero
+
+    (rowInds, colInds) = TimeData.find2sub(isna(td))
+    ## indices are returned chronologically!
+    
+    nNAs = length(rowInds)
+    
+    if with == "last"
+        for ii=1:nNAs
+            if rowInds[ii] > 1
+                td[rowInds[ii], colInds[ii]] =
+                    get(td, (rowInds[ii]-1), colInds[ii])
+            end
+        end
+
+    elseif with == "next"
+        for ii=nNAs:-1:1                   # chronologic iterating
+            if rowInds[ii] < size(td, 1)
+                td[rowInds[ii], colInds[ii]] =
+                    get(td, (rowInds[ii]+1), colInds[ii])
+            end
+        end
+
+    elseif with == "zero"
+        for ii=1:nNAs
+            td[rowInds[ii], colInds[ii]] = 0
+        end
+    end
+
+    return td
+end
+

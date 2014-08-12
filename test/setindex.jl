@@ -96,4 +96,61 @@ expTd = TimeData.Timedata(df, dats)
 @test_throws MethodError td[3, 2] = true
 
 
+##################
+## test impute! ##
+##################
+
+## imputing with zeros: 1.
+##------------------------
+
+td = TimeData.testcase(TimeData.Timenum, 2)
+impute!(td, "zero")
+
+## manually get expected value
+dats = td.idx
+df = DataFrame(prices1 = [0, 120, 140, 170, 200],
+               prices2 = [110, 120, 0, 130, 0])
+expTd = TimeData.Timenum(df, dats)
+
+## test
+@test isequal(expTd, td)
+
+## imputing with zeros: 2.
+##------------------------
+
+## zero in string column
+td = TimeData.testcase(TimeData.Timedata, 3)
+@test_throws MethodError impute!(td, "zero")
+
+## imputing last: 1.
+##------------------
+
+td = TimeData.testcase(TimeData.Timenum, 2)
+impute!(td, "last")
+
+## manually get expected value
+dats = td.idx
+df = DataFrame(prices1 = @data([NA, 120, 140, 170, 200]),
+               prices2 = [110, 120, 120, 130, 130])
+expTd = TimeData.Timenum(df, dats)
+
+## test
+@test isequal(expTd, td)
+
+
+## imputing with next: 1.
+##-----------------------
+
+td = TimeData.testcase(TimeData.Timenum, 2)
+impute!(td, "next")
+
+## manually get expected value
+dats = td.idx
+df = DataFrame(prices1 = [120, 120, 140, 170, 200],
+               prices2 = @data([110, 120, 130, 130, NA]))
+expTd = TimeData.Timenum(df, dats)
+
+## test
+@test isequal(expTd, td)
+
 end

@@ -39,6 +39,7 @@ getDates,
 hcat,
 HTML,
 idx,
+impute!,
 isaRowVector,
 isequalElemwise,
 issimilar,
@@ -65,6 +66,7 @@ showEntries,
 std,
 str,
 sum,
+testCase,
 Timedata,
 Timematr,
 Timenum,
@@ -92,5 +94,6 @@ include("join.jl")
 include("dataframe_extensions.jl")
 include("iterators.jl")
 include("convert.jl")
+include("utils.jl")
 
 end
