@@ -16,6 +16,8 @@ An implementation of time series data in Julia.
 
 *Documentation*: [[http://juliafinmetrix.github.io/TimeData.jl][here]].
 
+*JuliaFinMetriX*: [[http://juliafinmetrix.github.io/][here]].
 
+*JuliaFinMetriX standard liberary*: [[http://juliafinmetrix.readthedocs.org/en/latest/index.html][here]].
 
 
