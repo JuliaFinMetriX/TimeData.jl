@@ -18,6 +18,6 @@ An implementation of time series data in Julia.
 
 *JuliaFinMetriX*: [[http://juliafinmetrix.github.io/][here]].
 
-*JuliaFinMetriX standard liberary*: [[http://juliafinmetrix.readthedocs.org/en/latest/index.html][here]].
+*JuliaFinMetriX standard library*: [[http://juliafinmetrix.readthedocs.org/en/latest/index.html][here]].
 
 
