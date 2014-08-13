@@ -4,6 +4,7 @@ module TestDocumentation
 using Base.Test
 using DataArrays
 using DataFrames
+using Dates
 
 println("\n Running documentation tests\n")
 
@@ -23,10 +24,10 @@ newTm = 2.*tm
 
 mean(tm, 1)
 
-TimeData.rowmeans(tm)
+rowmeans(tm)
 
 vals = rand(4, 3);
-dats = Date[Date(2013, 7, ii) for ii=1:4];
+dats = [Date(2013, 7, ii) for ii=1:4];
 nams = [:A, :B, :C];
 valsDf = composeDataFrame(vals, nams);
 
@@ -66,16 +67,26 @@ tmp = tm[logicRow, logicCol]
 tmp = tm[logicRow, :]
 
 ## indexing with Dates
-DatesToFind = Date[Date(2013, 7, ii) for ii=2:3]
+DatesToFind = [Date(2013, 7, ii) for ii=2:3]
 tmp = tm[DatesToFind]
 tm[Date(2013,7,1):Date(2013,7,3)]
 tm[Date(2013,7,2):Date(2013,7,3), :B]
 tm[Date(2013,7,3):Date(2013,7,12), [true, false, false]]
 
+## returning the first value only
+get(tm, 1, 1)
+
+## returning all values as Array{Any,2}
+kk = get(tm)
+isa(kk, Array{Any})
+
 filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
 tm = readTimedata(filePath)
+tm[1:5, 1:4]
 
-#   str(tm) # uncomment for execution
+tm
+
+## str(tm) # uncomment for execution
 
 #   writeTimedata("data/logRet2.csv", tm) # uncomment for execution
 

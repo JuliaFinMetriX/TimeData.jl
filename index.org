@@ -66,6 +66,7 @@ module TestDocumentation
 using Base.Test
 using DataArrays
 using DataFrames
+using Dates
 
 println("\n Running documentation tests\n")
 
@@ -100,9 +101,9 @@ Extending the fabulous ways of indexing already provided by
 ~DataFrames~, data can easily be accessed - amongst others - through
 variable names and dates.
 
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
    using TimeData
-   using Datetime
+   using Dates
 
    fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
    tm = TimeData.readTimedata(fileName)[1:10, 1:4]
@@ -110,88 +111,58 @@ variable names and dates.
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (10,4)
-10x5 DataFrame
-|-------|------------|----------|----------|----------|----------|
-| Row # | idx        | MMM      | ABT      | ACE      | ACT      |
-| 1     | 2012-01-03 | 2.12505  | 0.88718  | 0.29744  | 0.47946  |
-| 2     | 2012-01-04 | 0.82264  | -0.38476 | -0.95495 | -0.52919 |
-| 3     | 2012-01-05 | -0.44787 | -0.23157 | 0.28445  | 2.74752  |
-| 4     | 2012-01-06 | -0.51253 | -0.93168 | 0.23891  | 1.94894  |
-| 5     | 2012-01-09 | 0.58732  | 0.0      | 0.46128  | 0.28436  |
-| 6     | 2012-01-10 | 0.52193  | 0.46693  | 1.31261  | 1.85986  |
-| 7     | 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 |
-| 8     | 2012-01-12 | 0.60934  | -0.46875 | 0.50453  | -0.93039 |
-| 9     | 2012-01-13 | -0.80912 | 0.50771  | -0.47478 | 0.25752  |
-| 10    | 2012-01-17 | 0.74711  | 0.50515  | 0.297    | -7.04176 |
-#+end_example
+|        idx |      MMM |      ABT |      ACE |      ACT |
+| 2012-01-03 |  2.12505 |  0.88718 |  0.29744 |  0.47946 |
+| 2012-01-04 |  0.82264 | -0.38476 | -0.95495 | -0.52919 |
+| 2012-01-05 | -0.44787 | -0.23157 |  0.28445 |  2.74752 |
+| 2012-01-06 | -0.51253 | -0.93168 |  0.23891 |  1.94894 |
+| 2012-01-09 |  0.58732 |        0 |  0.46128 |  0.28436 |
+| 2012-01-10 |  0.52193 |  0.46693 |  1.31261 |  1.85986 |
+| 2012-01-11 | -0.63413 | -0.38895 | -1.52066 | -3.06604 |
+| 2012-01-12 |  0.60934 | -0.46875 |  0.50453 | -0.93039 |
+| 2012-01-13 | -0.80912 |  0.50771 | -0.47478 |  0.25752 |
+| 2012-01-17 |  0.74711 |  0.50515 |    0.297 | -7.04176 |
 
 Using a range of dates:
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
-   tm[date(2012, 1, 4):date(2012, 1, 10), 1:2]
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
+   tm[Date(2012, 1, 4):Date(2012, 1, 10), 1:2]
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (5,2)
-5x3 DataFrame
-|-------|------------|----------|----------|
-| Row # | idx        | MMM      | ABT      |
-| 1     | 2012-01-04 | 0.82264  | -0.38476 |
-| 2     | 2012-01-05 | -0.44787 | -0.23157 |
-| 3     | 2012-01-06 | -0.51253 | -0.93168 |
-| 4     | 2012-01-09 | 0.58732  | 0.0      |
-| 5     | 2012-01-10 | 0.52193  | 0.46693  |
-#+end_example
+|        idx |      MMM |      ABT |
+| 2012-01-04 |  0.82264 | -0.38476 |
+| 2012-01-05 | -0.44787 | -0.23157 |
+| 2012-01-06 | -0.51253 | -0.93168 |
+| 2012-01-09 |  0.58732 |        0 |
+| 2012-01-10 |  0.52193 |  0.46693 |
 
 Using numeric indexing:
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
    tm[3:8, 2:3]
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (6,2)
-6x3 DataFrame
-|-------|------------|----------|----------|
-| Row # | idx        | ABT      | ACE      |
-| 1     | 2012-01-05 | -0.23157 | 0.28445  |
-| 2     | 2012-01-06 | -0.93168 | 0.23891  |
-| 3     | 2012-01-09 | 0.0      | 0.46128  |
-| 4     | 2012-01-10 | 0.46693  | 1.31261  |
-| 5     | 2012-01-11 | -0.38895 | -1.52066 |
-| 6     | 2012-01-12 | -0.46875 | 0.50453  |
-#+end_example
+|        idx |      ABT |      ACE |
+| 2012-01-05 | -0.23157 |  0.28445 |
+| 2012-01-06 | -0.93168 |  0.23891 |
+| 2012-01-09 |        0 |  0.46128 |
+| 2012-01-10 |  0.46693 |  1.31261 |
+| 2012-01-11 | -0.38895 | -1.52066 |
+| 2012-01-12 | -0.46875 |  0.50453 |
 
 Using column names:
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
    tm[3:8, [:ABT, :MMM]]
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (6,2)
-6x3 DataFrame
-|-------|------------|----------|----------|
-| Row # | idx        | ABT      | MMM      |
-| 1     | 2012-01-05 | -0.23157 | -0.44787 |
-| 2     | 2012-01-06 | -0.93168 | -0.51253 |
-| 3     | 2012-01-09 | 0.0      | 0.58732  |
-| 4     | 2012-01-10 | 0.46693  | 0.52193  |
-| 5     | 2012-01-11 | -0.38895 | -0.63413 |
-| 6     | 2012-01-12 | -0.46875 | 0.60934  |
-#+end_example
+|        idx |      ABT |      MMM |
+| 2012-01-05 | -0.23157 | -0.44787 |
+| 2012-01-06 | -0.93168 | -0.51253 |
+| 2012-01-09 |        0 |  0.58732 |
+| 2012-01-10 |  0.46693 |  0.52193 |
+| 2012-01-11 | -0.38895 | -0.63413 |
+| 2012-01-12 | -0.46875 |  0.60934 |
 
 
 ** Separate time information
@@ -203,48 +174,52 @@ observations only, do not need to explicitly take into account the
 time information anymore. For example, simply rescaling observations
 by a factor of 2 becomes:
 
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
    newTm = 2.*tm
 #+END_SRC
+
+#+RESULTS:
+|        idx |      MMM |      ABT |      ACE |       ACT |
+| 2012-01-03 |   4.2501 |  1.77436 |  0.59488 |   0.95892 |
+| 2012-01-04 |  1.64528 | -0.76952 |  -1.9099 |  -1.05838 |
+| 2012-01-05 | -0.89574 | -0.46314 |   0.5689 |   5.49504 |
+| 2012-01-06 | -1.02506 | -1.86336 |  0.47782 |   3.89788 |
+| 2012-01-09 |  1.17464 |        0 |  0.92256 |   0.56872 |
+| 2012-01-10 |  1.04386 |  0.93386 |  2.62522 |   3.71972 |
+| 2012-01-11 | -1.26826 |  -0.7779 | -3.04132 |  -6.13208 |
+| 2012-01-12 |  1.21868 |  -0.9375 |  1.00906 |  -1.86078 |
+| 2012-01-13 | -1.61824 |  1.01542 | -0.94956 |   0.51504 |
+| 2012-01-17 |  1.49422 |   1.0103 |    0.594 | -14.08352 |
 
 Functions that do not naturally extend to time data can simply be
 overloaded and delegated to observations only.
 
 Calculating mean values for each column:
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
    mean(tm, 1)
 #+END_SRC
 
 #+RESULTS:
-: 1x4 DataFrame
-: |-------|----------|-----------|----------|-----------|
-: | Row # | MMM      | ABT       | ACE      | ACT       |
-: | 1     | 0.300974 | -0.003874 | 0.044583 | -0.398972 |
+|      MMM |                    ABT |                 ACE |       ACT |
+| 0.300974 | -0.0038740000000000107 | 0.04458300000000001 | -0.398972 |
 
 Calculating mean values per date:
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
-   TimeData.rowmeans(tm)
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
+   rowmeans(tm)
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (10,1)
-10x2 DataFrame
-|-------|------------|------------|
-| Row # | idx        | x1         |
-| 1     | 2012-01-03 | 0.947282   |
-| 2     | 2012-01-04 | -0.261565  |
-| 3     | 2012-01-05 | 0.588133   |
-| 4     | 2012-01-06 | 0.18591    |
-| 5     | 2012-01-09 | 0.33324    |
-| 6     | 2012-01-10 | 1.04033    |
-| 7     | 2012-01-11 | -1.40244   |
-| 8     | 2012-01-12 | -0.0713175 |
-| 9     | 2012-01-13 | -0.129667  |
-| 10    | 2012-01-17 | -1.37312   |
-#+end_example
+|        idx |                  x1 |
+| 2012-01-03 |  0.9472824999999999 |
+| 2012-01-04 |           -0.261565 |
+| 2012-01-05 |  0.5881325000000001 |
+| 2012-01-06 | 0.18590999999999996 |
+| 2012-01-09 |             0.33324 |
+| 2012-01-10 |           1.0403325 |
+| 2012-01-11 |           -1.402445 |
+| 2012-01-12 |          -0.0713175 |
+| 2012-01-13 |          -0.1296675 |
+| 2012-01-17 |           -1.373125 |
 
 
 
@@ -256,7 +231,7 @@ and have two fields, separating time information from observations:
 - *idx:* an ~Array{T, 1}~, consisting of either type
   - ~Integer~,
   - ~Date~, or
-  - ~DateTime~ (from package ~Datetime~)
+  - ~DateTime~ (from package ~Dates~)
          
 However, accessing these fields directly is considered poor style, as
 one could circumvent any constraints on the individual fields this
@@ -279,8 +254,9 @@ fast and numerically optimized methods using ~Array{Float64, 2}~ under
 the hood. Hence, it is important that these constraints are reliably
 fulfilled. They are guaranteed as they are hard-coded into variables
 at time of creation through the individual constructors. And, by now,
-no further ~setindex~ methods exist that would allow data
-manipulation.
+only a few methods exist that allow editing fields for data
+manipulation, and they all are designed to maintain all restrictions
+on the data.
 
 The package generally tries to achieve high performance by delegating
 functionality to the most specialized case. For example, methods for
@@ -292,37 +268,22 @@ are not allowed to entail ~NAs~ anyways.
 For each type, variables can be created by directly handing over
 observations as ~DataFrame~ and time information as ~Array~ to the
 inner constructor.
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
 
    vals = rand(4, 3);
-   dats = Date{ISOCalendar}[date(2013, 7, ii) for ii=1:4];
+   dats = [Date(2013, 7, ii) for ii=1:4];
    nams = [:A, :B, :C];
    valsDf = composeDataFrame(vals, nams);
-   
+
    tm = Timematr(valsDf, dats)
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-
-
-
-
-
-
-
-
-type: Timematr{Date{ISOCalendar}}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|------------|-----------|----------|----------|
-| Row # | idx        | A         | B        | C        |
-| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
-#+end_example
+|        idx |                  A |                   B |                  C |
+| 2013-07-01 | 0.3668076837657581 |  0.6132177634585174 | 0.7271614060006228 |
+| 2013-07-02 | 0.8402870142445031 |  0.8268085074961338 | 0.7631093687543671 |
+| 2013-07-03 | 0.6880695323767783 | 0.03210864954311465 | 0.9955387409975662 |
+| 2013-07-04 | 0.8182674804881986 |  0.7627315792913878 |  0.966201684866371 |
 
 Besides, there also exist several outer constructors for each type,
 allowing more convenient creation. In particular, if observations do
@@ -333,7 +294,7 @@ and / or dates are missing. For these cases, there exist more
 convenient outer constructors, too, which generally follow the
 convention that dates never precede variable names as arguments.
 
-#+BEGIN_SRC julia :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :results value :tangle test/doctests.jl
    td = Timedata(vals, nams, dats)
    td = Timedata(vals, nams)
    td = Timedata(vals, dats)
@@ -341,48 +302,11 @@ convention that dates never precede variable names as arguments.
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-
-type: Timedata{Date{ISOCalendar}}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|------------|-----------|----------|----------|
-| Row # | idx        | A         | B        | C        |
-| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
-
-type: Timedata{Int64}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|-----|-----------|----------|----------|
-| Row # | idx | A         | B        | C        |
-| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
-
-type: Timedata{Date{ISOCalendar}}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|------------|-----------|----------|----------|
-| Row # | idx        | x1        | x2       | x3       |
-| 1     | 2013-07-01 | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2013-07-02 | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 2013-07-03 | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 2013-07-04 | 0.0447977 | 0.34037  | 0.399474 |
-
-type: Timedata{Int64}
-dimensions: (4,3)
-4x4 DataFrame
-|-------|-----|-----------|----------|----------|
-| Row # | idx | x1        | x2       | x3       |
-| 1     | 1   | 0.748284  | 0.650792 | 0.10363  |
-| 2     | 2   | 0.118111  | 0.954352 | 0.63716  |
-| 3     | 3   | 0.669835  | 0.351356 | 0.894607 |
-| 4     | 4   | 0.0447977 | 0.34037  | 0.399474 |
-#+end_example
+| idx |                 x1 |                  x2 |                 x3 |
+|   1 | 0.3668076837657581 |  0.6132177634585174 | 0.7271614060006228 |
+|   2 | 0.8402870142445031 |  0.8268085074961338 | 0.7631093687543671 |
+|   3 | 0.6880695323767783 | 0.03210864954311465 | 0.9955387409975662 |
+|   4 | 0.8182674804881986 |  0.7627315792913878 |  0.966201684866371 |
 
 * Indexing
 
@@ -409,7 +333,6 @@ example, ~DataFrames~ return ~Array~ for single columns.
    typeof(td[4:3, 5:4])
       
 #+END_SRC
-
 This will print:
 #+RESULTS:
 : Array{Float64,1}
@@ -421,7 +344,6 @@ This will print:
 : 
 : Timedata{Int64} (constructor with 1 method)
 
-
 Possible ways of indexing are:
 #+BEGIN_SRC julia :tangle test/doctests.jl :results silent
    ## indexing by numeric indices
@@ -431,26 +353,42 @@ Possible ways of indexing are:
    tmp = tm[2]
    tmp = tm[1:2, 2]
    tmp = tm[3, 3]
-   
+
    ## indexing with column names as symbols
    tmp = tm[:A]
    tmp = tm[2, [:A, :B]]
-   
+
    ## logical indexing
    logicCol = [true, false, true]
    logicRow = repmat([true, false], 2, 1)[:]
    tmp = tm[logicCol]
    tmp = tm[logicRow, logicCol]
    tmp = tm[logicRow, :]
-   
-   ## indexing with dates
-   datesToFind = Date{ISOCalendar}[date(2013, 7, ii) for ii=2:3]
-   tmp = tm[datesToFind]
-   tm[date(2013,7,1):date(2013,7,3)]
-   tm[date(2013,7,2):date(2013,7,3), :B]
-   tm[date(2013,7,3):date(2013,7,12), [true, false, false]]
+
+   ## indexing with Dates
+   DatesToFind = [Date(2013, 7, ii) for ii=2:3]
+   tmp = tm[DatesToFind]
+   tm[Date(2013,7,1):Date(2013,7,3)]
+   tm[Date(2013,7,2):Date(2013,7,3), :B]
+   tm[Date(2013,7,3):Date(2013,7,12), [true, false, false]]
 #+END_SRC
 
+As all ~getindex~ methods are designed to retain the ~TimeData~
+structure, we need an additional ~get~ method to actual get the value
+of an entry itself.
+
+#+BEGIN_SRC julia :tangle test/doctests.jl :results value
+   ## returning the first value only
+   get(tm, 1, 1)
+
+   ## returning all values as Array{Any,2}
+   kk = get(tm)
+   isa(kk, Array{Any})
+
+#+END_SRC
+
+#+RESULTS:
+: true
 
 * Read, write, io
 
@@ -459,19 +397,31 @@ Data can easily be imported from csv-files using function
 from the ~DataFrames~ package. Additionally, columns are parsed for
 dates. The first column matching the regexp for dates will be chosen
 as time identifier.
-#+BEGIN_SRC julia :tangle test/doctests.jl :results output
+#+BEGIN_SRC julia :tangle test/doctests.jl :results value
    filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
    tm = readTimedata(filePath)
+   tm[1:5, 1:4]
 #+END_SRC
 
-After loading the data, Julia will call the standard ~display~ method
-to show information about the data:
+#+RESULTS:
+|        idx |      MMM |      ABT |      ACE |      ACT |
+| 2012-01-03 |  2.12505 |  0.88718 |  0.29744 |  0.47946 |
+| 2012-01-04 |  0.82264 | -0.38476 | -0.95495 | -0.52919 |
+| 2012-01-05 | -0.44787 | -0.23157 |  0.28445 |  2.74752 |
+| 2012-01-06 | -0.51253 | -0.93168 |  0.23891 |  1.94894 |
+| 2012-01-09 |  0.58732 |        0 |  0.46128 |  0.28436 |
+
+In the REPL itself, Julia calls the ~display~ method to show
+information about an instance.
+
+#+BEGIN_SRC julia :tangle test/doctests.jl :results output
+   tm
+#+END_SRC
 
 #+RESULTS:
 #+begin_example
 
-
-type: Timematr{Date{ISOCalendar}}
+type: Timematr{Date}
 dimensions: (333,348)
 333x6 DataFrame
 |-------|------------|----------|----------|----------|----------|----------|
@@ -496,13 +446,14 @@ dimensions: (333,348)
 | 333   | 2013-05-01 | -0.14498 | -0.08162 | -0.94057 | -1.27548 | -0.82415 |
 #+end_example
 
+
 As one can see, the ~display~ method will show the type of the
 variable, together with its dimensions and a snippet of the first
 values. Note that the number of columns does not entail the dates
 column, but does only count the columns of the remaining variables.
 Inherently, ~display~ makes use of the display method that is
 implemented for ~DataFrames~, which is the reason for the somewhat
-misleading output line ~333x6 DataFrame:~. An issue that still needs
+misleading output line ~333x348 DataFrame:~. An issue that still needs
 to be fixed. However, html display in IJulia already shows an improved
 table output.
 
@@ -511,15 +462,15 @@ An even more elaborate way of looking at the data contained in a
 which will print:
 
 #+BEGIN_SRC julia :tangle test/doctests.jl :results output
-#   str(tm) # uncomment for execution
+   ## str(tm) # uncomment for execution
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
 
-type: Timematr{Date{ISOCalendar}}
+type: Timematr{Date}
 :vals  		  DataFrame
-:idx  		  Array{Date{ISOCalendar},1}
+:idx  		  Array{Date,1}
 
 dimensions of vals: (333,348)
 
@@ -564,14 +515,14 @@ string, while the second argument is the variable to be saved.
 
 * Functions and operators
 
-Mathematical operators and functions are only implemented on for
-Timematr types, since they are not well defined operations for general
-data (strings, ...).
+Mathematical operators and functions are only implemented for
+~Timematr~ and ~Timenum~ types, since they are not well defined
+operations for general data (strings, ...).
 
-Whenever possible, functions apply elementwise to observations only,
+Whenever possible, functions apply element-wise to observations only,
 and you should get back the same type that you did call the function
 on. In case that this is not possible, the type that you get back
-should be the natural first choice. For example, elementwise
+should be the natural first choice. For example, element-wise
 comparisons should return a logical value for each entry, which by
 definition could not be of type ~Timenum~ where only numeric values
 are allowed.
@@ -582,8 +533,8 @@ are allowed.
 #+END_SRC
 
 #+RESULTS:
-: Timematr{Date{ISOCalendar}} (constructor with 1 method)
-: Timedata{Date{ISOCalendar}} (constructor with 1 method)
+: Timematr{Date} (constructor with 1 method)
+: Timedata{Date} (constructor with 1 method)
 
 The standard library for ~TimeData~ comprises all standard operators
 and mathematical functions. As expected, these functions all apply
@@ -600,7 +551,7 @@ additional arguments are allowed for ~Arrays~, they are allowed for
 #+RESULTS:
 #+begin_example
 
-type: Timedata{Date{ISOCalendar}}
+type: Timedata{Date}
 dimensions: (3,3)
 3x4 DataFrame
 |-------|------------|-------|-------|-------|
@@ -609,7 +560,7 @@ dimensions: (3,3)
 | 2     | 2012-01-04 | true  | false | false |
 | 3     | 2012-01-05 | false | false | false |
 
-type: Timematr{Date{ISOCalendar}}
+type: Timematr{Date}
 dimensions: (3,3)
 3x4 DataFrame
 |-------|------------|----------|----------|----------|
@@ -618,7 +569,7 @@ dimensions: (3,3)
 | 2     | 2012-01-04 | 2.2765   | 0.680614 | 0.384831 |
 | 3     | 2012-01-05 | 0.638988 | 0.793287 | 1.32903  |
 
-type: Timematr{Date{ISOCalendar}}
+type: Timematr{Date}
 dimensions: (3,3)
 3x4 DataFrame
 |-------|------------|-------|-------|-------|
@@ -628,51 +579,11 @@ dimensions: (3,3)
 | 3     | 2012-01-05 | -0.45 | -0.23 | 0.28  |
 #+end_example
 
-A most likely not exhaustive list of basic functions is
-#+BEGIN_SRC julia :tangle no :eval never
-   TimeDataFunctions = [:(.+), :(.-), :(.*), :(./), :(.^),
-                        :(.==), :(.!=), :(.>), :(.>=), :(.<), :(.<=),
-                        :(&), :(|), :($),
-                        :(div), :(mod), :(fld), :(rem),
-                        :abs, :sign, :acos, :acosh, :asin, :asinh, :atan,
-                        :atanh, :sin, :sinh, :cos, :cosh, :tan, :tanh,
-                        :exp, :exp2, :expm1, :log, :log10, :log1p, :log2,
-                        :exponent, :sqrt, :gamma, :lgamma, :digamma,
-                        :erf, :erfc,
-                        :round, :ceil, :floor, :trunc]
-#+END_SRC
-
 
 * Additional functions
-Besides basic mathematical functions and operators, there are some
-additional functions that are defined for each ~TimeData~ type. For
-example, you can retrieve individual components of your variable with
-the following functions:
-- ~idx~: returns time information as ~Array~
-- ~names~: returns variable names as
-  ~Array{Union(UTF8String,ASCIIString),1}~  
-- ~core~: implemented for subtypes of ~AbstractTimematr~, it returns a
-  matrix of numeric values
-These functions shall help to inhibit direct access of ~TimeData~
-fields, which should be avoided.
-
-Some further implemented functions are: 
-- ~isequal~ 
-- ~ndims~
-- ~size~
-- ~isna~
-- ~hcat~
-- ~writemime~
-- ~convert~: DataFrame with dates as first column
-
-Some ~DataFrame~ extensions:
-- ~composeDataFrame~: construction from numeric array and column names 
-- ~round~
-- basic mathematical operators
-
-Furthermore, subtypes of type ~AbstractTimematr~ should already
-provide functionality for basic statistical functions like ~mean~,
-~var~ and ~cov~.
+Besides basic mathematical functions and operators, there are already
+quite some additional functions that are defined for several
+~TimeData~ types. You can find them in the [[http://juliafinmetrix.readthedocs.org/en/latest/timeData.html?highlight%3Dsetindex!][online documentation]].
 
 * Under the hood: implementation
 
@@ -690,13 +601,13 @@ interior design of ~TimeData~, take a look at [[http://grollchristian.wordpress.
 
 * Current state
 
-So far, only type ~Timematr~ has functionality that goes beyond the
-basic methods inherited from ~DataFrames~. Still, all ~TimeData~ types
-should already provide a convenient way to represent time series data,
-and any ~DataFrame~ functionality in principle can easily be regained
-by delegating functions to field ~vals~. Also, I only tested
-~TimeData~ types with ~date~ type from the ~Datetime~ package myself,
-and not yet with type ~datetime~.
+All ~TimeData~ types should already provide a convenient way to
+represent and handle time series data. In extension to the already
+implemented functions directly applying to types of the ~TimeData~
+package, any ~DataFrame~ functionality in principle can easily be
+regained by delegating functions to field ~vals~. So far, I only
+tested ~TimeData~ types with ~Date~ type from the ~Dates~ package
+myself, and not yet with type ~DateTime~.
 
 
 * Acknowledgement
@@ -713,7 +624,7 @@ to thank the developers of
   representation for general types of data in data analysis. It's a
   role model that every last bit of code of ~TimeData~ depends on, and
   the interface that every statistics package should use.
-- the *Datetime* package, which is a thoughtful implementation of
+- the *Dates* package, which is a thoughtful implementation of
   dates, time and durations, and the backbone of all time components
   in ~TimeData~.
 - the *TimeSeries* package, which follows a different approach to
@@ -722,6 +633,6 @@ to thank the developers of
   could borrow parts of code from it (for example, from an old version
   of function ~readtime~).
 
-#+BEGIN_SRC julia :exports none :results output :tangle test/doctests.jl
+#+BEGIN_SRC julia :exports none :results value :tangle test/doctests.jl
 end
 #+END_SRC
