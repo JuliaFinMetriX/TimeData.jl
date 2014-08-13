@@ -87,4 +87,16 @@ for t = (:Timenum, :Timematr)
     eval(macroexpand(:(@test_basic_operators($t))))        
 end
 
+############
+## test ! ##
+############
+
+df = DataFrame(a = @data([NA, true, false]),
+               b = @data([true, NA, false]))
+dfNegated = DataFrame(a = @data([NA, false, true]),
+               b = @data([false, NA, true]))
+
+td = Timedata(df)
+@test isequal(!td, Timedata(dfNegated))
+
 end

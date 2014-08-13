@@ -49,10 +49,10 @@ end
 ## impute! ##
 #############
 
-function impute!(td::TimeData.AbstractTimedata, with="last")
+function impute!(td::AbstractTimedata, with="last")
     ## impute NAs with last or next observation or zero
 
-    (rowInds, colInds) = TimeData.find2sub(isna(td))
+    (rowInds, colInds) = find2sub(isna(td))
     ## indices are returned chronologically!
     
     nNAs = length(rowInds)

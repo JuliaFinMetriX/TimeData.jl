@@ -31,6 +31,9 @@
 ## macro is parametrized with respect to type, because this way
 ## Timematr implementations involving core() can easily be re-defined
 ## and related to DataArray operators as well
+## 
+## if time indices do not coincide, time indices will be inferred from
+## the first TimeData instance involved in the operation!
 macro pres_symmetric_timenum(f, myType)
     esc(quote
         function $(f)(inst::$(myType), inst2::$(myType))
@@ -155,6 +158,15 @@ t = :Timenum
 for f in pres_msUnitary_functions
     eval(macroexpand(:(@pres_msUnitary_timematr($f))))
     eval(macroexpand(:(@pres_msUnitary_timenum($f, $t))))
+end
+
+function !(td::Timedata)
+    ## negate boolean values
+    df = DataFrame()
+    for (nam, col) in eachcol(td.vals)
+        df[nam] = !col
+    end
+    return Timedata(df, td.idx)
 end
 
 ######################################################
