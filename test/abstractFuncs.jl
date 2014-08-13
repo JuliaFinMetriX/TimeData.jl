@@ -106,6 +106,24 @@ tn4 = Timenum(df, [Date(2010, 1, 1):Date(2010, 1, 2)])
 @test isequalElemwise(tn, tn2) == Timedata([true true; false true],
                                            names(td), idx(td))
 
+##############
+## isapprox ##
+##############
+
+tm = testcase(Timenum, 1)
+tm2 = tm .+ 0.00000001
+@test !isequal(tm, tm2)
+@test isapprox(tm, tm2)
+
+tm = testcase(Timenum, 2)
+tm2 = tm .+ 0.00000001
+@test !isequal(tm, tm2)
+@test isapprox(tm, tm2)
+
+td = Timedata(rand(2, 2))
+td2 = deepcopy(td)
+td[1, 1] = get(td, 1, 1) .+ 0.00000001
+@test isapprox(td, td2)
 
 ####################
 ## complete_cases ##

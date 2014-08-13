@@ -92,6 +92,26 @@ isequal")
     return Timedata(vals, names(tn), idx(tn))
 end
 
+## isequal(NA, NA) -> true
+import Base.isapprox
+function isapprox(tn::AbstractTimedata, tn2::AbstractTimedata)
+    ## return single true or false
+    isequal(typeof(tn), typeof(tn2)) || return false
+
+    (nObs, nVars) = size(tn)
+    for ii=1:nObs
+        for jj=1:nVars
+            if !isequal(get(tn, ii, jj), get(tn2, ii, jj))
+                if !isapprox(get(tn, ii, jj), get(tn2, ii, jj))
+                    return false
+                end
+            end
+        end
+    end
+    isequal(tn.idx, tn2.idx) || return false
+    return true
+end
+
 ##########
 ## isna ##
 ##########
