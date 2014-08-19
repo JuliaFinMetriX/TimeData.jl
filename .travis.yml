@@ -14,11 +14,13 @@ script:
   - julia -e 'Pkg.add("DataFrames")'
   - julia -e 'Pkg.add("Dates")'
   - julia -e 'Pkg.update()'
-  - julia -e 'Pkg.init(); Pkg.add("TimeData"); Pkg.checkout("TimeData")'
-  - julia -e 'using TimeData; @assert isdefined(:TimeData); @assert typeof(TimeData) === Module'
+  - julia -e 'Pkg.init(); Pkg.add("TimeData")'
+  - julia -e 'Pkg.test("TimeData")'
+  - julia -e 'Pkg.checkout("TimeData")'
   - mkdir -p ~/.julia/TimeData
   - cp -R ./* ~/.julia/TimeData/
   - julia --code-coverage ./test/runtests.jl
+
 after_success:
   - julia -e 'cd(Pkg.dir("TimeData")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
 
