@@ -7,7 +7,7 @@ using Dates
 using TimeData
 ## using TimeData
 
-println("\n Running DataFrame extension tests\n")
+println("Running DataFrame extension tests")
 
 ######################
 ## composeDataFrame ##

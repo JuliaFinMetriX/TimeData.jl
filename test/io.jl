@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running IO function tests\n")
+println("Running IO function tests")
 
 dirPath = Pkg.dir("TimeData")
 filePath = joinpath(dirPath, "data", "logRet.csv")

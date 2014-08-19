@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running type preserving function tests\n")
+println("Running type preserving function tests")
 
 allTypes = (:Timedata, :Timenum, :Timematr)
 

@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running timematr tests\n")
+println("Running timematr tests")
 
 #######################################
 ## reconstruction from core elements ##

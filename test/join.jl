@@ -6,7 +6,7 @@ using DataArrays
 using Dates
 using DataFrames
 
-println("\n Running join tests\n")
+println("Running join tests")
 
 ##########################
 ## find dates functions ##

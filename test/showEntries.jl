@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running showEntries function tests\n")
+println("Running showEntries function tests")
 
 ######################
 ## test showEntries ##

@@ -7,7 +7,7 @@ using Dates
 using TimeData
 ## using TimeData
 
-println("\n Running conversion tests\n")
+println("Running conversion tests")
 
 df = DataFrame()
 df[:a] = @data([4, NA])

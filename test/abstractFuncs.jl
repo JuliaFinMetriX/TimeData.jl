@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running abstract function tests\n")
+println("Running abstract function tests")
 
 ## create instance
 vals = rand(30, 4)

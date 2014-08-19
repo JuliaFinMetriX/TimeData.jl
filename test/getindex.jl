@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running getindex tests:")
+println("Running getindex tests:")
 
 ## test for changes in DataFrame behaviour
 df = convert(DataFrame, rand(8, 4))

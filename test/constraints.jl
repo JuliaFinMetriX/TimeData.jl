@@ -7,7 +7,7 @@ using Dates
 using TimeData
 ## using TimeData
 
-println("\n Running constraints tests\n")
+println("Running constraints tests")
 
 ############
 ## chkIdx ##

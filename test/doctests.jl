@@ -6,7 +6,7 @@ using DataArrays
 using DataFrames
 using Dates
 
-println("\n Running documentation tests\n")
+println("Running documentation tests")
 
 using TimeData
 using Dates

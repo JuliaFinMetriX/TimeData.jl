@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running setindex function tests\n")
+println("Running setindex function tests")
 
 
 

@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running constructor tests\n")
+println("Running constructor tests")
 
 ## init test values
 vals = rand(30, 4)

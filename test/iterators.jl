@@ -7,7 +7,7 @@ using Dates
 using TimeData
 ## using TimeData
 
-println("\n Running iterator tests\n")
+println("Running iterator tests")
 
 df = DataFrame()
 df[:a] = @data([4, 5])

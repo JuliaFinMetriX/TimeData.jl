@@ -6,7 +6,7 @@ using DataFrames
 using Dates
 using TimeData
 
-println("\n Running operator tests\n")
+println("Running operator tests")
 
 ## init test values
 vals = [1 1 1 1;
