@@ -15,8 +15,10 @@ script:
   - julia -e 'Pkg.add("Dates")'
   - julia -e 'Pkg.update()'
   - julia -e 'Pkg.init(); Pkg.add("TimeData")'
+  - echo "Testing latest release:"
   - julia -e 'Pkg.test("TimeData")'
   - julia -e 'Pkg.checkout("TimeData")'
+  - echo "Testing master:"
   - mkdir -p ~/.julia/TimeData
   - cp -R ./* ~/.julia/TimeData/
   - julia --code-coverage ./test/runtests.jl
