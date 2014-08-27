@@ -11,7 +11,7 @@ println("Running constructor tests")
 ## init test values
 vals = rand(30, 4)
 dats = Date[Date(2013, 7, ii) for ii=1:30]
-tims = DateTime[DateTime(2010,02,ii,00,00,00)
+tims = DateTime[DateTime(2010,01,ii,00,00,00)
                                  for ii=1:30]
 idxs = [1:30]
 ## nams = ["A", "B", "C", "D"]
