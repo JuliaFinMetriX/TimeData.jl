@@ -52,6 +52,8 @@ end
 function impute!(td::AbstractTimedata, with="last")
     ## impute NAs with last or next observation or zero
 
+    (nRow, nCol) = size(td)
+    
     (rowInds, colInds) = find2sub(isna(td))
     ## indices are returned chronologically!
     
@@ -62,6 +64,17 @@ function impute!(td::AbstractTimedata, with="last")
             if rowInds[ii] > 1
                 td[rowInds[ii], colInds[ii]] =
                     get(td, (rowInds[ii]-1), colInds[ii])
+            end
+        end
+
+    elseif with == "single last"
+        for ii=1:nNAs
+            if rowInds[ii] > 1
+                ## only replace if next entry is not a NaN
+                if (rowInds[ii] == nRow) || !isna(get(td, (rowInds[ii]+1), colInds[ii]))
+                    td[rowInds[ii], colInds[ii]] =
+                        get(td, (rowInds[ii]-1), colInds[ii])
+                end
             end
         end
 
