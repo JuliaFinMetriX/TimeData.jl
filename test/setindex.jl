@@ -153,4 +153,25 @@ expTd = TimeData.Timenum(df, dats)
 ## test
 @test isequal(expTd, td)
 
+## imputing with single last:
+##---------------------------
+
+da1 = @data([NA; 3; 4; NA; NA; 4; 5; NA])
+da2 = @data([3; 4; NA; 8;  9;  5; NA; NA])
+df = DataFrame(prices1 = da1, prices2 = da2)
+
+dats = [Date(2010,1,1):Date(2010,1,8)]
+td = Timedata(df, dats)
+
+impute!(td, "single last")
+
+## manually get expected value
+dats = td.idx
+df = DataFrame(prices1 = @data([NA, 3, 4, NA, NA, 4, 5, 5]),
+               prices2 = @data([3, 4, 4, 8, 9, 5, NA, NA]))
+expTd = TimeData.Timedata(df, dats)
+
+## test
+@test isequal(expTd, td)
+
 end

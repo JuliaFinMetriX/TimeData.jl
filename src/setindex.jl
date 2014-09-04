@@ -70,7 +70,8 @@ function impute!(td::AbstractTimedata, with="last")
     elseif with == "single last"
         for ii=1:nNAs
             if rowInds[ii] > 1
-                ## only replace if next entry is not a NaN
+                ## only replace if next entry is not a NA or NA is
+                ## in last row
                 if (rowInds[ii] == nRow) || !isna(get(td, (rowInds[ii]+1), colInds[ii]))
                     td[rowInds[ii], colInds[ii]] =
                         get(td, (rowInds[ii]-1), colInds[ii])
