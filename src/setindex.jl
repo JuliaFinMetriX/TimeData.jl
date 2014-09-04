@@ -49,21 +49,19 @@ end
 ## impute! ##
 #############
 
-function impute!(td::AbstractTimedata, with="last")
+
+function impute!(da::DataArray, with="last")
     ## impute NAs with last or next observation or zero
 
-    (nRow, nCol) = size(td)
+    nRow = length(da)
     
-    (rowInds, colInds) = find2sub(isna(td))
-    ## indices are returned chronologically!
-    
+    rowInds = find(isna(da))
     nNAs = length(rowInds)
     
     if with == "last"
         for ii=1:nNAs
             if rowInds[ii] > 1
-                td[rowInds[ii], colInds[ii]] =
-                    get(td, (rowInds[ii]-1), colInds[ii])
+                da[rowInds[ii]] = da[rowInds[ii]-1]
             end
         end
 
@@ -72,27 +70,34 @@ function impute!(td::AbstractTimedata, with="last")
             if rowInds[ii] > 1
                 ## only replace if next entry is not a NA or NA is
                 ## in last row
-                if (rowInds[ii] == nRow) || !isna(get(td, (rowInds[ii]+1), colInds[ii]))
-                    td[rowInds[ii], colInds[ii]] =
-                        get(td, (rowInds[ii]-1), colInds[ii])
+                if (rowInds[ii] == nRow) || !isna(da[rowInds[ii]+1])
+                    da[rowInds[ii]] = da[rowInds[ii]-1]
                 end
             end
         end
 
     elseif with == "next"
         for ii=nNAs:-1:1                   # chronologic iterating
-            if rowInds[ii] < size(td, 1)
-                td[rowInds[ii], colInds[ii]] =
-                    get(td, (rowInds[ii]+1), colInds[ii])
+            if rowInds[ii] < nRow
+                da[rowInds[ii]] = da[rowInds[ii]+1]
             end
         end
 
     elseif with == "zero"
         for ii=1:nNAs
-            td[rowInds[ii], colInds[ii]] = 0
+            da[rowInds[ii]] = 0
         end
     end
 
+    return da
+end
+
+function impute!(td::AbstractTimedata, with="last")
+    ## apply impute! for DataArrays on each column, add metadata
+
+    for (nam, col) in eachcol(td.vals)
+        impute!(col, with)
+    end
     return td
 end
 
