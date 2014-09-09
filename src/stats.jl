@@ -3,20 +3,70 @@
 #######################
 
 import Base.mean
-function mean(tm::AbstractTimematr, dim::Int = 1)
+function mean(tm::AbstractTimematr, dim::Int)
     ## output: DataFrame, since date dimension is lost
     if dim == 2
         error("For rowwise mean use rowmeans function")
     end
-    meanVals = mean(core(tm), dim)
-    means = composeDataFrame(meanVals, names(tm))
+    meanVals = DataFrame()
+    for (nam, col) in eachcol(tm.vals)
+        meanVals[nam] = mean(col)
+    end
+    return meanVals
 end
+
+function mean(tn::AbstractTimenum, dim::Int)
+    ## output: DataFrame, since date dimension is lost
+    ## NAs are ignored!
+    if dim == 2
+        error("For rowwise mean use rowmeans function")
+    end
+    nObs, nAss = size(tn)
+    meanVals = DataFrame()
+    nVals = zeros(Int, nObs)
+    for (nam, col) in eachcol(tn.vals)
+        if isa(col, DataArray)
+            meanVals[nam] = mean(col[!col.na])
+        else
+            meanVals[nam] = mean(col)
+        end
+    end
+    return meanVals
+end
+
+
+## rowmeans
+##---------
 
 function rowmeans(tm::AbstractTimematr)
     ## output: Timematr
-    meanVals = mean(core(tm), 2)
-    means = Timematr(meanVals, idx(tm))
+    nObs, nAss = size(tm)
+    meanVals = zeros(Float64, nObs)
+    for (nam, col) in eachcol(tm.vals)
+        meanVals += col
+    end
+    return Timematr(composeDataFrame(meanVals./nAss, [:mean_values]),
+                    idx(tm))
 end
+
+function rowmeans(tn::Timenum)
+    ## output: Timematr, NAs are ignored
+    nObs, nAss = size(tn)
+    meanVals = DataArray(zeros(Float64, nObs))
+    nVals = zeros(Int, nObs)
+    for (nam, col) in eachcol(tn.vals)
+        if isa(col, DataArray)
+            nVals[!col.na] += 1
+            meanVals[!col.na] += col.data[!col.na]
+        else
+            nVals += 1
+            meanVals += col
+        end
+    end
+    return Timematr(DataFrame(mean_values = meanVals./nVals),
+                    idx(tn))
+end
+
 
 #######################
 ## Timematr get prod ##
