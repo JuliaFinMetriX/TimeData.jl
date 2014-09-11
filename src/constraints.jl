@@ -23,18 +23,22 @@ end
 ## check for numeric values in dataframe ##
 ###########################################
 
+function isNumericType(typ::Type)
+    # numeric and NAtype allowed, boolean not
+    valid = (issubtype(typ, Union(Number, NAtype))) &
+               (!issubtype(typ, Bool))
+    return valid
+end
+
 function chkNumDf(df::DataFrame)
     ## check for numeric values or NAs
     
     n = ncol(df)
     errMsg = "all columns must be numeric for conversion"
+    typs = eltypes(df)
     for ii=1:n
         ## check for numeric values
-        if(!issubtype(eltypes(df)[ii], Number) &
-    !isequal(eltypes(df)[ii], NAtype))
-            throw(ArgumentError(errMsg))
-        end
-        if(issubtype(eltypes(df)[ii], Bool))
+        if !isNumericType(typs[ii])
             throw(ArgumentError(errMsg))
         end
     end
