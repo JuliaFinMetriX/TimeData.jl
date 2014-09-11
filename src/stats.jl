@@ -45,7 +45,7 @@ function rowmeans(tm::AbstractTimematr)
     for (nam, col) in eachcol(tm.vals)
         meanVals += col
     end
-    return Timematr(composeDataFrame(meanVals./nAss, [:mean_values]),
+    return Timematr(DataFrame(mean_values = meanVals./nAss),
                     idx(tm))
 end
 
@@ -78,8 +78,11 @@ function prod(tm::AbstractTimematr, dim::Int = 1)
     if dim == 2
         error("For rowwise prod use rowprods function")
     end
-    prodVals = prod(core(tm), dim)
-    prods = composeDataFrame(prodVals, names(tm))
+    prodVals = DataFrame()
+    for (nam, col) in eachcol(tm.vals)
+        prodVals[nam] = prod(col)
+    end
+    return prodVals
 end
 
 function rowprods(tm::AbstractTimematr)
@@ -87,6 +90,16 @@ function rowprods(tm::AbstractTimematr)
     prodVals = prod(core(tm), 2)
     prods = Timematr(prodVals, idx(tm))
 end
+## function rowprods2(tm::AbstractTimematr)
+##     ## output: Timematr
+##     nObs, nAss = size(tm)
+##     prodVals = ones(Float64, nObs)
+##     for (nam, col) in eachcol(tm.vals)
+##         prodVals = prodVals .* col
+##     end
+##     return Timematr(composeDataFrame(prodVals, [:prod_values]),
+##                     idx(tm))
+## end
 
 ######################################
 ## Timematr get row and column sums ##

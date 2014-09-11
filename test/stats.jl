@@ -37,4 +37,6 @@ arrMean2 = TimeData.core(TimeData.rowmeans(tn))
 
 @test names(TimeData.rowmeans(tm)) == [:mean_values]
 
+expProd = prod()
+
 end
