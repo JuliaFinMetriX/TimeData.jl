@@ -38,6 +38,36 @@ function get(td::AbstractTimedata)
     return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
 end
 
+###############
+## floatcore ##
+###############
+
+function floatcore(tn::AbstractTimematr)
+    ## fast access to data values only 
+    nObs, nAss = size(tn)
+    vals = Array(Float64, nObs, nAss)
+    for ii=1:nAss
+        vals[:, ii] = tn.vals.columns[ii]
+    end
+    return vals
+end
+
+function floatcore(tn::AbstractTimenum)
+    ## fast access to data values only 
+    nObs, nAss = size(tn)
+    vals = Array(Float64, nObs, nAss)
+    
+    for ii=1:nAss
+        if isa(tn.vals.columns[ii], DataArray)
+            vals[:, ii] = tn.vals.columns[ii].data #::Array{Float64,1}
+            vals[tn.vals.columns[ii].na, ii] = NaN
+        else
+            vals[:, ii] = tn.vals.columns[ii] #::Array{Float64, 1}
+        end
+    end
+    return vals    
+end
+
 ###################
 ## Timedata size ##
 ###################
