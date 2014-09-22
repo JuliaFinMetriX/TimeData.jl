@@ -5,7 +5,7 @@
 
 [[https://travis-ci.org/JuliaFinMetriX/TimeData.jl][https://travis-ci.org/JuliaFinMetriX/TimeData.jl.png]]
 [[https://coveralls.io/r/JuliaFinMetriX/TimeData.jl?branch%3Dmaster][https://coveralls.io/repos/JuliaFinMetriX/TimeData.jl/badge.png?branch=master]]
-[[http://pkg.julialang.org/?pkg%3DTimeData&ver%3Dnightly][http://pkg.julialang.org/badges/TimeData_0.4.svg]]
+[[http://pkg.julialang.org/?pkg%3DTimeData&ver%3Dnightly][http://pkg.julialang.org/?pkg=TimeData&ver=nightly]]
 
 
 * Documentation
