@@ -3,7 +3,7 @@ module TestGetIndex
 using Base.Test
 using DataArrays
 using DataFrames
-using Dates
+
 using TimeData
 
 println("Running getindex tests:")

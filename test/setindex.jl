@@ -3,7 +3,7 @@ module TestSetindex
 using Base.Test
 using DataArrays
 using DataFrames
-using Dates
+
 using TimeData
 
 println("Running setindex function tests")

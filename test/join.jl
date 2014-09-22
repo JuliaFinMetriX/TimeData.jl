@@ -3,7 +3,7 @@ module TestJoin
 using Base.Test
 using TimeData
 using DataArrays
-using Dates
+
 using DataFrames
 
 println("Running join tests")

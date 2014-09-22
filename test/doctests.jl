@@ -4,12 +4,12 @@ module TestDocumentation
 using Base.Test
 using DataArrays
 using DataFrames
-using Dates
+
 
 println("Running documentation tests")
 
 using TimeData
-using Dates
+
 
 fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
 tm = TimeData.readTimedata(fileName)[1:10, 1:4]

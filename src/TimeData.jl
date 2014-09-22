@@ -1,13 +1,13 @@
 ## list packages that shall be automatically loaded
 using DataFrames
-using Dates
+## using Dates
 
 module TimeData
 
 ## list packages whos namespace is used
 using DataArrays
 using DataFrames
-using Dates
+
 using TimeSeries
 ## using Winston
 ## using Gadfly

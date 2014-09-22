@@ -3,7 +3,7 @@ module TestConstraints
 using Base.Test
 using DataArrays
 using DataFrames
-using Dates
+
 using TimeData
 ## using TimeData
 
@@ -32,7 +32,7 @@ invalidIdx = [1. 2 3]
 
 
 ## idx must be array!
-invalidIdx = today()
+invalidIdx = Dates.today()
 @test_throws TypeError TimeData.chkIdx(invalidIdx)
 
 #########################

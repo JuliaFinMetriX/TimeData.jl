@@ -3,7 +3,7 @@ module TestPreservingFuncs
 using Base.Test
 using DataArrays
 using DataFrames
-using Dates
+
 using TimeData
 
 println("Running type preserving function tests")

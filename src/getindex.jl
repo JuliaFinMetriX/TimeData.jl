@@ -150,11 +150,11 @@ for t = (:Timedata, :Timenum, :Timematr)
             return td[row_inds, x]
         end
         
-        function getindex(td::$(t), idx::StepRange{Date,Day})
+        function getindex(td::$(t), idx::StepRange{Date,Dates.Day})
             return getindex(td, [idx])
         end
         
-        function getindex(td::$(t), idx::StepRange{Date,Day},
+        function getindex(td::$(t), idx::StepRange{Date,Dates.Day},
                                    x::Any)
             return getindex(td, [idx], x)
         end
