@@ -5,8 +5,8 @@
 
 [[https://travis-ci.org/JuliaFinMetriX/TimeData.jl][https://travis-ci.org/JuliaFinMetriX/TimeData.jl.png]]
 [[https://coveralls.io/r/JuliaFinMetriX/TimeData.jl?branch%3Dmaster][https://coveralls.io/repos/JuliaFinMetriX/TimeData.jl/badge.png?branch=master]]
-[[http://pkg.julialang.org/?pkg%3DTimeData&ver%3Drelease][http://pkg.julialang.org/?pkg=TimeData&ver=release]]
-[[https://zenodo.org/badge/doi/10.5281/zenodo.12003.png]]
+[[http://pkg.julialang.org/?pkg%3DTimeData&ver%3Drelease][http://pkg.julialang.org/badges/TimeData_release.svg]]
+[[http://dx.doi.org/10.5281/zenodo.12003][https://zenodo.org/badge/doi/10.5281/zenodo.12003.png]]
 
 * Documentation
 
