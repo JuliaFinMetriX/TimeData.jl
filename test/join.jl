@@ -69,5 +69,18 @@ joinSortedIdx_right(tm1, tm2)
 joinSortedIdx_inner(tm1, tm2)
 joinSortedIdx_outer(tm1, tm2)
 
+## outer join old bug
+##-------------------
+
+tm1 = Timenum(DataFrame(Adj_Close = NA), [Date(2012,1,3)])
+tm2 = Timenum(DataFrame(Adj_Close2 = [3, 4, 5, 2, 1]),
+              [Date(2012,1,1):Date(2012,1,5)])
+actOut = joinSortedIdx_outer(tm1, tm2)
+
+expOut = Timedata(DataFrame(Adj_Close = DataArray(NAtype, 5),
+                           Adj_Close2 = [3, 4, 5, 2, 1]),
+              [Date(2012,1,1):Date(2012,1,5)])
+@test isequal(actOut, expOut)
+
 end
 

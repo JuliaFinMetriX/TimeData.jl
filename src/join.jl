@@ -158,7 +158,7 @@ function findAllOccurringDates(idx1, idx2)
                                 nDatesFound)
             ii += 1; nDatesFound += 1
         end
-    elseif ii < nIds1
+    elseif ii > nIds1
         while jj <= nIds2
             equalIds = addValueToDataArray!(equalIds, @data([NA jj]),
                                 nDatesFound)
