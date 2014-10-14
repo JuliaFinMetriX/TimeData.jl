@@ -22,7 +22,7 @@ function datsAsFloats(dats::Array{Date, 1})
     nObs = size(dats, 1)
     datsAsFloat = Array(Float64, nObs)
     for ii=1:nObs
-        datsAsFloat[ii] = dayofyear(dats[ii])./366 .+ year(dats[ii])
+        datsAsFloat[ii] = Dates.dayofyear(dats[ii])./366 .+ Dates.year(dats[ii])
     end
     return datsAsFloat
 end
@@ -30,6 +30,25 @@ end
 function datsAsFloats(tm::AbstractTimedata)
     return datsAsFloats(idx(tm))
 end
+
+## remove rows with NAs only
+##--------------------------
+
+function rmDatesOnlyNAs(tn::Timenum)
+    nObs, nVars = size(tn)
+    onlyNAs = [true for ii=1:nObs]
+    for ii=1:nObs
+        onlyNAsInRow = true
+        for jj=1:nVars
+            if !isna(get(tn, ii, jj))
+                onlyNAs[ii] = false
+                break
+            end
+        end
+    end
+    return tn[!onlyNAs, :]
+end
+
 
 #########################
 ## unit test utilities ##
