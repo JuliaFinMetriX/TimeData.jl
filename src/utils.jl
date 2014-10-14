@@ -1,3 +1,40 @@
+########################
+## plotting utilities ##
+########################
+
+## process dates
+##--------------
+
+function datsAsStrings(dats::Array{Date, 1})
+    nObs = size(dats, 1)
+    datsAsStr = Array(ASCIIString, nObs)
+    for ii=1:nObs
+        datsAsStr[ii] = string(dats[ii])
+    end
+    return datsAsStr
+end
+
+function datsAsStrings(tm::AbstractTimedata)
+    return datsAsStrings(idx(tm))
+end
+
+function datsAsFloats(dats::Array{Date, 1})
+    nObs = size(dats, 1)
+    datsAsFloat = Array(Float64, nObs)
+    for ii=1:nObs
+        datsAsFloat[ii] = dayofyear(dats[ii])./366 .+ year(dats[ii])
+    end
+    return datsAsFloat
+end
+
+function datsAsFloats(tm::AbstractTimedata)
+    return datsAsFloats(idx(tm))
+end
+
+#########################
+## unit test utilities ##
+#########################
+
 function testcase(timedataType, number::Int)
     ## easily create TimeData objects for testing
 

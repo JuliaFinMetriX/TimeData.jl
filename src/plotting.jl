@@ -1,13 +1,3 @@
-function datsAsStrings(tm::Timematr)
-    nObs = size(tm, 1)
-    datsAsStr = Array(ASCIIString, nObs)
-    idxes = idx(tm)
-    for ii=1:nObs
-        datsAsStr[ii] = string(idxes[ii])
-    end
-    return datsAsStr
-end
-
 import Gadfly.plot
 function plot(tm::Timematr, settings...)
     ## plot Timematr object

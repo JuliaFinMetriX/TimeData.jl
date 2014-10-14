@@ -68,6 +68,33 @@ function floatcore(tn::AbstractTimenum)
     return vals    
 end
 
+## process data values
+##--------------------
+
+function floatDf(tm::AbstractTimematr)
+    return tm.vals
+end
+
+function floatDf(tn::AbstractTimenum)
+    ## transform numeric DataFrame to Array(Float) with NaN instead of
+    ## NA 
+    nObs, nAss = size(tn.vals)
+    varNames = names(tn.vals)
+    newDf = DataFrame()
+    vals = Array(Float64, nObs)
+    for ii=1:nAss
+        if isa(tn.vals.columns[ii], DataArray)
+            vals = tn.vals.columns[ii].data #::Array{Float64,1}
+            vals[tn.vals.columns[ii].na] = NaN
+        else
+            vals = tn.vals.columns[ii] #::Array{Float64, 1}
+        end
+        newDf[varNames[ii]] = vals
+    end
+    return newDf
+end
+
+
 ###################
 ## Timedata size ##
 ###################
