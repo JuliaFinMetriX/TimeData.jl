@@ -20,21 +20,6 @@ function Timematr{T}(vals::DataFrame, idx::Array{T, 1})
     return Timematr{T}(vals, idx)
 end
 
-#############################
-## get numeric values only ##
-#############################
-
-## possible without NAs: extract values as Float64
-## Will always return Array{Float64, 2}, since it is based on
-## DataFrames. array only returns Array{Float, 1} for DataArrays. 
-function core(tm::AbstractTimematr)
-    return convert(Array{Float64}, array(tm.vals))
-end
-## alternative implementation not determining Float64
-## function core(tm::AbstractTimematr)
-##     return reshape([promote(array(tm.vals)...)...], size(tm))
-## end
-
 #############
 ## getVars ##
 #############
