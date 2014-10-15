@@ -37,9 +37,9 @@ for t in allTypes
     end)
 end
 
-##########
-## isna ##
-##########
+#############
+## isnaElw ##
+#############
 
 ## set up Timenum with NAs
 df = DataFrame()
@@ -51,7 +51,7 @@ tn = Timenum(df, dats)
 ## test outcome
 naVals = [false false; false false; false true; true true; false false]
 isNaTd = Timedata(naVals, names(tn), idx(tn))
-@test isna(tn) == isNaTd
+@test isnaElw(tn) == isNaTd
 
 
 
@@ -94,16 +94,16 @@ tn4 = Timenum(df, [Date(2010, 1, 1):Date(2010, 1, 2)])
 @test !(tn == tn4)
 
 ## elementwise equal objects
-@test isequalElemwise(tn, tn) == Timedata([true true; true true],
+@test isequalElw(tn, tn) == Timedata([true true; true true],
                                           names(td), idx(td))
 
 ## elementwise with unequal entries
 
 ## differences in names, indices or types throw errors
-@test_throws ErrorException !isequalElemwise(tn, td)
-@test_throws ErrorException !isequalElemwise(tn, tn4)
+@test_throws ErrorException !isequalElw(tn, td)
+@test_throws ErrorException !isequalElw(tn, tn4)
 
-@test isequalElemwise(tn, tn2) == Timedata([true true; false true],
+@test isequalElw(tn, tn2) == Timedata([true true; false true],
                                            names(td), idx(td))
 
 ##############
@@ -142,7 +142,7 @@ tm = Timematr(rand(2, 3))
 
 
 ###############
-## issimilar ##
+## equMeta ##
 ###############
 
 df = DataFrame()
@@ -152,12 +152,12 @@ dats = [Date(2014,1,1):Date(2014,1,5)]
 tn = TimeData.Timenum(df, dats)
 
 ## similar
-@test TimeData.issimilar(tn, tn)
+@test TimeData.equMeta(tn, tn)
 @test TimeData.hasSimilarColumns(tn, tn)
 
 ## different indices
 tn2 = TimeData.Timenum(df)
-@test !TimeData.issimilar(tn, tn2)
+@test !TimeData.equMeta(tn, tn2)
 @test TimeData.hasSimilarColumns(tn, tn2)
 
 ## different names
@@ -167,12 +167,12 @@ df[:b] = @data([3, 8, NA, NA, 2])
 dats = [Date(2014,1,1):Date(2014,1,5)]
 tn2 = TimeData.Timenum(df, dats)
 names!(tn2.vals, [:c, :d])
-@test !TimeData.issimilar(tn, tn2)
+@test !TimeData.equMeta(tn, tn2)
 @test !TimeData.hasSimilarColumns(tn, tn2)
 
 ## different types
 tm = TimeData.Timedata(df, dats)
-@test !TimeData.issimilar(tn, tm)
+@test !TimeData.equMeta(tn, tm)
 @test !TimeData.hasSimilarColumns(tn, tm)
 
 end

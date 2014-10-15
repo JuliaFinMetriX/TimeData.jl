@@ -22,7 +22,7 @@ end
 
 function core(td::AbstractTimematr)
     ## return Float64
-    return convert(Array{Float64}, array(tm.vals))
+    return convert(Array{Float64}, array(td.vals))
 end
 
 
@@ -108,9 +108,24 @@ function ==(tn::AbstractTimedata, tn2::AbstractTimedata)
     return ==(tn.vals, tn2.vals)
 end
 
-function isequalElemwise(tn::AbstractTimedata, tn2::AbstractTimedata)
+import Base.(.==)
+function .==(tn, tn2)
+    if !equMeta(tn, tn2)
+        error("Timedata object must be similar for elementwise
+isequal")
+    end
+    (nObs, nVars) = size(tn)
+    df = DataFrame()
+    for (nam, col) in eachcol(tn)
+        df[nam] = tn.vals[nam] .== tn2.vals[nam]
+    end
+    return Timedata(df, idx(tn))
+end
+
+
+function isequalElw(tn::AbstractTimedata, tn2::AbstractTimedata)
     ## return matrix with true / false elements
-    if !issimilar(tn, tn2)
+    if !equMeta(tn, tn2)
         error("Timedata object must be similar for elementwise
 isequal") 
     end
@@ -145,8 +160,7 @@ end
 ## isna ##
 ##########
 
-import DataFrames.isna
-function isna(td::AbstractTimedata)
+function isnaElw(td::AbstractTimedata)
     ## elementwise test for NA
     df = DataFrame()
     for (nam, col) in eachcol(td.vals)
@@ -175,13 +189,13 @@ end
 ## equal structure ##
 #####################
 
-function issimilar(td1::AbstractTimedata, td2::AbstractTimedata)
+function equMeta(td1::AbstractTimedata, td2::AbstractTimedata)
     isequal(typeof(td1), typeof(td2)) || return false
     isequal(names(td1), names(td2)) || return false
     isequal(td1.idx, td2.idx) || return false
 end
 
-function hasSimilarColumns(td1::AbstractTimedata, td2::AbstractTimedata)
+function equColMeta(td1::AbstractTimedata, td2::AbstractTimedata)
     isequal(super(typeof(td1)), super(typeof(td2))) || return false
     isequal(names(td1), names(td2)) || return false
 end

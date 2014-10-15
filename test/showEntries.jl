@@ -84,7 +84,7 @@ expTd = showEntries(testcase2, x -> x.> 130, sort="variables")
 
 expDf = DataFrame(variable = [:prices2], value = NA)
 expTd = TimeData.Timedata(expDf, [Date(2010,1,3)])
-@test TimeData.isequal(showEntries(testcase1, isna(testcase1)), expTd)
+@test TimeData.isequal(showEntries(testcase1, isnaElw(testcase1)), expTd)
 
 
 end

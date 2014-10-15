@@ -181,7 +181,7 @@ end
 macro nonpres_msSymmetric_timedata(f)
     esc(quote
         function $(f)(inst::AbstractTimedata, inst2::AbstractTimedata)
-            if !issimilar(inst, inst2)
+            if !equMeta(inst, inst2)
                 error("TimeData objects not similar")
             end
 
@@ -215,7 +215,7 @@ end
 macro nonpres_msSymmetric_timematr(f)
     esc(quote
         function $(f)(inst::Timematr, inst2::Timematr)
-            if !issimilar(inst, inst2)
+            if !equMeta(inst, inst2)
                 error("Timematr objects not similar")
             end
 
@@ -290,7 +290,7 @@ end
 macro time_data_comparison(f)
     esc(quote
         function $(f)(td1::Timedata, td2::Timedata)
-            if !issimilar(td1, td2)
+            if !equMeta(td1, td2)
                 error("Timedata objects not similar")
             end
 
