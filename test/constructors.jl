@@ -80,10 +80,10 @@ end
 
 ## idx initialized with wrong type
 vals = DataFrame(a = [2, 3, 4])
-invalidIdx = [1., 2, 3]
+invalidIdx = @data([1., NA, 3])
 for t in allTypes
     eval(quote
-        @test_throws TypeError $(t)(vals, invalidIdx)
+        @test_throws MethodError $(t)(vals, invalidIdx)
     end)
 end
 

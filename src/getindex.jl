@@ -139,6 +139,11 @@ for t = (:Timedata, :Timenum, :Timematr)
             row_ind = idx(td) .== date
             return td[row_ind, :]
         end
+
+        function getindex(td::$(t), date::Date, x::Any)
+            row_ind = idx(td) .== date
+            return getindex(td, row_ind, x)
+        end
         
         function getindex(td::$(t), idxs::Array{Date,1})
             row_inds = findin(TimeData.idx(td), idxs)
@@ -155,7 +160,7 @@ for t = (:Timedata, :Timenum, :Timematr)
         end
         
         function getindex(td::$(t), idx::StepRange{Date,Dates.Day},
-                                   x::Any)
+                          x::Any)
             return getindex(td, [idx], x)
         end
         

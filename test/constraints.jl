@@ -27,7 +27,7 @@ validIdx = [1:10]
 TimeData.chkIdx(validIdx)
 
 ## test invalid idx
-invalidIdx = [1. 2 3]
+invalidIdx = @data([1. NA 3])
 @test_throws TypeError TimeData.chkIdx(invalidIdx)
 
 
