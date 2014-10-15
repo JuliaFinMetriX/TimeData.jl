@@ -17,24 +17,24 @@ require("Winston")
 function GdfPlot(tn::Timenum)
     nams = names(tn)
     tn = rmDatesOnlyNAs(tn)
-    df = floatDf(tn) # NA to NaN
-    dats = datsAsFloats(tn)
-    df[:Idx] = dats
+    vals = getAs(tn, Float64, NaN) # NA to NaN
+    dats = datesAsFloats(tn)
+    df = composeDataFrame([dats vals], [:Idx; nams])
     stackedData = stack(df, nams)
     Gadfly.plot(stackedData, x="Idx", y="value",
          color="variable", Gadfly.Geom.line)
 end
 
-function GdfPlotStrings(tn::Timenum)
-    nams = names(tn)
-    tn = rmDatesOnlyNAs(tn)
-    df = floatDf(tn) # NA to NaN
-    dats = datsAsStrings(tn)
-    df[:Idx] = dats
-    stackedData = stack(df, nams)
-    Gadfly.plot(stackedData, x="Idx", y="value",
-         color="variable", Gadfly.Geom.line)
-end
+## function GdfPlotStrings(tn::Timenum)
+##     nams = names(tn)
+##     tn = rmDatesOnlyNAs(tn)
+##     df = floatDf(tn) # NA to NaN
+##     dats = datesAsStrings(tn)
+##     df[:Idx] = dats
+##     stackedData = stack(df, nams)
+##     Gadfly.plot(stackedData, x="Idx", y="value",
+##          color="variable", Gadfly.Geom.line)
+## end
 
 ## ## speed improvement through layers? doesn't seem so...
 ## function GdfPlotLayer(tn::Timenum)
@@ -84,8 +84,8 @@ end
 function WstPlot(tn::Timenum; title::String = "",
                  xlabel::String = "time",
                  ylabel::String = "value")
-    vals = floatcore(tn)
-    dats = datsAsFloats(idx(tn))
+    vals = getAs(tn, Float64, NaN) # transform to floating array
+    dats = datesAsFloats(idx(tn))
     Winston.plot(dats, vals)
     Winston.title(title)
     Winston.xlabel(xlabel)
