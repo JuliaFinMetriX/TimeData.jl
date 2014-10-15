@@ -16,8 +16,15 @@ end
 
 function core(td::AbstractTimedata)
     ## return all entries of Timedata object
+    ## in order to force output other than Array{Any}, use getAs
     return get(td)
 end
+
+function core(td::AbstractTimematr)
+    ## return Float64
+    return convert(Array{Float64}, array(tm.vals))
+end
+
 
 function idxtype(td::AbstractTimedata)
     return typeof(idx(td))
@@ -42,58 +49,23 @@ end
 ## floatcore ##
 ###############
 
-function floatcore(tn::AbstractTimematr)
-    ## fast access to data values only 
+function getAs(tn::AbstractTimedata, typ::Type=Any,
+               replaceNA=NA)
+    ## get data values only as Array
+    ## in order to get something different than Array{Any}, determine
+    ## type of array and replace NA values accordingly
     nObs, nAss = size(tn)
-    vals = Array(Float64, nObs, nAss)
-    for ii=1:nAss
-        vals[:, ii] = tn.vals.columns[ii]
-    end
-    return vals
-end
-
-function floatcore(tn::AbstractTimenum)
-    ## fast access to data values only 
-    nObs, nAss = size(tn)
-    vals = Array(Float64, nObs, nAss)
-    
+    vals = Array(typ, nObs, nAss)
     for ii=1:nAss
         if isa(tn.vals.columns[ii], DataArray)
-            vals[:, ii] = tn.vals.columns[ii].data #::Array{Float64,1}
-            vals[tn.vals.columns[ii].na, ii] = NaN
+            vals[:, ii] = tn.vals.columns[ii].data
+            vals[tn.vals.columns[ii].na, ii] = replaceNA
         else
-            vals[:, ii] = tn.vals.columns[ii] #::Array{Float64, 1}
+            vals[:, ii] = tn.vals.columns[ii]
         end
     end
     return vals    
 end
-
-## process data values
-##--------------------
-
-function floatDf(tm::AbstractTimematr)
-    return tm.vals
-end
-
-function floatDf(tn::AbstractTimenum)
-    ## transform numeric DataFrame to Array(Float) with NaN instead of
-    ## NA 
-    nObs, nAss = size(tn.vals)
-    varNames = names(tn.vals)
-    newDf = DataFrame()
-    vals = Array(Float64, nObs)
-    for ii=1:nAss
-        if isa(tn.vals.columns[ii], DataArray)
-            vals = tn.vals.columns[ii].data #::Array{Float64,1}
-            vals[tn.vals.columns[ii].na] = NaN
-        else
-            vals = tn.vals.columns[ii] #::Array{Float64, 1}
-        end
-        newDf[varNames[ii]] = vals
-    end
-    return newDf
-end
-
 
 ###################
 ## Timedata size ##
