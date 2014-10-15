@@ -2,10 +2,10 @@
 ## plotting utilities ##
 ########################
 
-## process dates
-##--------------
+## process dates to strings
+##-------------------------
 
-function datsAsStrings(dats::Array{Date, 1})
+function datesAsStrings(dats::Array{Date, 1})
     nObs = size(dats, 1)
     datsAsStr = Array(ASCIIString, nObs)
     for ii=1:nObs
@@ -14,11 +14,41 @@ function datsAsStrings(dats::Array{Date, 1})
     return datsAsStr
 end
 
-function datsAsStrings(tm::AbstractTimedata)
-    return datsAsStrings(idx(tm))
+function datesAsStrings(dats::Array{DateTime, 1})
+    nObs = size(dats, 1)
+    datsAsStr = Array(ASCIIString, nObs)
+    for ii=1:nObs
+        datsAsStr[ii] = string(dats[ii])
+    end
+    return datsAsStr
 end
 
-function datsAsFloats(dats::Array{Date, 1})
+function datesAsStrings(dats::Array{Integer, 1})
+    nObs = size(dats, 1)
+    datsAsStr = Array(ASCIIString, nObs)
+    for ii=1:nObs
+        datsAsStr[ii] = string(dats[ii])
+    end
+    return datsAsStr
+end
+
+function datesAsStrings(dats::Array{Float64, 1})
+    nObs = size(dats, 1)
+    datsAsStr = Array(ASCIIString, nObs)
+    for ii=1:nObs
+        datsAsStr[ii] = string(dats[ii])
+    end
+    return datsAsStr
+end
+
+function datesAsStrings(tm::AbstractTimedata)
+    return datesAsStrings(idx(tm))
+end
+
+## process dates to floating point numbers
+##----------------------------------------
+
+function datesAsNumbers(dats::Array{Date, 1})
     nObs = size(dats, 1)
     datsAsFloat = Array(Float64, nObs)
     for ii=1:nObs
@@ -27,23 +57,47 @@ function datsAsFloats(dats::Array{Date, 1})
     return datsAsFloat
 end
 
-function datsAsFloats(tm::AbstractTimedata)
-    return datsAsFloats(idx(tm))
+function datesAsNumbers(dats::Array{DateTime, 1})
+    nObs = size(dats, 1)
+    datsAsFloat = Array(Float64, nObs)
+    for ii=1:nObs
+        datsAsFloat[ii] = Dates.year(dats[ii]) .+
+        Dates.dayofyear(dats[ii])./366 .+
+        Dates.hour(dats[ii])./(366*24) .+
+        Dates.minute(dats[ii])./(366*24*60) .+
+        Dates.second(dats[ii])./(366*24*60*60)
+    end
+    return datsAsFloat
+end
+
+function datesAsNumbers(dats::Array{Float64, 1})
+    return dats
+end
+
+function datesAsNumbers(dats::Array{Integer, 1})
+    return dats
+end
+
+function datesAsNumbers(tm::AbstractTimedata)
+    return datesAsNumbers(idx(tm))
 end
 
 ## remove rows with NAs only
 ##--------------------------
 
-function rmDatesOnlyNAs(tn::Timenum)
+function rmDatesOnlyNAs(tm::Timematr)
+    return tm # nothing to do
+end
+
+function rmDatesOnlyNAs(tn::AbstractTimedata)
     nObs, nVars = size(tn)
-    onlyNAs = [true for ii=1:nObs]
-    for ii=1:nObs
-        onlyNAsInRow = true
-        for jj=1:nVars
-            if !isna(get(tn, ii, jj))
-                onlyNAs[ii] = false
-                break
-            end
+    onlyNAs = trues(nObs)
+    for ii=1:nVars
+        if isa(tn.vals.columns[ii], DataArray)
+            onlyNAs = onlyNAs & tn.vals.columns[ii].na
+        else
+            onlyNAs = falses(nObs)
+            break
         end
     end
     return tn[!onlyNAs, :]
@@ -83,7 +137,12 @@ function testcase(timedataType, number::Int)
         df[:prices1] = @data([100, 120, 140, 170, 200])
         df[:prices2] = @data([110, 120, NA, 130, 150])
         testInst = timedataType(df, dats)
-
+    elseif number == 5
+        dats = [Date(2010, 1, 1):Date(2010, 1, 5)]
+        df = DataFrame()
+        df[:prices1] = @data([100, 120, NA, 170, 200])
+        df[:prices2] = @data([110, 120, NA, 130, 150])
+        testInst = timedataType(df, dats)
     else
         error("testInst number not implemented yet")
     end
