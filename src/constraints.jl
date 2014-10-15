@@ -11,9 +11,10 @@ function chkIdx(idx)
                         Array,
                         typeof(idx)))
     end
-    if !issubtype(eltype(idx), Union(Integer, Date, DateTime))
+    if !issubtype(eltype(idx), Union(Integer, Float64, Date, DateTime))
         throw(TypeError(:chkIdx,
-                        "passed time index: entries must be either Integer or TimeType\n",
+                        "passed time index: entries must be either
+Integer, Float64 or TimeType\n",
                         Union(Integer, Date, DateTime),
                         eltype(idx)))
     end
