@@ -116,20 +116,20 @@ for t = (:Timedata, :Timenum, :Timematr)
         ## assumed as type preserving without further tests so far ##
         #############################################################
         
-        getindex(td::$(t), ex::Expr) = getindex(td, with(td.vals, ex))
-        getindex(td::$(t), ex::Expr, c::ColumnIndex) =
-            getindex(td, with(td.vals, ex), c)
+        ## getindex(td::$(t), ex::Expr) = getindex(td, with(td.vals, ex))
+        ## getindex(td::$(t), ex::Expr, c::ColumnIndex) =
+        ##     getindex(td, with(td.vals, ex), c)
         
-        ## typealias ColumnIndex Union(Real, Symbol)
-        getindex{T <: ColumnIndex}(td::$(t), ex::Expr, c::AbstractVector{T}) =
-            getindex(td, with(td.vals, ex), c)
+        ## ## typealias ColumnIndex Union(Real, Symbol)
+        ## getindex{T <: ColumnIndex}(td::$(t), ex::Expr, c::AbstractVector{T}) =
+        ##     getindex(td, with(td.vals, ex), c)
         
-        getindex(td::$(t), c::Real, ex::Expr) =
-            getindex(td, c, with(td.vals, ex))
-        getindex{T <: Real}(td::$(t), c::AbstractVector{T}, ex::Expr) =
-            getindex(td, c, with(td.vals, ex))
-        getindex(td::$(t), ex1::Expr, ex2::Expr) =
-            getindex(td, with(td.vals, ex1), with(td.vals, ex2))
+        ## getindex(td::$(t), c::Real, ex::Expr) =
+        ##     getindex(td, c, with(td.vals, ex))
+        ## getindex{T <: Real}(td::$(t), c::AbstractVector{T}, ex::Expr) =
+        ##     getindex(td, c, with(td.vals, ex))
+        ## getindex(td::$(t), ex1::Expr, ex2::Expr) =
+        ##     getindex(td, with(td.vals, ex1), with(td.vals, ex2))
 
         #########################
         ## indexing with dates ##

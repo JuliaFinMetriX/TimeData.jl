@@ -37,7 +37,7 @@ eachrow,
 find,
 geomMean,
 get,
-getAs,
+asArr,
 getDates,
 hcat,
 HTML,
@@ -67,7 +67,7 @@ rowstds,
 rowsums,
 setDfRow!,
 setNA!,
-showEntries,
+getEntries,
 std,
 str,
 sum,
@@ -90,7 +90,7 @@ include("setindex.jl")
 include("display.jl")
 include("abstractFuncs.jl")
 include("preservingFuncs.jl")
-include("showEntries.jl")
+include("getEntries.jl")
 include("operators.jl")
 include("stats.jl")
 include("io.jl")

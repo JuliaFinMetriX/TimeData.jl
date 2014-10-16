@@ -1,8 +1,8 @@
 ###############################
-## showEntries with function ##
+## getEntries with function ##
 ###############################
 
-function showEntries(td::TimeData.AbstractTimedata, f::Function; sort="dates")
+function getEntries(td::TimeData.AbstractTimedata, f::Function; sort="dates")
     ## show dates and variables fulfilling a criteria elementwise
     ##
     ## f returns true or false or NA
@@ -58,10 +58,10 @@ function showEntries(td::TimeData.AbstractTimedata, f::Function; sort="dates")
 end
 
 ######################################
-## define showEntries, single index ##
+## define getEntries, single index ##
 ######################################
 
-function showEntries(td::TimeData.AbstractTimedata,
+function getEntries(td::TimeData.AbstractTimedata,
                      singleInd::Array{Int}) 
     (rowInds, colInds) = ind2sub(size(td), singleInd)
     nObs = length(rowInds)
@@ -82,10 +82,10 @@ function showEntries(td::TimeData.AbstractTimedata,
 end
 
 ######################################
-## define showEntries, double index ##
+## define getEntries, double index ##
 ######################################
 
-function showEntries(td::TimeData.AbstractTimedata,
+function getEntries(td::TimeData.AbstractTimedata,
                      rowInds::Array{Int}, colInds::Array{Int})
 
     nObs = length(rowInds)
@@ -106,11 +106,11 @@ function showEntries(td::TimeData.AbstractTimedata,
 end
 
 ###################################
-## showEntries, logical indexing ##
+## getEntries, logical indexing ##
 ###################################
 
 
-function showEntries(td::TimeData.AbstractTimedata,
+function getEntries(td::TimeData.AbstractTimedata,
                      td2::TimeData.AbstractTimedata)
 
     if size(td) != size(td2)
@@ -124,7 +124,7 @@ logical indexing")
     end
 
     singleInds = find(td2)
-    return showEntries(td, singleInds)
+    return getEntries(td, singleInds)
 end
 
 

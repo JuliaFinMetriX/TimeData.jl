@@ -16,7 +16,7 @@ end
 
 function core(td::AbstractTimedata)
     ## return all entries of Timedata object
-    ## in order to force output other than Array{Any}, use getAs
+    ## in order to force output other than Array{Any}, use asArr
     return get(td)
 end
 
