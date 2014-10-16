@@ -36,6 +36,20 @@ function asArr(df::DataFrame, typ::Type=Any,
     return vals    
 end
 
+function asArr(dfr::DataFrameRow, typ::Type=Any,
+               replaceNA=NA)
+    nObs = length(dfr)
+    res = Array(typ, 1, nObs)
+    for ii=1:nObs
+        if isna(dfr[ii])
+            res[1, ii] = replaceNA
+        else
+            res[1, ii] = dfr[ii]
+        end
+    end
+    return res
+end
+
 function asArr(tn::AbstractTimedata, typ::Type=Any,
                replaceNA=NA)
     return asArr(tn.vals, typ, replaceNA)
@@ -44,8 +58,6 @@ end
 ## problem: columns with NAs only
 ## problem: NaN in boolean context will be true
 ## problem: DataArray{Any, 1} also exist: da.data then contains NAs
-
-
 
 
 #############
