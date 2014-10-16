@@ -1,3 +1,53 @@
+###########
+## asArr ##
+###########
+
+## asArr: try conversion to Array, implicitly dealing with NAs
+## 
+## using DataFrames, columns may be of different type and hence are
+## possibly not compatible with each other as columns of an array
+
+function asArr{T}(da::DataArray{T, 1}, typ::Type=Any,
+                  replaceNA=NA)
+    ## convert DataArray to typ and replace NAs with replaceNA
+    vals = convert(Array{typ, 1}, da.data)
+    vals[da.na] = replaceNA
+    return vals
+end
+
+function asArr(df::DataFrame, typ::Type=Any,
+               replaceNA=NA)
+    nObs, nAss = size(df)
+    vals = Array(typ, nObs, nAss)
+    ## copying into this array implicitly forces conversion to this
+    ## type afterwards 
+    for ii=1:nAss
+        if isa(df.columns[ii], DataArray) # deal with NAs
+            if eltype(df.columns[ii]) == NAtype # column of NAs only
+                vals[:, ii] = replaceNA
+            else
+                vals[:, ii] = df.columns[ii].data
+                vals[df.columns[ii].na, ii] = replaceNA
+            end
+        else # no NAs in simple Array
+            vals[:, ii] = df.columns[ii]
+        end
+    end
+    return vals    
+end
+
+function asArr(tn::AbstractTimedata, typ::Type=Any,
+               replaceNA=NA)
+    return asArr(tn.vals, typ, replaceNA)
+end
+
+## problem: columns with NAs only
+## problem: NaN in boolean context will be true
+## problem: DataArray{Any, 1} also exist: da.data then contains NAs
+
+
+
+
 #############
 ## Timenum ##
 #############

@@ -45,28 +45,6 @@ function get(td::AbstractTimedata)
     return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
 end
 
-###############
-## floatcore ##
-###############
-
-function getAs(tn::AbstractTimedata, typ::Type=Any,
-               replaceNA=NA)
-    ## get data values only as Array
-    ## in order to get something different than Array{Any}, determine
-    ## type of array and replace NA values accordingly
-    nObs, nAss = size(tn)
-    vals = Array(typ, nObs, nAss)
-    for ii=1:nAss
-        if isa(tn.vals.columns[ii], DataArray)
-            vals[:, ii] = tn.vals.columns[ii].data
-            vals[tn.vals.columns[ii].na, ii] = replaceNA
-        else
-            vals[:, ii] = tn.vals.columns[ii]
-        end
-    end
-    return vals    
-end
-
 ###################
 ## Timedata size ##
 ###################
