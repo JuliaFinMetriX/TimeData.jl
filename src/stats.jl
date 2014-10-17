@@ -112,7 +112,7 @@ function sum(tm::AbstractTimematr, dim::Int = 1)
         error("For rowwise sum use rowsums function")
     end
     sumVals = sum(core(tm), dim)
-    sums = DataFrame(sumVals, names(tm))
+    sums = composeDataFrame(sumVals, names(tm))
 end
 
 function rowsums(tm::AbstractTimematr)
@@ -140,7 +140,7 @@ end
 import Base.cor
 function cor(tm::AbstractTimematr)
     ## output: DataFrame
-    corDf = DataFrame(cor(core(tm)), names(tm.vals))
+    corDf = composeDataFrame(cor(core(tm)), names(tm.vals))
     return corDf
 end
 
