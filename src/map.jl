@@ -265,3 +265,59 @@ function chkDates(f::Function, tddi::TdDateIterator)
 end
 
 
+###################
+## collapseDates ##
+###################
+
+## reduces columns to single value
+## output: DataFrame
+
+function collapseDates(f::Function, tdci::TdColumnIterator)
+    df = DataFrame()
+    for (nam, col) in tdci
+        df[nam] = f(col)
+    end
+    return df
+end
+
+
+function collapseDates(f::Function, tdvi::TdVariableIterator)
+    df = DataFrame()
+    for tdCol in tdvi
+        tdRes = f(tdCol)
+        df[names(tdCol)[1]] = get(tdRes, :) # get single value
+    end
+    return df
+end
+
+##################
+## collapseVars ##
+##################
+
+## reduces row to single value
+## output: TimeData object
+function collapseVars(f::Function, tdri::TdRowIterator)
+    nObs = size(tdri.td, 1)
+    vals = Array(Any, nObs)
+    rowCounter = 1
+    for row in tdri # DataFrame
+        rowRes = f(row)
+        vals[rowCounter, 1] = get(rowRes, :) # get single value
+        rowCounter += 1
+    end
+    df = DataFrame(funcVal = anyToDa(vals))
+    return Timedata(df, idx(tdri.td))
+end
+
+function collapseVars(f::Function, tddi::TdDateIterator)
+    nObs = size(tddi.td, 1)
+    vals = Array(Any, nObs)
+    rowCounter = 1
+    for tmRow in tddi # TimeData object
+        rowRes = f(tmRow)
+        vals[rowCounter, 1] = get(rowRes, :) # get single value
+        rowCounter += 1
+    end
+    df = DataFrame(funcVal = anyToDa(vals))
+    return Timedata(df, idx(tddi.td))
+end

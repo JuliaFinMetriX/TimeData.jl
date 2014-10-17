@@ -181,4 +181,112 @@ expOut = tn .> 120
 @test isequal(tnHolds, expOut)
 
 
+########################
+## test collapseDates ##
+########################
+
+## eachcol
+##--------
+
+## column sum with NAs
+tn = TimeData.testcase(TimeData.Timenum, 2)
+df = TimeData.collapseDates(x -> sum(x), eachcol(tn))
+expOut = DataFrame(prices1 = [NA], prices2 = [NA])
+@test isequal(df, expOut)
+
+## column sum skipping NAs
+function sumSkipNA(da::DataArray)
+    sumVal = 0
+    for ii=1:length(da)
+        if !isna(da[ii])
+            sumVal += da[ii]
+        end
+    end 
+    return sumVal
+end
+
+tn = TimeData.testcase(TimeData.Timenum, 2)
+df = TimeData.collapseDates(x -> sumSkipNA(x), eachcol(tn))
+expOut = DataFrame(prices1 = 630, prices2 = 360)
+@test isequal(df, expOut)
+
+## eachvar
+##--------
+
+## column sum
+tm = TimeData.testcase(TimeData.Timematr, 1)
+df = TimeData.collapseDates(x -> sum(x, 1), TimeData.eachvar(tm))
+expOut = DataFrame(prices1 = 500, prices2 = 460)
+@test isequal(df, expOut)
+
+## count NAs
+function countNAs(td::TimeData.AbstractTimedata)
+    return sum(TimeData.asArr(TimeData.isnaElw(td), Bool, false))
+end
+
+tn = TimeData.testcase(TimeData.Timenum, 2)
+df = TimeData.collapseDates(x -> countNAs(x),
+                            TimeData.eachvar(tn))
+expOut = DataFrame(prices1 = 1, prices2 = 2)
+@test isequal(df, expOut)
+
+
+#######################
+## test collapseVars ##
+#######################
+
+## eachrow
+##--------
+
+## count NAs
+function countNAs(df::DataFrame)
+    sumNAs = 0
+    for ii=1:size(df, 2)
+        if isna(df[1, ii])
+            sumNAs += 1
+        end
+    end
+    return sumNAs
+end
+
+tn = TimeData.testcase(TimeData.Timenum, 2)
+td = TimeData.collapseVars(x -> countNAs(x),
+                           eachrow(tn))
+
+expOut = TimeData.Timedata(DataFrame(funcVal = [1, 0, 1, 0, 1]),
+                           TimeData.idx(tn))
+
+@test isequal(expOut, td)
+
+## eachdate
+##---------
+
+## calculate mean
+function meanDfRow(df::DataFrame)
+    sumVal = 0
+    sumNAs = 0
+    for ii=1:size(df, 2)
+        if !isna(df[1, ii])
+            sumVal += df[1, ii]
+        else
+            sumNAs += 1
+        end
+    end
+    return sumVal ./ (size(df, 2) - sumNAs)
+end
+
+tn = TimeData.testcase(TimeData.Timenum, 2)
+td = TimeData.collapseVars(x -> meanDfRow(x.vals),
+                           TimeData.eachdate(tn))
+
+mVals = [110, 120, 140, 150, 200]
+expOut = TimeData.Timedata(DataFrame(funcVal = mVals),
+                           TimeData.idx(tn))
+
+@test isequal(expOut, td)
+
+## using already existing rowmeans function for Timenum
+td = TimeData.collapseVars(x -> TimeData.rowmeans(x),
+                           TimeData.eachdate(tn))
+@test isequal(expOut, td)
 end
