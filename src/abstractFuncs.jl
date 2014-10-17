@@ -45,6 +45,38 @@ function get(td::AbstractTimedata)
     return [get(td, ii, jj) for ii=1:size(td, 1), jj=1:size(td, 2)]
 end
 
+## extract single value
+##---------------------
+
+function get(td::AbstractTimedata, x::Colon)
+    if size(td) != (1, 1)
+        error("TimeData obj must be 1x1 for call with colon")
+    end
+    return get(td, 1, 1)
+end
+
+function get(df::DataFrame, x::Colon)
+    if size(df) != (1, 1)
+        error("DataFrame obj must be 1x1 for call with colon")
+    end
+    return df[1, 1]
+end
+
+function get(da::DataArray, x::Colon)
+    if (size(da) != (1, 1)) | (size(da) != (1,))
+        error("DataArray obj must be 1x1 for call with colon")
+    end
+    return da[1, 1]
+end
+
+function get(x::NAtype, y::Colon)
+    return NA
+end
+
+function get(x::Any, y::Colon)
+    return x
+end
+
 ###################
 ## Timedata size ##
 ###################
@@ -100,7 +132,7 @@ isequal")
     return Timedata(df, idx(tn))
 end
 
-
+## isequal(NA, NA) -> true
 function isequalElw(tn::AbstractTimedata, tn2::AbstractTimedata)
     ## return matrix with true / false elements
     if !equMeta(tn, tn2)
@@ -114,7 +146,7 @@ isequal")
     return Timedata(vals, names(tn), idx(tn))
 end
 
-## isequal(NA, NA) -> true
+
 import Base.isapprox
 function isapprox(tn::AbstractTimedata, tn2::AbstractTimedata)
     ## return single true or false

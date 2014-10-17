@@ -3,7 +3,7 @@
 ######################################
 
 function getEntries(td::TimeData.AbstractTimedata,
-                     rowInds::Array{Int}, colInds::Array{Int})
+                    rowInds::Array{Int}, colInds::Array{Int})
 
     nObs = length(rowInds)
     nams = names(td)
@@ -41,8 +41,8 @@ function getEntries(td::TimeData.AbstractTimedata,
                     sortDates::Bool=false)
 
     if size(td) != size(logInds)
-        error("TimeData objects must be of equal dimensions for
-logical indexing")
+        error("TimeData and logical index array must be of equal
+dimensions for logical indexing")
     end
 
     if sortDates
@@ -55,33 +55,21 @@ logical indexing")
     return getEntries(td, rowInds, colInds)
 end
 
+#######################################################
+## getEntries, logical indexing with Timedata object ##
+#######################################################
 
-##############
-## getDates ##
-##############
-
-function getDates(f::Function, td::TimeData.AbstractTimedata)
-    ## find dates where at least one entry fulfills a given condition
-
-    (nObs, nVars) = size(td)
+function getEntries(td::TimeData.AbstractTimedata,
+                    td2::TimeData.AbstractTimedata;
+                    getNAs::Bool=false,
+                    sortDates::Bool=false)
     
-    ## preallocation
-    idxs = convert(typeof(td.idx), [])
-    
-    for ii=1:nObs
-        for jj=1:nVars
-            singleEntry = get(td, ii, jj)
-            
-            testVal = f(singleEntry)
-            if isna(testVal)
-                testVal = false
-            end
-            
-            if testVal
-                push!(idxs, td.idx[ii])
-                break # move to next date
-            end
-        end
+    if size(td) != size(td2)
+        error("TimeData objects must be of equal dimensions for
+logical indexing")
     end
-    return idxs
+
+    logInds = asArr(td2, Bool, getNAs)
+    return getEntries(td, logInds, sortDates)
 end
+

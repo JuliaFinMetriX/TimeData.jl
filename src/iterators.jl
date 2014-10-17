@@ -2,86 +2,57 @@
 ## iteration by columns ##
 ##########################
 
+## column iterator without dates
+##------------------------------
+
+## iterate over columns without dates equal to DataFrames:
+## (nam, col)
 immutable TdColumnIterator
     td::AbstractTimedata
 end
-
 import DataFrames.eachcol
 eachcol(td::AbstractTimedata) = TdColumnIterator(td)
 
 Base.start(itr::TdColumnIterator) = 1
 Base.done(itr::TdColumnIterator, j::Int) = j > size(itr.td, 2)
-Base.next(itr::TdColumnIterator, j::Int) = (itr.td[j], j + 1)
+function Base.next(itr::TdColumnIterator, j::Int)
+    return ((names(itr.td)[j], itr.td.vals[j]), j + 1)
+end
 Base.size(itr::TdColumnIterator) = (size(itr.td, 2), )
 Base.length(itr::TdColumnIterator) = size(itr.td, 2)
-Base.getindex(itr::TdColumnIterator, j::Any) = itr.td[:, j]
+Base.getindex(itr::TdColumnIterator, j::Any) = itr.td.vals[j]
 
-import Base.map
+## column iterator with dates
+##---------------------------
 
-## map function for column iterator always returns Timedata object of
-## same size! Indices remain unchanged!
-function map(f::Function, tdci::TdColumnIterator)
-    # note: `f` must return a consistent length
-    res = DataFrame()
-    for (n, v) in eachcol(tdci.td.vals)
-        res[n] = f(v)
-    end
-    
-    td = Timedata(res, idx(tdci.td))
-    if isa(tdci.td, AbstractTimematr)
-        try
-            td = convert(Timematr, td)
-        catch
-        end
-    elseif isa(tdci.td, AbstractTimenum)
-        try
-            td = convert(Timenum, td)
-        catch
-        end
-    end
-    return td
+## iterate over variable as TimeData object
+immutable TdVariableIterator
+    td::AbstractTimedata
 end
+eachvar(td::AbstractTimedata) = TdVariableIterator(td)
 
-## map function for column iterator always returns Timedata object of
-## same size! Indices remain unchanged!
-
-## map for two collections:
-function map(f::Function, tdci::TdColumnIterator, x)
-    # note: `f` must return a consistent length
-    nIter1 = length(tdci)
-    nIter2 = length(x)
-    if nIter1 != nIter2
-        error("length of iterators must be identical")
-    end
-
-    res = DataFrame()
-    nams = names(tdci.td)
-    state = start(x)
-    for ii=1:nIter1
-        val, state = next(x, state)
-        res[nams[ii]] = f(tdci.td.vals[:, ii], val)
-    end
-
-    display(res)
-    td = Timedata(res, idx(tdci.td))
-    if isa(tdci.td, AbstractTimenum)
-        try
-            td = convert(Timenum, td)
-        catch
-        end
-    elseif isa(tdci.td, AbstractTimenum)
-        try
-            td = convert(Timematr, td)
-        catch
-        end
-    end
-    return td
+Base.start(itr::TdVariableIterator) = 1
+Base.done(itr::TdVariableIterator, j::Int) = j > size(itr.td, 2)
+function Base.next(itr::TdVariableIterator, j::Int)
+    return (itr.td[:, j], j + 1)
 end
+Base.size(itr::TdVariableIterator) = (size(itr.td, 2), )
+Base.length(itr::TdVariableIterator) = size(itr.td, 2)
+Base.getindex(itr::TdVariableIterator, j::Any) = itr.td[:, j]
+
+
+
+
+
 
 #######################
 ## iteration by rows ##
 #######################
 
+## row without date information
+##-----------------------------
+
+## iterate over rows as DataFrames without date information:
 immutable TdRowIterator
     td::AbstractTimedata
 end
@@ -90,18 +61,79 @@ eachrow(td::AbstractTimedata) = TdRowIterator(td)
 
 Base.start(itr::TdRowIterator) = 1
 Base.done(itr::TdRowIterator, i::Int) = i > size(itr.td, 1)
-Base.next(itr::TdRowIterator, i::Int) = (itr.td[i, :], i + 1)
+function Base.next(itr::TdRowIterator, i::Int)
+    return (itr.td.vals[i, :], i + 1)
+end
 Base.size(itr::TdRowIterator) = (size(itr.td, 1), )
 Base.length(itr::TdRowIterator) = size(itr.td, 1)
-Base.getindex(itr::TdRowIterator, i::Any) = itr.td[i, :]
+Base.getindex(itr::TdRowIterator, i::Any) = itr.td.vals[i, :]
 
-import Base.map
-function map(f::Function, tdri::TdRowIterator)
-    ret = deepcopy(tdri.td)
-    for ii=1:size(tdri.td, 1)
-        ret.vals[ii, :] = (f(tdri.td[ii, :])).vals
-    end
-    return ret
+## row with date information
+##--------------------------
+
+## iterator over rows as TimeData object
+immutable TdDateIterator
+    td::AbstractTimedata
+end
+eachdate(td::AbstractTimedata) = TdDateIterator(td)
+
+Base.start(itr::TdDateIterator) = 1
+Base.done(itr::TdDateIterator, i::Int) = i > size(itr.td, 1)
+function Base.next(itr::TdDateIterator, i::Int)
+    return (itr.td[i, :], i + 1)
+end
+Base.size(itr::TdDateIterator) = (size(itr.td, 1), )
+Base.length(itr::TdDateIterator) = size(itr.td, 1)
+Base.getindex(itr::TdDateIterator, i::Any) = itr.td[i, :]
+
+
+
+
+
+#################################
+## iteration over each element ##
+#################################
+
+## to be implemented
+## column-first iterator over individual entries without metadata 
+immutable TdEntryIterator
+    td::AbstractTimedata
+end
+eachentry(td::AbstractTimedata) = TdEntryIterator(td)
+
+Base.start(itr::TdEntryIterator) = 1
+function Base.done(itr::TdEntryIterator, i::Int)
+    return i > size(itr.td, 1)*size(itr.td, 2)
+end
+function Base.next(itr::TdEntryIterator, i::Int)
+    rowInd, colInd = ind2sub(size(itr.td), i)
+    return (get(itr.td, rowInd, colInd), i + 1)
+end
+Base.size(itr::TdEntryIterator) = (size(itr.td, 1)*size(itr.td, 2), )
+Base.length(itr::TdEntryIterator) = size(itr.td, 1)*size(itr.td, 2)
+function Base.getindex(itr::TdEntryIterator, i::Any)
+    rowInd, colInd = ind2sub(size(itr.td), i)
+    return get(itr.td, rowInd, colInd)
 end
 
+## column-first iterator over individual entries with metadata
+immutable TdObsIterator
+    td::AbstractTimedata
+end
+eachobs(td::AbstractTimedata) = TdObsIterator(td)
+
+Base.start(itr::TdObsIterator) = 1
+function Base.done(itr::TdObsIterator, i::Int)
+    return i > size(itr.td, 1)*size(itr.td, 2)
+end
+function Base.next(itr::TdObsIterator, i::Int)
+    rowInd, colInd = ind2sub(size(itr.td), i)
+    return (itr.td[rowInd, colInd], i + 1)
+end
+Base.size(itr::TdObsIterator) = (size(itr.td, 1)*size(itr.td, 2), )
+Base.length(itr::TdObsIterator) = size(itr.td, 1)*size(itr.td, 2)
+function Base.getindex(itr::TdObsIterator, i::Any)
+    rowInd, colInd = ind2sub(size(itr.td), i)
+    return itr.td[rowInd, colInd]
+end
 

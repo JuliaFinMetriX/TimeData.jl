@@ -8,6 +8,7 @@ using TimeData
 
 println("Running getEntries function tests")
 
+
 ######################
 ## test getEntries ##
 ######################
@@ -34,11 +35,13 @@ values = Any[140, 170, 200, 150]
 df = DataFrame(variable = variables, value = values)
 expTd = TimeData.Timedata(df, idxVals)
 
-@test isequal(expTd, getEntries(testcase1, x -> x.>130))
-@test isequal(expTd, getEntries(testcase1, x -> x.>130;
-                                 sort="dates")) 
-@test_throws ErrorException getEntries(testcase1, x -> x.>130;
-                                        sort="something") 
+## entries large than 130
+actOut = TimeData.chkElw(x -> x.>130,
+                     TimeData.eachentry(testcase1)) |>
+     x -> TimeData.asArr(x, Bool, false) |>
+     x -> TimeData.getEntries(testcase1, x)
+
+@test isequal(expTd, actOut)
 
 ## expected results for second test case with variable ordering 
 idxVals = Date[Date("2010-01-05"),
@@ -50,8 +53,13 @@ values = Any[150, 140, 170, 200]
 
 df = DataFrame(variable = variables, value = values)
 expTd2 = TimeData.Timedata(df, idxVals)
-@test isequal(expTd2, getEntries(testcase2, x -> x.>130; sort="variables"))
 
+actOut = TimeData.chkElw(x -> x.>130,
+                         TimeData.eachentry(testcase2)) |>
+         x -> TimeData.asArr(x, Bool, false) |>
+         x -> TimeData.getEntries(testcase2, x, false)
+
+@test isequal(expTd2, actOut)
 
 ####################################
 ## test getEntries with indexing ##
@@ -68,23 +76,11 @@ df = DataFrame(variable = variables, value = values)
 expTd = TimeData.Timedata(df, idxVals)
 
 singleInd = [1, 5, 6, 8]
-@test isequal(expTd, getEntries(testcase1, singleInd))
+@test isequal(expTd, TimeData.getEntries(testcase1, singleInd))
 
 @test isequal(expTd,
-              getEntries(testcase1,
+              TimeData.getEntries(testcase1,
                           ind2sub(size(testcase1),
                                   singleInd)...))
-
-###########################
-## test logical indexing ##
-###########################
-
-expTd = getEntries(testcase2, x -> x.> 130, sort="variables")
-@test isequal(expTd, getEntries(testcase2, testcase2 .> 130)) 
-
-expDf = DataFrame(variable = [:prices2], value = NA)
-expTd = TimeData.Timedata(expDf, [Date(2010,1,3)])
-@test TimeData.isequal(getEntries(testcase1, isnaElw(testcase1)), expTd)
-
 
 end

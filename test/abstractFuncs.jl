@@ -37,6 +37,17 @@ for t in allTypes
     end)
 end
 
+## get with :
+##-----------
+
+tm = TimeData.testcase(TimeData.Timematr, 1)
+@test TimeData.get(tm[1, 1], :) == 100
+@test_throws Exception TimeData.get(tm[1, :], :)
+
+df = DataFrame(a = [3, 5])
+@test get(df[1, :], :) == 3
+@test_throws Exception TimeData.get(df, :)
+
 #############
 ## isnaElw ##
 #############

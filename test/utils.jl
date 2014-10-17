@@ -55,5 +55,33 @@ expOut = TimeData.testcase(TimeData.Timenum, 1)
 actOut = TimeData.rmDatesOnlyNAs(tn)
 @test isequal(actOut, expOut)
 
+#############
+## anyToDa ##
+#############
+
+## findstub_vector
+##----------------
+
+@test TimeData.findstub_vector(Any[NA, NA, 3.4, 2]) == 3.4
+@test TimeData.findstub_vector(Any[3.4, NA, 2]) == 3.4
+
+## anyToDa
+##--------
+
+xx = Any[3, 4.2, NA]
+@test isequal(@data([3, 4.2, NA]), TimeData.anyToDa(xx))
+
+xx = Any[3, "hello", NA]
+@test isequal(@data([3, "hello", NA]), TimeData.anyToDa(xx))
+
+## anyToDf
+##--------
+
+xx = Any[3 4; NA 2.4]
+expOut = DataFrame(a = @data([3, NA]), b = [4, 2.4])
+@test isequal(expOut, TimeData.anyToDf(xx, [:a, :b]))
+
+## wrong number of column names
+@test_throws Exception TimeData.anyToDf(xx, [:a, :b, :c])
 
 end

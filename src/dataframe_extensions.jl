@@ -119,6 +119,31 @@ function setDfRow!(df::DataFrame, arr::Array, rowInd::Int)
     return df
 end
 
+function setDfRow!(df::DataFrame, dfRow::DataFrame, rowInd::Int)
+    if size(df, 2) != size(dfRow, 2)
+        error("wrong number of columns during assignment")
+    end
+    if size(dfRow, 1) != 1
+        error("only 1xn DataFrame can be used for row assignment")
+    end
+
+    for ii=1:size(df, 2)
+        df[rowInd, ii] = dfRow[1, ii]
+    end
+    return df
+end
+
+function setDfRow!(df::DataFrame, dfRow::DataFrameRow, rowInd::Int)
+    if size(df, 2) != length(dfRow)
+        error("wrong number of columns during assignment")
+    end
+
+    for ii=1:size(df, 2)
+        df[rowInd, ii] = dfRow[ii]
+    end
+    return df
+end
+
 ######################
 ## org-babel output ##
 ######################
@@ -130,3 +155,17 @@ function Base.writedlm(io::IO, df::DataFrame, dlm; opts...)
     writedlm(io, arrAny, dlm; opts...)
 end
 
+###################
+## preallocation ##
+###################
+
+function preallocateDf(td)
+    ## DataFrame of same size with same column types as TimeData
+    return DataFrame(eltypes(td.vals), names(td), size(td, 1))
+end
+
+function preallocateBoolDf(nams::Array{Symbol,1}, nObs::Int)
+    nVars = length(nams)
+    typs = [Bool for ii=1:nVars]
+    return DataFrame(typs, nams, nObs)
+end

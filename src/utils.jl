@@ -148,3 +148,55 @@ function testcase(timedataType, number::Int)
     end
     return deepcopy(testInst)
 end
+
+#########################
+## DataArray utilities ##
+#########################
+
+function findstub_vector(x::Vector)
+    ## return first value that is not NA
+    if !isna(x[1])
+        return x[1]
+    else
+        for ii=2:length(x)
+            if !isna(x[ii])
+                return x[ii]
+            end
+        end
+    end
+    return NA
+end
+
+function anyToDa(x::Vector)
+    nObs = size(x, 1)
+    stubVal = findstub_vector(x)
+    if isna(stubVal) # only NAs
+        return DataArray(NAtype, nObs)
+    else
+        # split up in values and NAs
+        naIndicator = falses(nObs)
+        data = Array(Any, nObs)
+        for ii=1:nObs
+            if isna(x[ii])
+                naIndicator[ii] = true
+                data[ii] = stubVal
+            else
+                data[ii] = x[ii]
+            end
+        end
+    end
+    return DataArray([data...], naIndicator)
+end
+
+function anyToDf(x::Matrix, nams::Array{Symbol, 1})
+    nObs, nCols = size(x)
+    if length(nams) != nCols
+        error("number of names and columns must match")
+    end
+    df = DataFrame()
+    for ii=1:nCols
+        df[nams[ii]] = anyToDa(x[:, ii])
+    end
+    return df
+end
+
