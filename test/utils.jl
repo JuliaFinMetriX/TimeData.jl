@@ -5,9 +5,9 @@ using TimeData
 
 println("Running utility function tests")
 
-####################
-## rmDatesOnlyNAs ##
-####################
+#############
+## narowrm ##
+#############
 
 ## get input
 tn = TimeData.testcase(TimeData.Timenum, 5)
@@ -23,7 +23,7 @@ df[:prices2] = @data([110, 120, 130, 150])
 expOut = TimeData.Timenum(df, dats)
 
 ## test actual outcome
-actOut = TimeData.rmDatesOnlyNAs(tn)
+actOut = TimeData.narowrm(tn)
 @test isequal(actOut, expOut)
 
 ## get input
@@ -42,7 +42,7 @@ df[:prices2] = @data([110])
 expOut = TimeData.Timenum(df, dats)
 
 ## test actual outcome
-actOut = TimeData.rmDatesOnlyNAs(inputTn)
+actOut = TimeData.narowrm(inputTn)
 @test isequal(actOut, expOut)
 
 ## get input
@@ -52,7 +52,7 @@ tn = TimeData.testcase(TimeData.Timenum, 1)
 expOut = TimeData.testcase(TimeData.Timenum, 1)
 
 ## test actual outcome
-actOut = TimeData.rmDatesOnlyNAs(tn)
+actOut = TimeData.narowrm(tn)
 @test isequal(actOut, expOut)
 
 #############

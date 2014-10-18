@@ -5,7 +5,7 @@
 ## process dates to strings
 ##-------------------------
 
-function datesAsStrings(dats::Array{Date, 1})
+function dat2str(dats::Array{Date, 1})
     nObs = size(dats, 1)
     datsAsStr = Array(ASCIIString, nObs)
     for ii=1:nObs
@@ -14,7 +14,7 @@ function datesAsStrings(dats::Array{Date, 1})
     return datsAsStr
 end
 
-function datesAsStrings(dats::Array{DateTime, 1})
+function dat2str(dats::Array{DateTime, 1})
     nObs = size(dats, 1)
     datsAsStr = Array(ASCIIString, nObs)
     for ii=1:nObs
@@ -23,7 +23,7 @@ function datesAsStrings(dats::Array{DateTime, 1})
     return datsAsStr
 end
 
-function datesAsStrings(dats::Array{Integer, 1})
+function dat2str(dats::Array{Integer, 1})
     nObs = size(dats, 1)
     datsAsStr = Array(ASCIIString, nObs)
     for ii=1:nObs
@@ -32,7 +32,7 @@ function datesAsStrings(dats::Array{Integer, 1})
     return datsAsStr
 end
 
-function datesAsStrings(dats::Array{Float64, 1})
+function dat2str(dats::Array{Float64, 1})
     nObs = size(dats, 1)
     datsAsStr = Array(ASCIIString, nObs)
     for ii=1:nObs
@@ -41,14 +41,14 @@ function datesAsStrings(dats::Array{Float64, 1})
     return datsAsStr
 end
 
-function datesAsStrings(tm::AbstractTimedata)
-    return datesAsStrings(idx(tm))
+function dat2str(tm::AbstractTimedata)
+    return dat2str(idx(tm))
 end
 
 ## process dates to floating point numbers
 ##----------------------------------------
 
-function datesAsNumbers(dats::Array{Date, 1})
+function dat2num(dats::Array{Date, 1})
     nObs = size(dats, 1)
     datsAsFloat = Array(Float64, nObs)
     for ii=1:nObs
@@ -57,7 +57,7 @@ function datesAsNumbers(dats::Array{Date, 1})
     return datsAsFloat
 end
 
-function datesAsNumbers(dats::Array{DateTime, 1})
+function dat2num(dats::Array{DateTime, 1})
     nObs = size(dats, 1)
     datsAsFloat = Array(Float64, nObs)
     for ii=1:nObs
@@ -70,26 +70,26 @@ function datesAsNumbers(dats::Array{DateTime, 1})
     return datsAsFloat
 end
 
-function datesAsNumbers(dats::Array{Float64, 1})
+function dat2num(dats::Array{Float64, 1})
     return dats
 end
 
-function datesAsNumbers(dats::Array{Integer, 1})
+function dat2num(dats::Array{Integer, 1})
     return dats
 end
 
-function datesAsNumbers(tm::AbstractTimedata)
-    return datesAsNumbers(idx(tm))
+function dat2num(tm::AbstractTimedata)
+    return dat2num(idx(tm))
 end
 
 ## remove rows with NAs only
 ##--------------------------
 
-function rmDatesOnlyNAs(tm::Timematr)
+function narowrm(tm::Timematr)
     return tm # nothing to do
 end
 
-function rmDatesOnlyNAs(tn::AbstractTimedata)
+function narowrm(tn::AbstractTimedata)
     nObs, nVars = size(tn)
     onlyNAs = trues(nObs)
     for ii=1:nVars

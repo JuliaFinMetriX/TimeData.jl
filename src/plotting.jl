@@ -10,9 +10,9 @@ require("Winston")
 
 function gdfPlot(tn::Timenum)
     nams = names(tn)
-    tn = rmDatesOnlyNAs(tn)
+    tn = narowrm(tn)
     vals = asArr(tn, Float64, NaN) # NA to NaN
-    dats = datesAsFloats(tn)
+    dats = dat2num(tn)
     df = composeDataFrame([dats vals], [:Idx; nams])
     stackedData = stack(df, nams)
     Gadfly.plot(stackedData, x="Idx", y="value",
@@ -28,7 +28,7 @@ function wstPlot(tn::Timenum; title::String = "",
                  xlabel::String = "time",
                  ylabel::String = "value")
     vals = asArr(tn, Float64, NaN) # transform to floating array
-    dats = datesAsFloats(idx(tn))
+    dats = dat2num(idx(tn))
     Winston.plot(dats, vals)
     Winston.title(title)
     Winston.xlabel(xlabel)
