@@ -5,11 +5,10 @@ using Base.Test
 using DataArrays
 using DataFrames
 
-
-println("Running documentation tests")
+println("\n Running documentation tests\n")
 
 using TimeData
-
+using Base.Dates
 
 fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
 tm = TimeData.readTimedata(fileName)[1:10, 1:4]
@@ -96,5 +95,15 @@ typeof(tm .> 0.5)
 tm[1:3, 1:3] .> 0.5
 exp(tm[1:3, 1:3])
 round(tm[1:3, 1:3], 2)
+
+filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
+tm = readTimedata(filePath)
+
+
+columnsMeetingCondition = chkVars(x -> minimum(x, 1)[1, 1] .< -25, eachvar(tm)) |>
+                          x -> asArr(x, Bool, false) |>
+                          x -> tm[x[:]]
+
+minimum(columnsMeetingCondition, 1)
 
 end

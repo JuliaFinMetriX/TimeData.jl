@@ -66,7 +66,6 @@ module TestDocumentation
 using Base.Test
 using DataArrays
 using DataFrames
-using Dates
 
 println("\n Running documentation tests\n")
 
@@ -103,7 +102,7 @@ variable names and dates.
 
 #+BEGIN_SRC julia :results value :tangle test/doctests.jl
    using TimeData
-   using Dates
+   using Base.Dates
 
    fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
    tm = TimeData.readTimedata(fileName)[1:10, 1:4]
@@ -581,18 +580,28 @@ dimensions: (3,3)
 
 * Iterators and map
 
-** Iterators
-The idea of iterators and ~map~ is to allow successive application of
-a given function to parts of the data set. For rectangular data, there
-basically exist three ways to iteratively step through the data set:
-- element by element
-- row by row
-- column by column
+The idea of iterators and ~map~ is to allow application of a given
+function successively to parts of the data set, such that the
+resulting values will automatically be embed into the metadata again.
+Applying a function iteratively and simply capturing the results in an
+~Array{Any, 1}~ is a quite easy task with comprehensions. However,
+automatically storing the data in a meaningful way encapsulated by its
+respective metadata is the hard part of the task. This, however, can
+be easily achieved through a combination of iterators and ~map~ for a
+quite general set tasks.
 
-In addition, functions can either apply to the individual values
-themselves, or to values embedded into their metadata (values plus
-time information and / or variable name). Hence, the package
-implements six different standard iterators:
+** Iterators
+For rectangular data, there basically exist three ways of iteratively
+stepping through:
+- element-wise
+- row-wise
+- column-wise
+
+In addition, functions can either apply to individual values only or
+to values that are embedded with metadata (values plus time
+information and / or variable name). Hence, the package implements six
+different standard iterators, each return different slices of a given
+~TimeData~ object:
 
 |              | value     | value plus metadata |
 |--------------+-----------+---------------------|
@@ -600,16 +609,16 @@ implements six different standard iterators:
 | row-wise     | eachrow   | eachdate            |
 | column-wise  | eachcol   | eachvar             | 
 
-Thereby, all iterators that contain metadata will provide the
-individual parts of the data in the same type as the original data.
-Hence, ~eachdate~ applied to a ~Timematr~ will return ~Timematr~
-objects of dimension 1xm, while ~eachvar~ applied to a ~Timedata~
-object will return nx1 ~Timedata~ objects.
+All iterators containing metadata will provide slices of the data in
+the exact same type as the original data. Hence, ~eachdate~ applied to
+a ~Timematr~ will return ~Timematr~ objects of dimension $1\times m$,
+while ~eachvar~ applied to a ~Timedata~ object will return $n \times
+1$ ~Timedata~ objects.
 
 Iterators without metadata provide data in the following formats
-- ~eachentry~: individual entries themselves
-- ~eachrow~: 1xm ~DataFrame~ - this is different to ~eachrow~ for
-  ~DataFrames~ 
+- ~eachentry~: individual entries only
+- ~eachrow~: $1\times m$ ~DataFrame~ - this is different to ~eachrow~
+  for ~DataFrames~
 - ~eachcol~: tuple (nam, col), where nam is the variable name as
   ~Symbol~ and col is the data as ~DataArray~ or ~Array~
 
@@ -625,20 +634,19 @@ dimension are implemented through ~collapse~ (see below).
 Hence, any operation that will map a data row to a row again, and a
 data column to a column again, is implemented through function ~map~.
 Furthermore, as we do not know a priori which type to expect of an
-arbitrary function, output values will always be in the most captured
-as type ~Timedata~, which is the most general ~TimeData~ type. Hence,
-the output of any function applied iteratively to data with ~map~ will
-always be a ~Timedata~ object of dimensions equal to the original data
-set. 
+arbitrary function, output values will always be captured in the most
+general format as type ~Timedata~. Hence, the output of any function
+applied iteratively to data with ~map~ will always be a ~Timedata~
+object of dimensions equal to the original data set.
 
 Although we know that ~map~ will always map a row to a row, there
-still are multiple formats that conceptually represent row-wise data:
-an 1xm ~DataFrame~, an 1xm ~TimeData~ object, an 1xm ~Array~ or an mx1
-~Array~. In other words: does the mapping function preserve meta-data
-or not?
+still are multiple formats that conceptually could represent row-wise
+data: an $1 \times m$ ~DataFrame~, an $1 \times m$ ~TimeData~ object,
+an $1 \times m$ ~Array~ or an $m \times 1$ ~Array~. In other words:
+some mapping functions preserve metadata, and some don't.
 
-So far, ~map~ knows how to deal with the following output formats for
-any given input iterator:
+So far, ~map~ automatically handles several function output formats
+for any given input iterator:
 
 | iterator    | output formats                                            |
 |-------------+-----------------------------------------------------------|
@@ -649,45 +657,101 @@ any given input iterator:
 | ~eachdate~  | mx1 ~Array~ or 1xm ~Array~, 1xm ~DataFrame~ or ~TimeData~ |
 | ~eachvar~   | nx1 ~Array~ or ~DataFrame~ or ~DataArray~ or ~TimeData~   |
 
+Internally, column data is extracted from possible metadata by
+function ~getColData~, row data by ~nthRowElem~ and singleton entries
+by ~get(x, :)~. Only the extracted values themselves then will be used
+in the output.
 
 ** Collapse
 
+While ~map~ is designed to always match the dimension of the original
+input data, there are also situations where a function collapses a
+complete row or column to a single value. Such mappings are
+implemented by two collapse functions, each of them being accessible
+with two different iterators: one returning values only, and one
+returning values with metadata. Also, the output of both functions
+differs:
 
+- ~collapseDates~: 
+  - output: $1 \times m$ ~DataFrame~
+  - possible iterators: ~eachrow~, ~eachdate~
+- ~collapseVars~: 
+  - output: $n \times 1$ ~TimeData~
+  - possible iterators: ~eachcol~, ~eachvar~
 
 ** Check condition
 
-For some special cases, there exist individual implementations in
-order to allow for more efficient data handling. For example, ~chk~
-functions are successively checking whether a given condition is
-fulfilled by the iterative parts of the data or not. Hence, a function
-applied to a given part will return one of three possible values:
+For some special cases there exist more fine-tailored implementations
+of iterative data mapping in order to allow for more efficient data
+handling. For example, ~chk...~ functions are successively checking
+whether a given condition is fulfilled for the individual data slices,
+and hence will return one of only three possible values for each
+slice:
 - ~true~
 - ~false~
 - ~NA~
 
-Hence, we already know upfront that the result will be of type
-~DataFrame~ with all individual columns being of type ~DataArray{Bool,
-1}~.
+Again, we can check whether a certain condition holds based on three
+different ways of slicing the data: the condition can be a property of
+either individual values (~chkElw~), individual rows (~chkDates~) or
+individual columns (~chkVars~). This way, output dimensions and
+formats will vary depending on the condition used:
+- ~chkElw~: $n \times m$ ~TimeData~ object
+- ~chkDates~: $n \times 1$ ~TimeData~ object
+- ~chkVars~: $1 \times m$ ~DataFrame~
+Still, however, all individual entries of any output must be either
+~Bool~ or ~NA~.
 
-The following three functions again can be used with either the meta
-data version of the respective iterator or the plain values
-themselves:
+Also, a certain condition can be a property of the plain data values
+themselves, or of data combined with metadata. Hence, all three
+~chk...~ functions again allow for two different iterators each:
 - ~chkElw~: either ~eachentry~ or ~eachobs~
 - ~chkDates~: either ~eachrow~ or ~eachdate~
 - ~chkVars~: either ~eachcol~ or ~eachvar~
 
-In order to use output of any ~chk~ function to logically index values
-from the original data set, one first needs to get rid of possible
-~NAs~. Therefore, simple convert the output to ~Array{Bool, 2}~ with
-~asArr~, and use the resulting array to index the original data.
+One frequent application of ~chk...~ functions is selecting data
+slices based on whether a certain condition is fulfilled. This
+selection generally comprises three steps:
+- checking whether the condition is met for data slices
+- deciding how to interpret slices with unknown property regarding the
+  condition: should ~NA~ be interpreted as ~true~ or ~false~?
+- converting the result to ~Array{Bool, 1}~ or ~Array{Bool, 2}~ to use
+  it for logical indexing
 
-For example, in order to get all columns that exhibit a maximum value
-above 10:
-#+BEGIN_SRC julia
-columnsMeetingCondition = chkvars(x -> max(x) > 10, eachcol(tm)) |>
-                          x -> asArr(x, Bool, false) |>
-                          tm[:, x]
+Thereby the selection of certain rows or columns will again result in
+a rectangular shaped data set. ~chkElw~, however, selects individual
+entries from possibly different columns and rows, so that the data has
+to be returned as ~TimeData~ object in long format: in addition to the
+index, the result comprises columns ~variable~ and ~value~.
+
+For example, selecting all columns with a maximum value above 10:
+#+BEGIN_SRC julia :exports both :tangle test/doctests.jl
+   filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
+   tm = readTimedata(filePath)
+
+
+   columnsMeetingCondition = chkVars(x -> minimum(x, 1)[1, 1] .< -25, eachvar(tm)) |>
+                             x -> asArr(x, Bool, false) |>
+                             x -> tm[x[:]]
+
+   minimum(columnsMeetingCondition, 1)
 #+END_SRC
+
+#+RESULTS:
+|      APOL |       CTL |      FOSL |
+| -25.04314 | -25.61743 | -47.11015 |
+
+* Plotting
+
+problem with dates: 
+- as strings:
+  - not working for Winston
+  - interpreted as categorical data by gadfly: very slow
+
+** Winston
+
+** Gadfly
+only numeric values
 
 * Additional functions
 Besides basic mathematical functions and operators, there are already

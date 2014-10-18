@@ -165,9 +165,52 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js"></script>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
 </head>
 <body>
 <div id="content">
+<h1 class="title">TimeData.jl</h1>
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -183,10 +226,24 @@ for the JavaScript code in this tag.
 <li><a href="#sec-4">4. Indexing</a></li>
 <li><a href="#sec-5">5. Read, write, io</a></li>
 <li><a href="#sec-6">6. Functions and operators</a></li>
-<li><a href="#sec-7">7. Additional functions</a></li>
-<li><a href="#sec-8">8. Under the hood: implementation</a></li>
-<li><a href="#sec-9">9. Current state</a></li>
-<li><a href="#sec-10">10. Acknowledgement</a></li>
+<li><a href="#sec-7">7. Iterators and map</a>
+<ul>
+<li><a href="#sec-7-1">7.1. Iterators</a></li>
+<li><a href="#sec-7-2">7.2. Map</a></li>
+<li><a href="#sec-7-3">7.3. Collapse</a></li>
+<li><a href="#sec-7-4">7.4. Check condition</a></li>
+</ul>
+</li>
+<li><a href="#sec-8">8. Plotting</a>
+<ul>
+<li><a href="#sec-8-1">8.1. Winston</a></li>
+<li><a href="#sec-8-2">8.2. Gadfly</a></li>
+</ul>
+</li>
+<li><a href="#sec-9">9. Additional functions</a></li>
+<li><a href="#sec-10">10. Under the hood: implementation</a></li>
+<li><a href="#sec-11">11. Current state</a></li>
+<li><a href="#sec-12">12. Acknowledgement</a></li>
 </ul>
 </div>
 </div>
@@ -234,7 +291,7 @@ variable names and dates.
 <div class="org-src-container">
 
 <pre class="src src-julia">using TimeData
-using Dates
+using Base.Dates
 
 fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
 tm = TimeData.readTimedata(fileName)[1:10, 1:4]
@@ -1365,10 +1422,391 @@ dimensions: (3,3)
 </div>
 </div>
 
-
 <div id="outline-container-sec-7" class="outline-2">
-<h2 id="sec-7"><span class="section-number-2">7</span> Additional functions</h2>
+<h2 id="sec-7"><span class="section-number-2">7</span> Iterators and map</h2>
 <div class="outline-text-2" id="text-7">
+<p>
+The idea of iterators and <code>map</code> is to allow application of a given
+function successively to parts of the data set, such that the
+resulting values will automatically be embed into the metadata again.
+Applying a function iteratively and simply capturing the results in an
+<code>Array{Any, 1}</code> is a quite easy task with comprehensions. However,
+automatically storing the data in a meaningful way encapsulated by its
+respective metadata is the hard part of the task. This, however, can
+be easily achieved through a combination of iterators and <code>map</code> for a
+quite general set tasks.
+</p>
+</div>
+
+<div id="outline-container-sec-7-1" class="outline-3">
+<h3 id="sec-7-1"><span class="section-number-3">7.1</span> Iterators</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+For rectangular data, there basically exist three ways of iteratively
+stepping through:
+</p>
+<ul class="org-ul">
+<li>element-wise
+</li>
+<li>row-wise
+</li>
+<li>column-wise
+</li>
+</ul>
+
+<p>
+In addition, functions can either apply to individual values only or
+to values that are embedded with metadata (values plus time
+information and / or variable name). Hence, the package implements six
+different standard iterators, each return different slices of a given
+<code>TimeData</code> object:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">value</th>
+<th scope="col" class="left">value plus metadata</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">element-wise</td>
+<td class="left">eachentry</td>
+<td class="left">eachobs</td>
+</tr>
+
+<tr>
+<td class="left">row-wise</td>
+<td class="left">eachrow</td>
+<td class="left">eachdate</td>
+</tr>
+
+<tr>
+<td class="left">column-wise</td>
+<td class="left">eachcol</td>
+<td class="left">eachvar</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+All iterators containing metadata will provide slices of the data in
+the exact same type as the original data. Hence, <code>eachdate</code> applied to
+a <code>Timematr</code> will return <code>Timematr</code> objects of dimension \(1\times m\),
+while <code>eachvar</code> applied to a <code>Timedata</code> object will return \(n \times
+1\) <code>Timedata</code> objects.
+</p>
+
+<p>
+Iterators without metadata provide data in the following formats
+</p>
+<ul class="org-ul">
+<li><code>eachentry</code>: individual entries only
+</li>
+<li><code>eachrow</code>: \(1\times m\) <code>DataFrame</code> - this is different to <code>eachrow</code>
+  for <code>DataFrames</code>
+</li>
+<li><code>eachcol</code>: tuple (nam, col), where nam is the variable name as
+<code>Symbol</code> and col is the data as <code>DataArray</code> or <code>Array</code>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-7-2" class="outline-3">
+<h3 id="sec-7-2"><span class="section-number-3">7.2</span> Map</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+With iterators specifying how to slice a given data set, we still need
+to define what type of function should be applied to each part.
+Thereby, we again distinguish functions into two groups. Functions
+that preserve the original dimensions of the data are implemented
+through function <code>map</code>, while functions that reduce the original
+dimension are implemented through <code>collapse</code> (see below).
+</p>
+
+<p>
+Hence, any operation that will map a data row to a row again, and a
+data column to a column again, is implemented through function <code>map</code>.
+Furthermore, as we do not know a priori which type to expect of an
+arbitrary function, output values will always be captured in the most
+general format as type <code>Timedata</code>. Hence, the output of any function
+applied iteratively to data with <code>map</code> will always be a <code>Timedata</code>
+object of dimensions equal to the original data set.
+</p>
+
+<p>
+Although we know that <code>map</code> will always map a row to a row, there
+still are multiple formats that conceptually could represent row-wise
+data: an \(1 \times m\) <code>DataFrame</code>, an \(1 \times m\) <code>TimeData</code> object,
+an \(1 \times m\) <code>Array</code> or an \(m \times 1\) <code>Array</code>. In other words:
+some mapping functions preserve metadata, and some don't.
+</p>
+
+<p>
+So far, <code>map</code> automatically handles several function output formats
+for any given input iterator:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">iterator</th>
+<th scope="col" class="left">output formats</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left"><code>eachentry</code></td>
+<td class="left">a single value of any standard type</td>
+</tr>
+
+<tr>
+<td class="left"><code>eachrow</code></td>
+<td class="left">mx1 <code>Array</code> or 1xm <code>Array</code>, 1xm <code>DataFrame</code></td>
+</tr>
+
+<tr>
+<td class="left"><code>eachcol</code></td>
+<td class="left">nx1 <code>Array</code> or <code>DataArray</code></td>
+</tr>
+
+<tr>
+<td class="left"><code>eachobs</code></td>
+<td class="left">1x1 <code>Array</code>, <code>DataFrame</code> or <code>TimeData</code></td>
+</tr>
+
+<tr>
+<td class="left"><code>eachdate</code></td>
+<td class="left">mx1 <code>Array</code> or 1xm <code>Array</code>, 1xm <code>DataFrame</code> or <code>TimeData</code></td>
+</tr>
+
+<tr>
+<td class="left"><code>eachvar</code></td>
+<td class="left">nx1 <code>Array</code> or <code>DataFrame</code> or <code>DataArray</code> or <code>TimeData</code></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Internally, column data is extracted from possible metadata by
+function <code>getColData</code>, row data by <code>nthRowElem</code> and singleton entries
+by <code>get(x, :)</code>. Only the extracted values themselves then will be used
+in the output.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> Collapse</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+While <code>map</code> is designed to always match the dimension of the original
+input data, there are also situations where a function collapses a
+complete row or column to a single value. Such mappings are
+implemented by two collapse functions, each of them being accessible
+with two different iterators: one returning values only, and one
+returning values with metadata. Also, the output of both functions
+differs:
+</p>
+
+<ul class="org-ul">
+<li><code>collapseDates</code>: 
+<ul class="org-ul">
+<li>output: \(1 \times m\) <code>DataFrame</code>
+</li>
+<li>possible iterators: <code>eachrow</code>, <code>eachdate</code>
+</li>
+</ul>
+</li>
+<li><code>collapseVars</code>: 
+<ul class="org-ul">
+<li>output: \(n \times 1\) <code>TimeData</code>
+</li>
+<li>possible iterators: <code>eachcol</code>, <code>eachvar</code>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-7-4" class="outline-3">
+<h3 id="sec-7-4"><span class="section-number-3">7.4</span> Check condition</h3>
+<div class="outline-text-3" id="text-7-4">
+<p>
+For some special cases there exist more fine-tailored implementations
+of iterative data mapping in order to allow for more efficient data
+handling. For example, <code>chk...</code> functions are successively checking
+whether a given condition is fulfilled for the individual data slices,
+and hence will return one of only three possible values for each
+slice:
+</p>
+<ul class="org-ul">
+<li><code>true</code>
+</li>
+<li><code>false</code>
+</li>
+<li><code>NA</code>
+</li>
+</ul>
+
+<p>
+Again, we can check whether a certain condition holds based on three
+different ways of slicing the data: the condition can be a property of
+either individual values (<code>chkElw</code>), individual rows (<code>chkDates</code>) or
+individual columns (<code>chkVars</code>). This way, output dimensions and
+formats will vary depending on the condition used:
+</p>
+<ul class="org-ul">
+<li><code>chkElw</code>: \(n \times m\) <code>TimeData</code> object
+</li>
+<li><code>chkDates</code>: \(n \times 1\) <code>TimeData</code> object
+</li>
+<li><code>chkVars</code>: \(1 \times m\) <code>DataFrame</code>
+</li>
+</ul>
+<p>
+Still, however, all individual entries of any output must be either
+<code>Bool</code> or <code>NA</code>.
+</p>
+
+<p>
+Also, a certain condition can be a property of the plain data values
+themselves, or of data combined with metadata. Hence, all three
+<code>chk...</code> functions again allow for two different iterators each:
+</p>
+<ul class="org-ul">
+<li><code>chkElw</code>: either <code>eachentry</code> or <code>eachobs</code>
+</li>
+<li><code>chkDates</code>: either <code>eachrow</code> or <code>eachdate</code>
+</li>
+<li><code>chkVars</code>: either <code>eachcol</code> or <code>eachvar</code>
+</li>
+</ul>
+
+<p>
+One frequent application of <code>chk...</code> functions is selecting data
+slices based on whether a certain condition is fulfilled. This
+selection generally comprises three steps:
+</p>
+<ul class="org-ul">
+<li>checking whether the condition is met for data slices
+</li>
+<li>deciding how to interpret slices with unknown property regarding the
+condition: should <code>NA</code> be interpreted as <code>true</code> or <code>false</code>?
+</li>
+<li>converting the result to <code>Array{Bool, 1}</code> or <code>Array{Bool, 2}</code> to use
+it for logical indexing
+</li>
+</ul>
+
+<p>
+Thereby the selection of certain rows or columns will again result in
+a rectangular shaped data set. <code>chkElw</code>, however, selects individual
+entries from possibly different columns and rows, so that the data has
+to be returned as <code>TimeData</code> object in long format: in addition to the
+index, the result comprises columns <code>variable</code> and <code>value</code>.
+</p>
+
+<p>
+For example, selecting all columns with a maximum value above 10:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-julia">filePath = joinpath(Pkg.dir("TimeData"), "data", "logRet.csv");
+tm = readTimedata(filePath)
+
+
+columnsMeetingCondition = chkVars(x -&gt; minimum(x, 1)[1, 1] .&lt; -25, eachvar(tm)) |&gt;
+                          x -&gt; asArr(x, Bool, false) |&gt;
+                          x -&gt; tm[x[:]]
+
+minimum(columnsMeetingCondition, 1)
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="right" />
+
+<col  class="right" />
+
+<col  class="right" />
+</colgroup>
+<tbody>
+<tr>
+<td class="right">APOL</td>
+<td class="right">CTL</td>
+<td class="right">FOSL</td>
+</tr>
+
+<tr>
+<td class="right">-25.04314</td>
+<td class="right">-25.61743</td>
+<td class="right">-47.11015</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> Plotting</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+problem with dates: 
+</p>
+<ul class="org-ul">
+<li>as strings:
+<ul class="org-ul">
+<li>not working for Winston
+</li>
+<li>interpreted as categorical data by gadfly: very slow
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-8-1" class="outline-3">
+<h3 id="sec-8-1"><span class="section-number-3">8.1</span> Winston</h3>
+</div>
+
+<div id="outline-container-sec-8-2" class="outline-3">
+<h3 id="sec-8-2"><span class="section-number-3">8.2</span> Gadfly</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+only numeric values
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> Additional functions</h2>
+<div class="outline-text-2" id="text-9">
 <p>
 Besides basic mathematical functions and operators, there are already
 quite some additional functions that are defined for several
@@ -1377,9 +1815,9 @@ quite some additional functions that are defined for several
 </div>
 </div>
 
-<div id="outline-container-sec-8" class="outline-2">
-<h2 id="sec-8"><span class="section-number-2">8</span> Under the hood: implementation</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-sec-10" class="outline-2">
+<h2 id="sec-10"><span class="section-number-2">10</span> Under the hood: implementation</h2>
+<div class="outline-text-2" id="text-10">
 <p>
 The balancing act between emulating and extending <code>DataFrames</code> is
 implemented in Julia maybe a bit less naturally than in traditional
@@ -1396,9 +1834,9 @@ interior design of <code>TimeData</code>, take a look at <a href="http://grollch
 </div>
 </div>
 
-<div id="outline-container-sec-9" class="outline-2">
-<h2 id="sec-9"><span class="section-number-2">9</span> Current state</h2>
-<div class="outline-text-2" id="text-9">
+<div id="outline-container-sec-11" class="outline-2">
+<h2 id="sec-11"><span class="section-number-2">11</span> Current state</h2>
+<div class="outline-text-2" id="text-11">
 <p>
 All <code>TimeData</code> types should already provide a convenient way to
 represent and handle time series data. In extension to the already
@@ -1412,9 +1850,9 @@ myself, and not yet with type <code>DateTime</code>.
 </div>
 
 
-<div id="outline-container-sec-10" class="outline-2">
-<h2 id="sec-10"><span class="section-number-2">10</span> Acknowledgement</h2>
-<div class="outline-text-2" id="text-10">
+<div id="outline-container-sec-12" class="outline-2">
+<h2 id="sec-12"><span class="section-number-2">12</span> Acknowledgement</h2>
+<div class="outline-text-2" id="text-12">
 <p>
 Of course, any package can only be as good as the individual parts
 that it builds on. Accordingly, I'd like to thank all people that
