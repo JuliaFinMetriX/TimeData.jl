@@ -22,6 +22,7 @@ AbstractTimedata,
 AbstractTimenum,
 AbstractTimematr,
 aggrRets,
+asArr,
 asArrayOfEqualDimensions,
 chkDates,
 chkElw,
@@ -60,6 +61,7 @@ joinSortedIdx_inner,
 joinSortedIdx_left,
 joinSortedIdx_outer,
 joinSortedIdx_right,
+loadPlotting,
 map,
 mean,
 minimum,
@@ -111,5 +113,9 @@ include("join.jl")
 include("dataframe_extensions.jl")
 include("convert.jl")
 include("utils.jl")
+
+function loadPlotting()
+    include(joinpath(Pkg.dir("TimeData"), "src/plotting.jl"))
+end    
 
 end

@@ -1,56 +1,83 @@
-import Gadfly.plot
-function plot(tm::Timematr, settings...)
-    ## plot Timematr object
-    ## - multi-line plot
-    ## - index must be dates convertible to strings
-    ## - plot only some maximum number of randomly picked paths
-    ## - plot some statistics
-    
-    dats = datsAsStrings(tm)
-    (nObs, nAss) = size(tm)
-    
-    ## maximum number of paths plotted
-    maxPaths = 10
+## deferred loading
+##-----------------
 
-    ## get values for paths
-    if nAss > maxPaths
-        ## get randomly drawn paths
+require("Gadfly")
+require("Winston")
 
-        chosenAssets = randperm(nAss)[1:maxPaths]
-        randPaths = core(tm)[:, chosenAssets]
-        nams = names(tm)[chosenAssets]
+#####################
+## Gadfly plotting ##
+#####################
 
-        ## get statistics
-        allVals = core(tm)
-        averagePath = mean(allVals, 2)
-        lowestEndingPath = indmin(allVals[end, :])
-        lowPath = allVals[:, lowestEndingPath]
-        highestEndingPath = indmax(allVals[end, :])
-        highPath = allVals[:, highestEndingPath]
-
-        vals = [averagePath lowPath highPath randPaths]
-        valsDf = composeDataFrame(vals,
-                                  [:mean, :low, :high,
-                                   nams])  
-    else
-        valsDf = copy(tm.vals)
-    end
-
-    nams = names(valsDf)
-    valsDf[:Idx] = dats
-    
-    stackedData = stack(valsDf, nams)
-
-    plot(stackedData, x="Idx", y="value",
-         color="variable", Geom.line, settings...)
+function gdfPlot(tn::Timenum)
+    nams = names(tn)
+    tn = rmDatesOnlyNAs(tn)
+    vals = asArr(tn, Float64, NaN) # NA to NaN
+    dats = datesAsFloats(tn)
+    df = composeDataFrame([dats vals], [:Idx; nams])
+    stackedData = stack(df, nams)
+    Gadfly.plot(stackedData, x="Idx", y="value",
+         color="variable", Gadfly.Geom.line)
 end
 
+######################
+## Winston plotting ##
+######################
 
-##################################
-## plotting numeric time series ##
-##################################
-
-import Winston.plot
-function plotWst(tm::Timematr)
-    plot(core(tm))
+## no legend, but fast
+function wstPlot(tn::Timenum; title::String = "",
+                 xlabel::String = "time",
+                 ylabel::String = "value")
+    vals = asArr(tn, Float64, NaN) # transform to floating array
+    dats = datesAsFloats(idx(tn))
+    Winston.plot(dats, vals)
+    Winston.title(title)
+    Winston.xlabel(xlabel)
+    Winston.ylabel(ylabel)
 end
+
+## import Gadfly.plot
+## function plot(tm::Timematr, settings...)
+##     ## plot Timematr object
+##     ## - multi-line plot
+##     ## - index must be dates convertible to strings
+##     ## - plot only some maximum number of randomly picked paths
+##     ## - plot some statistics
+    
+##     dats = datsAsStrings(tm)
+##     (nObs, nAss) = size(tm)
+    
+##     ## maximum number of paths plotted
+##     maxPaths = 10
+
+##     ## get values for paths
+##     if nAss > maxPaths
+##         ## get randomly drawn paths
+
+##         chosenAssets = randperm(nAss)[1:maxPaths]
+##         randPaths = core(tm)[:, chosenAssets]
+##         nams = names(tm)[chosenAssets]
+
+##         ## get statistics
+##         allVals = core(tm)
+##         averagePath = mean(allVals, 2)
+##         lowestEndingPath = indmin(allVals[end, :])
+##         lowPath = allVals[:, lowestEndingPath]
+##         highestEndingPath = indmax(allVals[end, :])
+##         highPath = allVals[:, highestEndingPath]
+
+##         vals = [averagePath lowPath highPath randPaths]
+##         valsDf = composeDataFrame(vals,
+##                                   [:mean, :low, :high,
+##                                    nams])  
+##     else
+##         valsDf = copy(tm.vals)
+##     end
+
+##     nams = names(valsDf)
+##     valsDf[:Idx] = dats
+    
+##     stackedData = stack(valsDf, nams)
+
+##     plot(stackedData, x="Idx", y="value",
+##          color="variable", Geom.line, settings...)
+## end
