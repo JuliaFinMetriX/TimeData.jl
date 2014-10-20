@@ -82,6 +82,13 @@ function dat2num(tm::AbstractTimedata)
     return dat2num(idx(tm))
 end
 
+function dat2num(da::DataArray)
+    datsAsFloat = Array(Float64, length(da))
+    datsAsFloat[!da.na] = dat2num(da.data[!da.na])
+    datsAsFloat[da.na] = NaN
+    return datsAsFloat
+end
+
 ## remove rows with NAs only
 ##--------------------------
 
@@ -200,3 +207,28 @@ function anyToDf(x::Matrix, nams::Array{Symbol, 1})
     return df
 end
 
+## applying array function to DataArray
+##-------------------------------------
+
+function arrFunc2Da(f::Func, da::DataArray)
+    ## apply a function to all no-NA elements of DataArray and return
+    ## result as DataArray
+    ## Note: function must preserve dimensions: n values need to be
+    ## mapped to n values again!
+    res = f(da.data[!da.na])
+    resDa = DataArray(eltype(res), length(da))
+    resDa[!da.na] = res
+    return resDa
+end
+
+function arrFunc2Da(f::Func, da::DataArray, replaceNA = NA)
+    ## apply a function to all no-NA elements of DataArray and return
+    ## result as array
+    ## Note: one must explicitly deal with NAs!
+    ## Note: function must preserve dimensions: n values need to be
+    ## mapped to n values again!
+    res = f(da.data[!da.na])
+    resArr = Array(eltype(res), length(da))
+    resArr[!da.na] = replaceNA
+    return resArr
+end
