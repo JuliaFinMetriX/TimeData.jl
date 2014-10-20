@@ -164,12 +164,12 @@ tn = TimeData.Timenum(df, dats)
 
 ## similar
 @test TimeData.equMeta(tn, tn)
-@test TimeData.equColMeta(tn, tn)
+@test TimeData.similarMeta(tn, tn)
 
 ## different indices
 tn2 = TimeData.Timenum(df)
 @test !TimeData.equMeta(tn, tn2)
-@test TimeData.equColMeta(tn, tn2)
+@test TimeData.similarMeta(tn, tn2)
 
 ## different names
 df = DataFrame()
@@ -179,11 +179,11 @@ dats = [Date(2014,1,1):Date(2014,1,5)]
 tn2 = TimeData.Timenum(df, dats)
 names!(tn2.vals, [:c, :d])
 @test !TimeData.equMeta(tn, tn2)
-@test !TimeData.equColMeta(tn, tn2)
+@test TimeData.similarMeta(tn, tn2)
 
 ## different types
 tm = TimeData.Timedata(df, dats)
 @test !TimeData.equMeta(tn, tm)
-@test !TimeData.equColMeta(tn, tm)
+@test !TimeData.similarMeta(tn, tm)
 
 end

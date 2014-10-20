@@ -37,7 +37,7 @@
 macro pres_symmetric_timenum(f, myType)
     esc(quote
         function $(f)(inst::$(myType), inst2::$(myType))
-            if !equColMeta(inst, inst2)
+            if !similarMeta(inst, inst2)
                 error("Timematr variables not similar")
             end
             
@@ -74,7 +74,7 @@ macro pres_symmetric_timematr(f)
     esc(quote
         ## tm1 .+ tm2
         function $(f)(inst::Timematr, inst2::Timematr)
-            if !equColMeta(inst, inst2)
+            if !similarMeta(inst, inst2)
                 error("Timematr variables not similar")
             end
             return Timematr($(f)(core(inst), core(inst2)),

@@ -200,14 +200,26 @@ end
 #####################
 
 function equMeta(td1::AbstractTimedata, td2::AbstractTimedata)
+    ## test if column and index metadata are exactly equal
     isequal(typeof(td1), typeof(td2)) || return false
     isequal(names(td1), names(td2)) || return false
     isequal(td1.idx, td2.idx) || return false
 end
 
-function equColMeta(td1::AbstractTimedata, td2::AbstractTimedata)
+function similarMeta(td1::AbstractTimedata, td2::AbstractTimedata)
+    ## test if either index or column metadata is equal
+    ## subtraction for TimeData objects makes sense if either:
+    ## - variables are equal: variable minus lagged version of
+    ##   variable
+    ## - index values are equal: one variable minus another variable
+
+    ## variables must be of equal type
     isequal(super(typeof(td1)), super(typeof(td2))) || return false
-    isequal(names(td1), names(td2)) || return false
+
+    equDates = isequal(td1.idx, td2.idx)
+    equColMeta = isequal(names(td1), names(td2))
+
+    (equDates | equColMeta) || return false
 end
     
     
