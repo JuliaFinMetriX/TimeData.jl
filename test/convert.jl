@@ -3,7 +3,7 @@ module TestConversions
 using Base.Test
 using DataArrays
 using DataFrames
-
+using TimeSeries
 using TimeData
 ## using TimeData
 
