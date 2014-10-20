@@ -70,5 +70,19 @@ for t = (:Timedata, :Timenum, :Timematr, :Timecop)
             idx = [1:size(vals, 1)]
             tn = $(t)(vals, idx)
         end
+
+        ########################
+        ## index as DataArray ##
+        ########################
+
+        function $(t)(vals::DataFrame, idx::DataVector) 
+            if any(idx.na)
+                error("Index values may not be missing")
+            else
+                return $(t)(vals, asArr(idx, eltype(idx)))
+            end
+        end
+
+
     end
 end

@@ -71,6 +71,9 @@ for t in allTypes
         td = $(t)(valsDf, dats)
         td = $(t)(valsDf, tims)
         td = $(t)(valsDf, idxs)
+
+        ## testing index values as DataArray
+        td = $(t)(valsDf, convert(DataArray, idxs))
     end)
 end
 
@@ -83,7 +86,7 @@ vals = DataFrame(a = [2, 3, 4])
 invalidIdx = @data([1., NA, 3])
 for t in allTypes
     eval(quote
-        @test_throws MethodError $(t)(vals, invalidIdx)
+        @test_throws Exception $(t)(vals, invalidIdx)
     end)
 end
 
