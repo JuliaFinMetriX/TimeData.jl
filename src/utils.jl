@@ -210,7 +210,7 @@ end
 ## applying array function to DataArray
 ##-------------------------------------
 
-function arrFunc2Da(f::Func, da::DataArray)
+function arrFunc2Da(f::Function, da::DataArray)
     ## apply a function to all no-NA elements of DataArray and return
     ## result as DataArray
     ## Note: function must preserve dimensions: n values need to be
@@ -221,7 +221,7 @@ function arrFunc2Da(f::Func, da::DataArray)
     return resDa
 end
 
-function arrFunc2Da(f::Func, da::DataArray, replaceNA = NA)
+function arrFunc2Da(f::Function, da::DataArray, replaceNA = NA)
     ## apply a function to all no-NA elements of DataArray and return
     ## result as array
     ## Note: one must explicitly deal with NAs!
