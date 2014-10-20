@@ -512,6 +512,27 @@ string, while the second argument is the variable to be saved.
 #   writeTimedata("data/logRet2.csv", tm) # uncomment for execution
 #+END_SRC
 
+* Conversion
+
+To DataFrame:
+- td.vals (without index)
+- convert(DataFrame, td)
+
+Get column as DataArray:
+- td.vals[ii]
+- td.vals[:, ii]
+
+As array:
+- asArr
+
+Array with NaN to DataFrame with NA:
+- still missing?
+
+Remove NAs:
+- dropna (DataArray)
+- complete_cases (DataFrame)
+- narm (TimeData)
+
 * Functions and operators
 
 Mathematical operators and functions are only implemented for
