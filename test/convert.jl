@@ -139,4 +139,29 @@ tn = TimeData.Timedata(df, dats1)
 @test_throws ArgumentError TimeData.convert(TimeData.Timenum, tn)
 @test_throws ArgumentError TimeData.convert(TimeData.Timematr, tn)
 
+################
+## TimeArrays ##
+################
+
+## TimeArray to TimeData
+##----------------------
+
+d = [Date(1980,1,1):Date(2015,1,1)];
+t = TimeArray(d,rand(length(d)),["test"])
+tm = convert(AbstractTimedata, t)
+
+@test all(t.values .== asArr(tm, Float64))
+@test names(tm) == [:test]
+@test t.timestamp == idx(tm)
+
+## TimeData to TimeArray
+##----------------------
+
+t2 = convert(TimeArray, tm)
+
+@test all(t2.values .== asArr(tm, Float64))
+@test t2.colnames == ["test"]
+@test t2.timestamp == idx(tm)
+
+
 end

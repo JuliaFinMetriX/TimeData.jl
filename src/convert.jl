@@ -198,3 +198,9 @@ function convert(::Type{AbstractTimedata}, ta::TimeArray)
     end
     td
 end
+
+function convert(::Type{TimeArray}, tn::AbstractTimenum)
+    dats = idx(tn)
+    nams = UTF8String[string(names(tn)[ii]) for ii = 1:size(tn, 2)]
+    return TimeArray(dats, asArr(tn, Float64, NaN), nams)
+end
