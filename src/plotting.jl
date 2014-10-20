@@ -8,7 +8,7 @@ require("Winston")
 ## Gadfly plotting ##
 #####################
 
-function gdfPlot(tn::Timenum)
+function gdfPlot(tn::AbstractTimenum)
     nams = names(tn)
     tn = narowrm(tn)
     vals = asArr(tn, Float64, NaN) # NA to NaN
@@ -24,7 +24,7 @@ end
 ######################
 
 ## no legend, but fast
-function wstPlot(tn::Timenum; title::String = "",
+function wstPlot(tn::AbstractTimenum; title::String = "",
                  xlabel::String = "time",
                  ylabel::String = "value")
     vals = asArr(tn, Float64, NaN) # transform to floating array
@@ -34,6 +34,22 @@ function wstPlot(tn::Timenum; title::String = "",
     Winston.xlabel(xlabel)
     Winston.ylabel(ylabel)
 end
+
+###############
+## histogram ##
+###############
+
+
+function wstHist(x::Vector, nBins::Int = 20; title = "", xlabel = "", ylabel = "")
+    p = Winston.FramedPlot(title = title, xlabel = xlabel, ylabel = ylabel)
+    Winston.add(p, Winston.Histogram(hist(x[!isnan(x)], nBins)...))
+end
+
+function wstHist(da::DataArray, nBins::Int = 20; title = "", xlabel = "", ylabel = "")
+    x = asArr(da, Float64, NaN)
+    wstHist(x, nBins, title = title, xlabel = xlabel, ylabel = ylabel)
+end
+
 
 ## import Gadfly.plot
 ## function plot(tm::Timematr, settings...)
