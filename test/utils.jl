@@ -2,6 +2,7 @@ module TestUtilFuncs
 
 using Base.Test
 using TimeData
+using Dates
 
 println("Running utility function tests")
 

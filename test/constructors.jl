@@ -3,6 +3,7 @@ module TestConstructors
 using Base.Test
 using DataArrays
 using DataFrames
+using Dates
 
 using TimeData
 

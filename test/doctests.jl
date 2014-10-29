@@ -8,7 +8,7 @@ using DataFrames
 println("\n Running documentation tests\n")
 
 using TimeData
-using Base.Dates
+using Dates
 
 fileName = joinpath(Pkg.dir("TimeData"), "data/logRet.csv")
 tm = TimeData.readTimedata(fileName)[1:10, 1:4]

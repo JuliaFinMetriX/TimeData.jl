@@ -5,6 +5,8 @@ using DataArrays
 using DataFrames
 using TimeSeries
 using TimeData
+using Dates
+
 ## using TimeData
 
 println("Running conversion tests")

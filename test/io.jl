@@ -3,6 +3,7 @@ module TestIoFuncs
 using Base.Test
 using DataArrays
 using DataFrames
+using Dates
 
 using TimeData
 
