@@ -603,13 +603,13 @@ dimensions: (3,3)
 
 The idea of iterators and ~map~ is to allow application of a given
 function successively to parts of the data set, such that the
-resulting values will automatically be embed into the metadata again.
-Applying a function iteratively and simply capturing the results in an
-~Array{Any, 1}~ is a quite easy task with comprehensions. However,
-automatically storing the data in a meaningful way encapsulated by its
-respective metadata is the hard part of the task. This, however, can
-be easily achieved through a combination of iterators and ~map~ for a
-quite general set tasks.
+resulting values will automatically be embedded into the metadata
+again. Applying a function iteratively and simply capturing the
+results in an ~Array{Any, 1}~ is a quite easy task with
+comprehensions. However, automatically storing the data in a
+meaningful way encapsulated by its respective metadata is the hard
+part of the task. This, however, can be easily achieved through a
+combination of iterators and ~map~ for a quite general set tasks.
 
 ** Iterators
 For rectangular data, there basically exist three ways of iteratively
@@ -621,8 +621,8 @@ stepping through:
 In addition, functions can either apply to individual values only or
 to values that are embedded with metadata (values plus time
 information and / or variable name). Hence, the package implements six
-different standard iterators, each return different slices of a given
-~TimeData~ object:
+different standard iterators, each returning different slices of a
+given ~TimeData~ object:
 
 |              | value     | value plus metadata |
 |--------------+-----------+---------------------|
