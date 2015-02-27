@@ -533,6 +533,18 @@ Remove NAs:
 - complete_cases (DataFrame)
 - narm (TimeData)
 
+* Data manipulation
+
+The following data manipulation functions could be used from
+~DataFrames~ and are not yet implemented for ~TimeData~ types yet. 
+
+- sort
+- select / groupby
+- stack / melt (wide to long format)
+- unstack / cast (long to wide)
+- merge / join
+- normalization
+
 * Functions and operators
 
 Mathematical operators and functions are only implemented for
