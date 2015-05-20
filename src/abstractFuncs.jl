@@ -73,6 +73,10 @@ function get(x::NAtype, y::Colon)
     return NA
 end
 
+function get{T}(x::Nullable{T}, y::Colon)
+    return x
+end
+
 function get(x::Any, y::Colon)
     return x
 end

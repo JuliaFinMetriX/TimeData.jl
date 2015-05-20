@@ -5,11 +5,14 @@ using Dates
 module TimeData
 
 ## list packages whos namespace is used
+using Compat
+using Docile
 using DataArrays
 using DataFrames
 using Dates
 
 using TimeSeries
+using JFinM_Charts
 ## using Winston
 ## using Gadfly
 
@@ -111,6 +114,7 @@ include("stats.jl")
 include("io.jl")
 include("join.jl")
 ## include("plotting.jl")
+include("jfinm_charts_plotting.jl")
 include("dataframe_extensions.jl")
 include("convert.jl")
 include("utils.jl")
