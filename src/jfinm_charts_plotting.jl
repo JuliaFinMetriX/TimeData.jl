@@ -5,12 +5,17 @@
 ## handle data
 ##------------
 
+import JFinM_Charts.writeData
+
 @doc doc"""
 Write data as .csv file. Hence, intended name needs not be modified.
 """->
-## write data to disk
 function writeData(tm::AbstractTimenum,
-                   chrt::JFinM_Charts.MLineChart,
-                   intendedFname::String)
-    writeTimedata(intendedFname, tm)
+                   chrt::MLineChart,
+                   intendedFname::Array{ASCIIString, 1})
+
+    if length(intendedFname) > 1
+        error("Only a single data path is required.")
+    end
+    writeTimedata(intendedFname[1], tm)
 end

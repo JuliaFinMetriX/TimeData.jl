@@ -93,6 +93,7 @@ Timematr,
 Timenum,
 vcat,
 writedlm,
+writeData,
 writeTimedata
 
 include("constraints.jl")

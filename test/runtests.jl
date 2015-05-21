@@ -23,7 +23,14 @@ tests = ["abstractFuncs.jl",
          "operators.jl"]
 
 
+println("Running TimeData tests:")
+
 for t in tests
+    println("")
+    println("----------------------")
+    println(" * $(t)")
+    println("----------------------")
+    println("")
     include(string(Pkg.dir("TimeData"), "/test/", t))
 end
 
