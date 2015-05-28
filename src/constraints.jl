@@ -65,7 +65,7 @@ end
 ###########################################
 
 function chkUnit(df::DataFrame)
-    vals = array(df)
+    vals = convert(Array, df)
     if (any(vals .< 0) | any(vals .> 1))
         throw(ArgumentError("values must be inside of unit interval"))
     end

@@ -121,7 +121,7 @@ function convert(::Type{AbstractTimedata}, df::DataFrame)
     if any(eltypes(df) .== Date)
         ## take first occuring column
         dateCol = find(eltypes(df) .== Date)[1]
-        idx = array(df[dateCol])
+        idx = convert(Array, df[dateCol])
         delete!(df, [dateCol])
         
     else ## find column that contain dates as String

@@ -22,7 +22,7 @@ end
 
 function core(td::AbstractTimematr)
     ## return Float64
-    return convert(Array{Float64}, array(td.vals))
+    return convert(Array{Float64}, convert(Array, td.vals))
 end
 
 
@@ -77,9 +77,17 @@ function get{T}(x::Nullable{T}, y::Colon)
     return x
 end
 
-function get(x::Any, y::Colon)
+function get(x::Bool, y::Colon)
     return x
 end
+
+function get(x::Real, y::Colon)
+    return x
+end
+
+## function get(x::Any, y::Colon)
+##     return x
+## end
 
 ###################
 ## Timedata size ##
