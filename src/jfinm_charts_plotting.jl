@@ -17,5 +17,6 @@ function writeData(tm::AbstractTimenum,
     if length(intendedFname) > 1
         error("Only a single data path is required.")
     end
+    println("used data name: $(intendedFname[1])")
     writeTimedata(intendedFname[1], tm)
 end
