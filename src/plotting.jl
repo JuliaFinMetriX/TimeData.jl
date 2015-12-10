@@ -2,7 +2,7 @@
 ##-----------------
 
 require("Gadfly")
-require("Winston")
+## require("Winston")
 
 #####################
 ## Gadfly plotting ##
@@ -23,32 +23,32 @@ end
 ## Winston plotting ##
 ######################
 
-## no legend, but fast
-function wstPlot(tn::AbstractTimenum; title::String = "",
-                 xlabel::String = "time",
-                 ylabel::String = "value")
-    vals = asArr(tn, Float64, NaN) # transform to floating array
-    dats = dat2num(idx(tn))
-    Winston.plot(dats, vals)
-    Winston.title(title)
-    Winston.xlabel(xlabel)
-    Winston.ylabel(ylabel)
-end
+## ## no legend, but fast
+## function wstPlot(tn::AbstractTimenum; title::String = "",
+##                  xlabel::String = "time",
+##                  ylabel::String = "value")
+##     vals = asArr(tn, Float64, NaN) # transform to floating array
+##     dats = dat2num(idx(tn))
+##     Winston.plot(dats, vals)
+##     Winston.title(title)
+##     Winston.xlabel(xlabel)
+##     Winston.ylabel(ylabel)
+## end
 
 ###############
 ## histogram ##
 ###############
 
 
-function wstHist(x::Vector, nBins::Int = 20; title = "", xlabel = "", ylabel = "")
-    p = Winston.FramedPlot(title = title, xlabel = xlabel, ylabel = ylabel)
-    Winston.add(p, Winston.Histogram(hist(x[!isnan(x)], nBins)...))
-end
+## function wstHist(x::Vector, nBins::Int = 20; title = "", xlabel = "", ylabel = "")
+##     p = Winston.FramedPlot(title = title, xlabel = xlabel, ylabel = ylabel)
+##     Winston.add(p, Winston.Histogram(hist(x[!isnan(x)], nBins)...))
+## end
 
-function wstHist(da::DataArray, nBins::Int = 20; title = "", xlabel = "", ylabel = "")
-    x = asArr(da, Float64, NaN)
-    wstHist(x, nBins, title = title, xlabel = xlabel, ylabel = ylabel)
-end
+## function wstHist(da::DataArray, nBins::Int = 20; title = "", xlabel = "", ylabel = "")
+##     x = asArr(da, Float64, NaN)
+##     wstHist(x, nBins, title = title, xlabel = xlabel, ylabel = ylabel)
+## end
 
 
 ## import Gadfly.plot
