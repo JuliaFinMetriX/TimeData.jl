@@ -8,7 +8,7 @@ require("Gadfly")
 ## Gadfly plotting ##
 #####################
 
-function gdfPlot(tn::AbstractTimenum)
+function gdfPlot(tn::AbstractTimenum, args...)
     nams = names(tn)
     tn = narowrm(tn)
     vals = asArr(tn, Float64, NaN) # NA to NaN
@@ -16,7 +16,7 @@ function gdfPlot(tn::AbstractTimenum)
     df = composeDataFrame([dats vals], [:Idx; nams])
     stackedData = stack(df, nams)
     Gadfly.plot(stackedData, x="Idx", y="value",
-         color="variable", Gadfly.Geom.line)
+         color="variable", Gadfly.Geom.line, args...)
 end
 
 ######################
